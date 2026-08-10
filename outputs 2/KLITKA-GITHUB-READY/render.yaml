@@ -1,9 +1,0 @@
-services:
-  - type: web
-    name: klitka-online
-    runtime: node
-    plan: free
-    buildCommand: npm test
-    startCommand: npm start
-    healthCheckPath: /healthz
-    autoDeploy: true
