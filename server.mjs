@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 
 export const START_CASH = 5_000_000;
 export const START_PRICE = 2_000_000;
-export const AUCTION_MS = 8_000;
+export const AUCTION_MS = 10_000;
 export const COUNTDOWN_MS = 2_900;
 export const RESULT_MS = 1_300;
 export const MIN_PLAYERS = 2;
@@ -237,6 +237,38 @@ const serveFile = (response, requestPath) => {
     'content-type': contentTypes[extension] || 'application/octet-stream',
     'cache-control': extension === '.html' ? 'no-store' : 'public, max-age=86400'
   });
+  if (extension === '.html') {
+    let html = fs.readFileSync(filePath, 'utf8')
+      .replace(
+        'Prototyp lokalny: tryb demo symuluje pozostałe telefony botami. Pokój sieciowy będzie kolejną warstwą — reguły i ekrany są już wspólne dla obu trybów.',
+        'Mikrokawalerki są łudząco podobne do prawdziwych, ale nie przedstawiają rzeczywistych ofert. Gra ma charakter satyryczny.'
+      )
+      .replace('W prototypie dobierz graczy testowych', 'W trybie demo dobierz graczy testowych')
+      .replace('const AUCTION_MS = 8_000;', 'const AUCTION_MS = 10_000;');
+
+    // Jednoplikowa aktualizacja musi również naprawić starszy index.html,
+    // jeśli klient nie wgrał jeszcze wersji z zabezpieczeniem finału.
+    if (!html.includes('finalFallbackTimer') && !html.includes('network-final-fallback')) {
+      html = html.replace(
+        "if (snapshot.phase === 'result') return showNetworkResult(snapshot);",
+        `if (snapshot.phase === 'result') {
+          showNetworkResult(snapshot);
+          // network-final-fallback: każdy telefon pokaże finał, nawet jeśli zgubi ostatnie SSE.
+          if (snapshot.round + 1 >= snapshot.totalListings) {
+            setTimeout(() => {
+              if (!network.active || state.phase !== 'result') return;
+              $('#result-overlay').hidden = true;
+              showFinal();
+            }, 1_800);
+          }
+          return;
+        }`
+      );
+    }
+
+    response.end(html);
+    return true;
+  }
   fs.createReadStream(filePath).pipe(response);
   return true;
 };
