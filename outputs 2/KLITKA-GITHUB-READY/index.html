@@ -1,0 +1,1540 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+  <meta name="theme-color" content="#183b4d">
+  <meta name="robots" content="noindex,nofollow,noarchive">
+  <title>KLITKA — gra o patodeweloperce</title>
+  <style>
+    :root {
+      --ink: #162d3d;
+      --cream: #f4f6f7;
+      --paper: #ffffff;
+      --red: #ed4c3b;
+      --red-dark: #c93225;
+      --yellow: #ffe48f;
+      --green: #1f9855;
+      --green-dark: #0b6138;
+      --blue: #2367c9;
+      --purple: #7b61a8;
+      --muted: #667782;
+      --line: #d6dfe3;
+      --shadow: 0 8px 24px rgba(28, 55, 70, .12);
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { min-height: 100%; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: #e8edef;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      font-synthesis: none;
+      overscroll-behavior: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    button, input { font: inherit; }
+    button { -webkit-user-select: none; user-select: none; touch-action: manipulation; }
+    [hidden] { display: none !important; }
+
+    .app {
+      width: min(100%, 390px);
+      min-height: 100dvh;
+      margin: 0 auto;
+      background: var(--cream);
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 0 60px rgba(28, 55, 70, .18);
+    }
+
+    .screen {
+      min-height: 100dvh;
+      padding: max(22px, env(safe-area-inset-top)) 18px max(24px, env(safe-area-inset-bottom));
+      display: flex;
+      flex-direction: column;
+      animation: screen-in .28s ease both;
+    }
+
+    @keyframes screen-in {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: none; }
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      font-size: 13px;
+      font-weight: 950;
+      letter-spacing: .13em;
+      text-transform: uppercase;
+    }
+
+    .brand-house {
+      width: 32px;
+      height: 28px;
+      background: linear-gradient(135deg, #35af68 0 55%, #168348 56% 100%);
+      clip-path: polygon(50% 0, 100% 41%, 100% 100%, 0 100%, 0 41%);
+      border-radius: 1px 1px 3px 3px;
+      position: relative;
+      display: inline-block;
+      transform: translateY(2px);
+      filter: drop-shadow(0 2px 1px rgba(5, 47, 27, .35));
+    }
+
+    .brand-house::before {
+      content: "";
+      position: absolute;
+      inset: 5px 16px 3px 4px;
+      background: rgba(255,255,255,.2);
+      clip-path: polygon(55% 0, 100% 34%, 100% 100%, 0 100%, 0 34%);
+    }
+
+    .brand-house::after {
+      content: "";
+      position: absolute;
+      width: 6px;
+      height: 10px;
+      right: 6px;
+      bottom: 3px;
+      background: rgba(7, 55, 30, .45);
+      border-radius: 1px;
+    }
+
+    .hero { padding: 6vh 2px 15px; }
+    .hero h1 {
+      margin: 0;
+      font-size: clamp(62px, 19vw, 102px);
+      line-height: .79;
+      letter-spacing: -.075em;
+      font-weight: 1000;
+      color: #183b4d;
+      transform: none;
+      text-shadow: 3px 3px 0 white;
+    }
+
+    .lead {
+      margin: 0 2px 26px;
+      font-size: 19px;
+      line-height: 1.26;
+      font-weight: 720;
+      max-width: 420px;
+    }
+
+    .panel {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 20px;
+    }
+
+    .label {
+      display: block;
+      margin: 0 0 7px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 950;
+      letter-spacing: .09em;
+      text-transform: uppercase;
+    }
+
+    .text-input {
+      width: 100%;
+      height: 56px;
+      border: 2px solid #9eacb4;
+      border-radius: 10px;
+      background: white;
+      color: var(--ink);
+      padding: 0 15px;
+      outline: 0;
+      font-size: 20px;
+      font-weight: 750;
+    }
+
+    .text-input:focus { border-color: var(--blue); box-shadow: 0 0 0 4px rgba(35,103,201,.14); }
+
+    .primary, .secondary, .danger, .ghost {
+      width: 100%;
+      min-height: 58px;
+      border: 0;
+      border-radius: 10px;
+      padding: 10px 16px;
+      font-weight: 850;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: .025em;
+      transition: transform .08s ease, box-shadow .08s ease, opacity .15s ease, background .15s ease;
+    }
+
+    .primary {
+      background: var(--green);
+      color: white;
+      box-shadow: 0 4px 10px rgba(16, 111, 58, .25);
+    }
+
+    .secondary { background: #e4edf2; color: var(--ink); border: 2px solid #a9bac3; box-shadow: none; }
+    .danger { background: var(--red); color: white; box-shadow: 0 5px 14px rgba(173, 42, 31, .24); }
+    .ghost { min-height: 48px; background: transparent; border: 2px solid #9eacb4; box-shadow: none; }
+    button:active:not(:disabled) { transform: translateY(2px); box-shadow: none; }
+    button:disabled { cursor: default; opacity: .36; filter: grayscale(.35); }
+    .button-stack { display: grid; gap: 10px; margin-top: 15px; }
+    .tiny-note { margin: 16px 4px 0; color: var(--muted); font-size: 12px; line-height: 1.35; font-weight: 700; }
+
+    .identity-block {
+      margin: -20px -20px 0;
+      padding: 19px 20px 20px;
+      background: #eef4f6;
+      border-bottom: 1px solid var(--line);
+      border-radius: var(--radius) var(--radius) 0 0;
+    }
+    .entry-number {
+      display: inline-grid;
+      place-items: center;
+      width: 24px;
+      height: 24px;
+      margin-right: 6px;
+      color: white;
+      background: var(--blue);
+      border-radius: 50%;
+      font-size: 12px;
+      font-weight: 900;
+    }
+    .entry-divider {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 17px 0 5px;
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 850;
+      letter-spacing: .09em;
+      text-transform: uppercase;
+    }
+    .entry-divider::before, .entry-divider::after { content: ""; height: 1px; flex: 1; background: var(--line); }
+    .join-box { margin-top: 10px; padding: 13px; background: #f5f7f8; border: 1px solid var(--line); border-radius: 12px; }
+    .join-row { display: grid; grid-template-columns: 1fr 118px; gap: 8px; }
+    .join-row .text-input { height: 50px; font-size: 17px; }
+    .entry-hint { margin: 7px 0 0; color: var(--muted); font-size: 11px; font-weight: 650; }
+    .entry-error { min-height: 18px; margin: 10px 2px 0; color: var(--red-dark); font-size: 12px; line-height: 1.3; font-weight: 850; }
+    .network-status { margin: -10px 0 17px; text-align: center; color: var(--muted); font-size: 11px; font-weight: 850; }
+    .network-status.connected { color: var(--green-dark); }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      min-height: 42px;
+      margin-bottom: 13px;
+    }
+
+    .round-pill, .room-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 8px 11px;
+      background: white;
+      font-size: 12px;
+      font-weight: 950;
+    }
+
+    .lobby-title { margin: 30px 0 4px; font-size: 34px; line-height: .95; letter-spacing: -.04em; }
+    .code-card {
+      margin: 20px 0;
+      padding: 20px;
+      text-align: center;
+      color: white;
+      background: #183b4d;
+      border: 0;
+      border-radius: 14px;
+      box-shadow: var(--shadow);
+    }
+    .code-card small { display: block; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; }
+    .room-code { display: block; margin-top: 6px; font: 1000 48px/1 ui-monospace, monospace; letter-spacing: .14em; }
+
+    .player-list { display: grid; gap: 9px; margin: 12px 0 18px; }
+    .lobby-player {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: white;
+      font-weight: 900;
+    }
+    .avatar {
+      width: 42px;
+      height: 42px;
+      flex: 0 0 auto;
+      display: grid;
+      place-items: center;
+      border: 2px solid white;
+      box-shadow: 0 0 0 1px #9dabb2;
+      border-radius: 50%;
+      background: var(--avatar, var(--yellow));
+      font-size: 21px;
+      font-weight: 1000;
+    }
+    .host-tag { margin-left: auto; color: var(--muted); font-size: 10px; letter-spacing: .08em; }
+
+    .player-count-control {
+      display: grid;
+      grid-template-columns: 54px 1fr 54px;
+      gap: 8px;
+      align-items: center;
+      margin: 12px 0 17px;
+    }
+    .player-count-control button { height: 50px; border: 1px solid var(--line); border-radius: 10px; background: white; color: var(--ink); font-size: 24px; font-weight: 900; }
+    .player-count-label { text-align: center; font-weight: 950; }
+    .player-count-label strong { display: block; font-size: 24px; }
+
+    .game-screen { padding-left: 12px; padding-right: 12px; background: #f1f4f5; }
+
+    .listing-card {
+      position: relative;
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+
+    .photo-grid {
+      height: clamp(238px, 32vh, 286px);
+      padding: 7px;
+      display: grid;
+      grid-template-columns: 1.55fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      gap: 6px;
+      background: #e2e7e9;
+    }
+
+    .photo {
+      position: relative;
+      min-width: 0;
+      min-height: 0;
+      overflow: hidden;
+      border: 0;
+      border-radius: 7px;
+      background: linear-gradient(135deg, #dad6cc, #a8a398);
+    }
+    .photo:first-child { grid-row: 1 / 3; }
+    .photo-grid.count-1 { grid-template-columns: 1fr; grid-template-rows: 1fr; }
+    .photo-grid.count-2 { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr; }
+    .photo-grid.count-1 .photo:first-child,
+    .photo-grid.count-2 .photo:first-child { grid-row: 1; }
+    .photo img { width: 100%; height: 100%; display: block; object-fit: cover; }
+    .photo.is-broken::after {
+      content: "ZDJĘCIE OFERTY";
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      padding: 8px;
+      color: #5d594f;
+      font-size: 10px;
+      font-weight: 1000;
+      letter-spacing: .08em;
+      background: repeating-linear-gradient(45deg,#e7e3d8 0 10px,#d8d3c7 10px 20px);
+    }
+
+    .listing-facts {
+      display: grid;
+      grid-template-columns: 1fr 1.25fr;
+      border-top: 1px solid var(--line);
+    }
+    .fact { padding: 13px 14px 14px; }
+    .fact + .fact { border-left: 1px solid var(--line); }
+    .fact small { display: block; margin-bottom: 2px; color: var(--muted); font-size: 9px; font-weight: 1000; letter-spacing: .09em; text-transform: uppercase; }
+    .fact strong { font-size: clamp(23px, 7vw, 34px); line-height: .95; letter-spacing: -.045em; white-space: nowrap; }
+    .fact.rent { background: #edf7f1; }
+    .fact.rent strong { color: var(--green-dark); }
+    .fact.rent strong { font-size: clamp(20px, 6.1vw, 30px); }
+
+    .location-strip {
+      position: absolute;
+      top: 14px;
+      left: 14px;
+      max-width: calc(100% - 28px);
+      padding: 7px 10px;
+      border: 0;
+      border-radius: 7px;
+      background: rgba(255,253,245,.94);
+      box-shadow: 0 2px 10px rgba(20,45,60,.16);
+      font-size: 11px;
+      font-weight: 1000;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .ready-panel {
+      margin-top: 13px;
+      padding: 12px;
+      background: white;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+    }
+    .ready-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin-bottom: 9px; }
+    .ready-heading strong { font-size: 15px; }
+    .ready-heading span { color: var(--muted); font-size: 10px; font-weight: 900; }
+    .ready-players { display: flex; flex-wrap: wrap; gap: 7px; }
+    .ready-chip {
+      min-width: 0;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 8px 6px 6px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: white;
+      font-size: 10px;
+      font-weight: 950;
+      transition: background .2s ease, transform .2s ease;
+    }
+    .ready-chip .avatar { width: 24px; height: 24px; border-width: 1px; font-size: 12px; }
+    .ready-chip.ready { background: #a7f2b9; transform: translateY(-1px); }
+    .ready-chip.ready::after { content: "✓"; color: var(--green-dark); font-size: 15px; }
+    .ready-button { margin-top: 10px; }
+    .ready-button.is-ready { background: #b4e9c0; }
+
+    .player-rail {
+      margin: 5px -12px 0;
+      padding: 2px 12px 8px;
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .player-rail::-webkit-scrollbar { display: none; }
+    .player-card {
+      width: 150px;
+      flex: 0 0 150px;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: white;
+    }
+    .player-card.me { background: #eaf2ff; border-color: #9bb9e7; }
+    .player-card-top { display: flex; align-items: center; gap: 6px; min-width: 0; }
+    .player-card .avatar { width: 36px; height: 36px; border-width: 1.5px; font-size: 17px; }
+    .player-card-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; font-weight: 1000; }
+    .player-balance-label { margin-top: 8px; color: var(--muted); font-size: 8px; font-weight: 1000; letter-spacing: .1em; text-transform: uppercase; }
+    .player-balance { margin-top: 2px; color: var(--ink); font-size: 15px; line-height: 1; font-weight: 1000; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .balances-heading { margin: 13px 1px 0; font-size: 10px; font-weight: 1000; letter-spacing: .1em; text-transform: uppercase; }
+    .houses { min-height: 15px; margin: 5px 0 0 2px; display: flex; flex-wrap: wrap; gap: 2px; }
+    .mini-house {
+      position: relative;
+      width: 17px;
+      height: 16px;
+      margin-top: 1px;
+      background: linear-gradient(135deg, #35ad67 0 55%, #137c43 56% 100%);
+      clip-path: polygon(50% 0, 100% 40%, 100% 100%, 0 100%, 0 40%);
+      border-radius: 1px 1px 2px 2px;
+      filter: drop-shadow(0 1px 1px rgba(4,54,27,.35));
+      animation: house-land .4s cubic-bezier(.22,1.5,.5,1) both;
+    }
+    .mini-house::before {
+      content: "";
+      position: absolute;
+      width: 4px;
+      height: 6px;
+      right: 3px;
+      bottom: 2px;
+      background: rgba(7, 55, 30, .42);
+    }
+    @keyframes house-land { from { opacity: 0; transform: translateY(-16px) rotate(-18deg) scale(1.6); } }
+
+    .auction-wrap {
+      margin-top: 13px;
+      padding: 14px 10px 11px;
+      background: #272722;
+      color: white;
+      border: 0;
+      border-radius: 19px;
+      box-shadow: 0 6px 18px rgba(17,31,39,.18);
+    }
+    .auction-label { text-align: center; font-size: 10px; font-weight: 1000; letter-spacing: .13em; color: #aaa99f; }
+    .ticker {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 3px;
+      margin: 7px auto 10px;
+      white-space: nowrap;
+    }
+    .ticker-sep { width: 7px; align-self: flex-end; padding-bottom: 5px; color: #a5a397; font-size: 22px; font-weight: 900; }
+    .ticker-digit {
+      position: relative;
+      width: clamp(30px, 9.4vw, 47px);
+      height: clamp(49px, 14vw, 70px);
+      overflow: hidden;
+      display: grid;
+      place-items: center;
+      color: #f6f2d7;
+      background: linear-gradient(#171713 49.2%, #55544d 49.5% 50.5%, #11110f 50.8%);
+      border: 2px solid #77756b;
+      border-radius: 7px;
+      box-shadow: inset 0 0 12px #000, 0 2px 0 #050505;
+      font: 950 clamp(31px, 9vw, 47px)/1 ui-monospace, "SFMono-Regular", Menlo, monospace;
+      perspective: 110px;
+    }
+    .ticker-digit::before, .ticker-digit::after {
+      content: "";
+      position: absolute;
+      z-index: 2;
+      left: 3px;
+      right: 3px;
+      height: 1px;
+      background: rgba(0,0,0,.9);
+      top: 50%;
+    }
+    .ticker-digit.snap span { animation: split-flip .095s linear; }
+    @keyframes split-flip {
+      0% { transform: translateY(-46%) rotateX(-72deg); filter: brightness(1.9); }
+      55% { transform: translateY(12%) rotateX(20deg); }
+      100% { transform: none; filter: none; }
+    }
+    .ticker-currency { text-align: center; color: #aaa99f; font-size: 10px; font-weight: 1000; letter-spacing: .08em; }
+    .auction-progress { height: 5px; margin: 9px 4px 0; overflow: hidden; border-radius: 99px; background: #0b0b09; }
+    .auction-progress > i { display: block; width: 100%; height: 100%; background: var(--red); transform-origin: left; }
+
+    .buy-button {
+      position: relative;
+      min-height: 76px;
+      margin-top: 11px;
+      background: var(--red);
+      color: white;
+      font-size: 24px;
+      letter-spacing: -.015em;
+      box-shadow: 0 6px 16px rgba(173, 42, 31, .26);
+      overflow: hidden;
+    }
+    .buy-button::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(110deg, transparent 15%, rgba(255,255,255,.25) 48%, transparent 70%);
+      transform: translateX(-120%);
+      animation: sheen 1.45s infinite;
+    }
+    @keyframes sheen { 70%,100% { transform: translateX(130%); } }
+    .buy-help { min-height: 17px; margin-top: 8px; text-align: center; color: var(--muted); font-size: 11px; font-weight: 850; }
+
+    .countdown-overlay, .result-overlay {
+      position: fixed;
+      z-index: 20;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      padding: 25px;
+      background: rgba(23,23,18,.76);
+      backdrop-filter: blur(3px);
+    }
+    .countdown-number {
+      color: var(--yellow);
+      font-size: min(62vw, 280px);
+      line-height: .8;
+      font-weight: 1000;
+      -webkit-text-stroke: 6px var(--ink);
+      text-shadow: 9px 10px 0 var(--red);
+      animation: count-pop .64s ease both;
+    }
+    @keyframes count-pop { from { opacity: 0; transform: scale(1.8) rotate(-7deg); } to { opacity: 1; transform: scale(1) rotate(2deg); } }
+    .result-card {
+      width: min(100%, 420px);
+      padding: 28px 20px;
+      text-align: center;
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      box-shadow: 0 18px 48px rgba(8,27,37,.28);
+      animation: result-pop .32s cubic-bezier(.2,1.3,.5,1) both;
+    }
+    @keyframes result-pop { from { opacity: 0; transform: scale(.7) rotate(-5deg); } }
+    .result-icon { font-size: 64px; line-height: 1; }
+    .result-kicker { margin-top: 10px; color: var(--muted); font-size: 11px; font-weight: 1000; letter-spacing: .12em; text-transform: uppercase; }
+    .result-card h2 { margin: 5px 0 4px; font-size: 33px; line-height: .95; }
+    .result-card p { margin: 8px 0 0; font-weight: 900; }
+
+    .final-screen { background: linear-gradient(180deg, #edf7f1, #f4f6f7 62%); }
+    .final-crown { margin: 6vh 0 8px; text-align: center; font-size: 74px; line-height: 1; transform: rotate(-6deg); }
+    .final-title { margin: 0; text-align: center; font-size: 48px; line-height: .88; letter-spacing: -.055em; }
+    .final-subtitle { margin: 12px auto 22px; text-align: center; font-size: 14px; font-weight: 850; }
+    .standings { display: grid; gap: 10px; margin-bottom: 18px; }
+    .standing {
+      display: grid;
+      grid-template-columns: 36px 42px minmax(0,1fr) auto;
+      align-items: center;
+      gap: 9px;
+      padding: 10px;
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      box-shadow: 0 4px 14px rgba(28,55,70,.08);
+    }
+    .standing:first-child { background: #dff5e7; border-color: #89cda5; }
+    .standing-rank { font-size: 22px; font-weight: 1000; text-align: center; }
+    .standing .avatar { width: 38px; height: 38px; font-size: 18px; }
+    .standing-name { min-width: 0; font-weight: 1000; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .standing-meta { margin-top: 2px; color: var(--muted); font-size: 9px; font-weight: 850; }
+    .standing-income { text-align: right; font-size: 16px; font-weight: 1000; }
+    .standing-income small { display: block; color: var(--muted); font-size: 8px; text-transform: uppercase; }
+
+    .legal-line { margin-top: auto; padding-top: 15px; text-align: center; color: rgba(23,23,18,.57); font-size: 9px; line-height: 1.35; font-weight: 750; }
+
+    @media (max-height: 760px) {
+      .game-screen { padding-top: max(10px, env(safe-area-inset-top)); }
+      .topbar { margin-bottom: 7px; min-height: 34px; }
+      .photo-grid { height: 218px; }
+      .listing-facts .fact { padding: 9px 11px 10px; }
+      .ready-panel { margin-top: 9px; padding: 9px; }
+      .player-rail { margin-top: 4px; }
+      .auction-wrap { margin-top: 8px; padding-top: 8px; }
+      .ticker-digit { height: 45px; }
+      .buy-button { min-height: 60px; margin-top: 8px; }
+    }
+
+    @media (min-width: 650px) {
+      body { padding: 18px 0; }
+      .app, .screen { min-height: 844px; }
+      .app { border: 3px solid var(--ink); border-radius: 34px; }
+      .countdown-overlay, .result-overlay { inset: 18px calc((100vw - 384px)/2); min-height: 808px; border-radius: 31px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app" id="app">
+    <section class="screen" id="intro-screen">
+      <div class="brand"><span class="brand-house" aria-hidden="true"></span> gra mieszkaniowa</div>
+      <div class="hero">
+        <h1>KLITKA</h1>
+      </div>
+      <p class="lead">Kupuj metry, których prawie nie ma. Wygrywa, kto zgarnie największy czynsz.</p>
+
+      <div class="panel">
+        <div class="identity-block">
+          <label class="label" for="name-input"><span class="entry-number">1</span>Podaj imię albo przezwisko</label>
+          <input class="text-input" id="name-input" maxlength="16" autocomplete="nickname" placeholder="np. Rafał">
+          <p class="entry-hint">Ta nazwa będzie widoczna dla pozostałych graczy.</p>
+        </div>
+        <div class="entry-divider"><span>wybierz grę</span></div>
+        <div class="button-stack">
+          <button class="primary" id="demo-button" disabled>Zagraj demo</button>
+          <button class="secondary" id="create-button" disabled>Załóż pokój</button>
+        </div>
+        <div class="join-box">
+          <label class="label" for="join-code">Dołącz do pokoju</label>
+          <div class="join-row">
+            <input class="text-input" id="join-code" maxlength="5" inputmode="text" placeholder="K7M2X">
+            <button class="ghost" id="join-button" disabled>Dołącz</button>
+          </div>
+        </div>
+        <div class="entry-error" id="entry-error" role="alert"></div>
+      </div>
+      <p class="tiny-note">Prototyp lokalny: tryb demo symuluje pozostałe telefony botami. Pokój sieciowy będzie kolejną warstwą — reguły i ekrany są już wspólne dla obu trybów.</p>
+    </section>
+
+    <section class="screen" id="lobby-screen" hidden>
+      <div class="topbar">
+        <div class="brand"><span class="brand-house" aria-hidden="true"></span> KLITKA</div>
+        <button class="ghost" id="leave-lobby" style="width:auto;min-height:38px;padding:6px 10px">Wyjdź</button>
+      </div>
+      <h2 class="lobby-title">Zbierz fliperów.</h2>
+      <p style="margin:5px 0 0;font-weight:750;color:var(--muted)">Podaj kod osobom, które mają wejść do gry.</p>
+      <div class="code-card">
+        <small>Kod pokoju</small>
+        <strong class="room-code" id="room-code">K7M2X</strong>
+      </div>
+      <div class="network-status" id="network-status">Łączenie z pokojem…</div>
+
+      <span class="label">Gracze w pokoju</span>
+      <div class="player-list" id="lobby-player-list"></div>
+
+      <div class="panel" id="test-player-panel" style="padding:14px;margin-bottom:16px">
+        <span class="label">W prototypie dobierz graczy testowych</span>
+        <div class="player-count-control">
+          <button id="players-minus" aria-label="Mniej graczy">−</button>
+          <div class="player-count-label"><strong id="player-count">4</strong><span id="listing-count-label">12 mieszkań</span></div>
+          <button id="players-plus" aria-label="Więcej graczy">+</button>
+        </div>
+        <p class="tiny-note" style="margin:0">Liczba ofert = liczba graczy + 8. Każdy zaczyna z 5 000 000 zł.</p>
+      </div>
+      <button class="primary" id="start-button">Wszyscy są — zaczynamy</button>
+    </section>
+
+    <section class="screen game-screen" id="game-screen" hidden>
+      <div class="topbar">
+        <div class="round-pill"><span id="round-label">MIESZKANIE 1 / 12</span></div>
+        <strong id="my-wallet" hidden>5 000 000 zł</strong>
+      </div>
+
+      <article class="listing-card" id="listing-card">
+        <div class="photo-grid" id="photo-grid"></div>
+        <div class="location-strip" id="location-strip">Lublin · centrum</div>
+        <div class="listing-facts">
+          <div class="fact"><small>Metraż</small><strong id="area-value">9 m²</strong></div>
+          <div class="fact rent"><small>Miesięczny najem</small><strong id="rent-value">1 500 zł</strong></div>
+        </div>
+      </article>
+
+      <section class="ready-panel" id="ready-panel">
+        <div class="ready-heading"><strong>Każdy musi być gotowy</strong><span id="ready-counter">0 / 4</span></div>
+        <div class="ready-players" id="ready-players"></div>
+        <button class="primary ready-button" id="ready-button">Jestem gotowy</button>
+      </section>
+
+      <section class="auction-wrap" id="auction-panel" hidden>
+        <div class="auction-label">CENA SPADA · ZATRZYMAJ JĄ</div>
+        <div class="ticker" id="ticker" aria-live="off"></div>
+        <div class="ticker-currency">ZŁOTYCH</div>
+        <div class="auction-progress"><i id="auction-progress"></i></div>
+      </section>
+      <button class="danger buy-button" id="buy-button" hidden>Kupuję!</button>
+      <div class="buy-help" id="buy-help"></div>
+
+      <div class="balances-heading">Salda graczy</div>
+      <div class="player-rail" id="player-rail"></div>
+      <div class="legal-line">Wnętrza są fikcyjne i zostały wygenerowane syntetycznie na potrzeby gry.</div>
+    </section>
+
+    <section class="screen final-screen" id="final-screen" hidden>
+      <div class="brand"><span class="brand-house" aria-hidden="true"></span> KLITKA</div>
+      <div class="final-crown">👑</div>
+      <h1 class="final-title" id="winner-title">Król Fliperów</h1>
+      <p class="final-subtitle">Wygrywa najwyższy miesięczny przychód. Niewydane miliony właśnie przepadły.</p>
+      <div class="standings" id="standings"></div>
+      <button class="primary" id="again-button">Jeszcze raz</button>
+    </section>
+
+    <div class="countdown-overlay" id="countdown-overlay" hidden><div class="countdown-number" id="countdown-number">3</div></div>
+    <div class="result-overlay" id="result-overlay" hidden>
+      <div class="result-card">
+        <div class="result-icon" id="result-icon">🏠</div>
+        <div class="result-kicker" id="result-kicker">Sprzedane</div>
+        <h2 id="result-title">Rafał bierze klitkę</h2>
+        <p id="result-copy">za 456 250 zł</p>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    (() => {
+      'use strict';
+
+      const START_CASH = 5_000_000;
+      const START_PRICE = 2_000_000;
+      const AUCTION_MS = 8_000;
+      const BOT_NAMES = ['Piotr', 'Wojciech', 'Kuba', 'Aneta', 'Marek'];
+      const AVATAR_COLORS = ['#ffd934', '#78d9ff', '#d69cff', '#ff9c8c', '#8ce09f', '#ffb15c'];
+      const AVATAR_ICONS = ['😎', '🤑', '🤓', '🥸', '😏', '🤠'];
+
+      const syntheticPhoto = number => [
+        `assets/listings/synthetic/${String(number).padStart(2, '0')}.jpg`
+      ];
+
+      // Fikcyjne oferty z całkowicie syntetycznymi wnętrzami.
+      // Każda oferta ma jedno czytelne zdjęcie zoptymalizowane pod telefon.
+      const LISTINGS = [
+        { city: 'Centrum · inwestycyjna okazja', area: 7, rent: 850, photos: syntheticPhoto(1) },
+        { city: 'Śródmieście · standard premium', area: 10, rent: 2350, photos: syntheticPhoto(2) },
+        { city: 'Poddasze · naturalny charakter', area: 18, rent: 1450, photos: syntheticPhoto(3) },
+        { city: 'Centrum · kompaktowy układ', area: 11, rent: 2100, photos: syntheticPhoto(4) },
+        { city: 'Blisko komunikacji · gotowiec', area: 9, rent: 1400, photos: syntheticPhoto(5) },
+        { city: 'Centrum · pełne wyposażenie', area: 12, rent: 1400, photos: syntheticPhoto(6) },
+        { city: 'Top lokalizacja · po remoncie', area: 9, rent: 2200, photos: syntheticPhoto(7) },
+        { city: 'Śródmieście · funkcjonalne 12 m²', area: 12, rent: 1200, photos: syntheticPhoto(8) },
+        { city: 'Centrum · antresola', area: 10, rent: 1500, photos: syntheticPhoto(9) },
+        { city: 'Apartament premium · 11 m²', area: 11, rent: 2350, photos: syntheticPhoto(10) },
+        { city: 'Centrum · gotowe do wejścia', area: 10, rent: 2350, photos: syntheticPhoto(11) },
+        { city: 'Kamienica · loftowy klimat', area: 12, rent: 1750, photos: syntheticPhoto(12) },
+        { city: 'Centrum · niezależne wejście', area: 9, rent: 1600, photos: syntheticPhoto(13) },
+        { city: 'Spokojna okolica · umeblowane', area: 12, rent: 1500, photos: syntheticPhoto(14) },
+        { city: 'Blisko uczelni · duży stół', area: 12, rent: 1200, photos: syntheticPhoto(15) },
+        { city: 'Przyziemie · mikroloft', area: 8, rent: 950, photos: syntheticPhoto(16) },
+        { city: 'Poddasze · wyjątkowy układ', area: 13, rent: 1850, photos: syntheticPhoto(17) },
+        { city: 'Centrum · 6,5 m² możliwości', area: 6.5, rent: 850, photos: syntheticPhoto(18) },
+        { city: 'Projekt architekta · antresola', area: 14, rent: 2400, photos: syntheticPhoto(19) },
+        { city: 'Industrial premium · ostatnie piętro', area: 11, rent: 2500, photos: syntheticPhoto(20) }
+      ];
+
+      const $ = (selector) => document.querySelector(selector);
+      const screens = {
+        intro: $('#intro-screen'),
+        lobby: $('#lobby-screen'),
+        game: $('#game-screen'),
+        final: $('#final-screen')
+      };
+
+      const state = {
+        phase: 'intro',
+        roomCode: '',
+        playerCount: 4,
+        players: [],
+        listings: [],
+        listingIndex: 0,
+        ready: new Set(),
+        botReadyTimers: [],
+        auctionStart: 0,
+        auctionFrame: 0,
+        botTargets: [],
+        settled: false,
+        demo: true,
+        networkListing: null,
+        totalListings: 0
+      };
+
+      const network = {
+        active: false,
+        roomCode: '',
+        playerId: '',
+        token: '',
+        eventSource: null,
+        serverOffset: 0,
+        lastRevision: -1,
+        lastPhase: '',
+        lastResultKey: '',
+        purchasePending: false,
+        countdownFrame: 0
+      };
+
+      const money = value => Math.max(0, Math.round(value)).toLocaleString('pl-PL') + ' zł';
+      const shuffle = input => {
+        const a = input.slice();
+        for (let i = a.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [a[i], a[j]] = [a[j], a[i]];
+        }
+        return a;
+      };
+
+      function entryError(message = '') {
+        $('#entry-error').textContent = message;
+      }
+
+      async function api(path, body) {
+        const response = await fetch(path, {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify(body)
+        });
+        const result = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(result.error || 'Nie udało się połączyć z grą.');
+        return result;
+      }
+
+      function closeNetwork() {
+        network.eventSource?.close();
+        network.eventSource = null;
+        network.active = false;
+        network.lastRevision = -1;
+        network.lastPhase = '';
+        network.lastResultKey = '';
+        network.purchasePending = false;
+        cancelAnimationFrame(network.countdownFrame);
+        if (typeof sessionStorage !== 'undefined') sessionStorage.removeItem('klitka-session');
+      }
+
+      function saveNetworkSession() {
+        if (typeof sessionStorage === 'undefined') return;
+        sessionStorage.setItem('klitka-session', JSON.stringify({
+          roomCode: network.roomCode,
+          playerId: network.playerId,
+          token: network.token
+        }));
+      }
+
+      function connectNetwork(session) {
+        closeNetwork();
+        network.active = true;
+        network.roomCode = session.roomCode;
+        network.playerId = session.playerId;
+        network.token = session.token;
+        saveNetworkSession();
+        state.roomCode = network.roomCode;
+        state.demo = false;
+        $('#test-player-panel').hidden = true;
+        $('#network-status').textContent = 'Łączenie z pokojem…';
+        $('#network-status').classList.remove('connected');
+        const query = new URLSearchParams({ playerId: network.playerId, token: network.token });
+        network.eventSource = new EventSource(`/api/rooms/${network.roomCode}/stream?${query}`);
+        network.eventSource.addEventListener('state', event => {
+          const snapshot = JSON.parse(event.data);
+          network.serverOffset = snapshot.serverNow - Date.now();
+          if (snapshot.revision < network.lastRevision) return;
+          network.lastRevision = snapshot.revision;
+          $('#network-status').textContent = 'Połączono · wszyscy widzą tę samą grę';
+          $('#network-status').classList.add('connected');
+          applyNetworkSnapshot(snapshot);
+        });
+        network.eventSource.onerror = () => {
+          $('#network-status').textContent = 'Przywracam połączenie…';
+          $('#network-status').classList.remove('connected');
+        };
+      }
+
+      async function createNetworkRoom() {
+        entryError();
+        $('#create-button').disabled = true;
+        try {
+          const session = await api('/api/rooms', { name: cleanName() });
+          connectNetwork(session);
+          showScreen('lobby');
+        } catch (error) {
+          entryError(location.protocol === 'file:'
+            ? 'Tryb online działa po uruchomieniu wersji serwerowej, nie z pliku na dysku.'
+            : error.message);
+          updateEntryState();
+        }
+      }
+
+      async function joinNetworkRoom() {
+        entryError();
+        const code = $('#join-code').value.trim().toUpperCase();
+        if (code.length !== 5) return;
+        $('#join-button').disabled = true;
+        try {
+          const session = await api(`/api/rooms/${code}/join`, { name: cleanName() });
+          connectNetwork(session);
+          showScreen('lobby');
+        } catch (error) {
+          entryError(location.protocol === 'file:'
+            ? 'Tryb online działa po uruchomieniu wersji serwerowej, nie z pliku na dysku.'
+            : error.message);
+          updateEntryState();
+        }
+      }
+
+      async function networkAction(action) {
+        return api(`/api/rooms/${network.roomCode}/${action}`, {
+          playerId: network.playerId,
+          token: network.token
+        });
+      }
+
+      function showScreen(name) {
+        Object.entries(screens).forEach(([key, el]) => { el.hidden = key !== name; });
+        state.phase = name;
+        window.scrollTo(0, 0);
+      }
+
+      function cleanName() {
+        const value = $('#name-input').value.trim().replace(/[<>]/g, '').slice(0, 16);
+        return value;
+      }
+
+      function updateEntryState() {
+        const hasName = cleanName().length > 0;
+        const hasRoomCode = $('#join-code').value.trim().length === 5;
+        $('#demo-button').disabled = !hasName;
+        $('#create-button').disabled = !hasName;
+        $('#join-button').disabled = !hasName || !hasRoomCode;
+      }
+
+      function roomCode() {
+        const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+        return Array.from({ length: 5 }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+      }
+
+      function buildPlayers(count) {
+        const names = [cleanName(), ...BOT_NAMES];
+        return Array.from({ length: count }, (_, index) => ({
+          id: 'p' + index,
+          name: names[index],
+          isHuman: index === 0,
+          cash: START_CASH,
+          properties: [],
+          avatar: AVATAR_ICONS[index],
+          color: AVATAR_COLORS[index]
+        }));
+      }
+
+      function avatarHtml(player) {
+        return `<span class="avatar" style="--avatar:${player.color}">${player.avatar}</span>`;
+      }
+
+      function renderLobby() {
+        $('#room-code').textContent = state.roomCode;
+        $('#player-count').textContent = state.playerCount;
+        $('#listing-count-label').textContent = `${state.playerCount + 8} mieszkań`;
+        $('#players-minus').disabled = state.playerCount <= 2;
+        $('#players-plus').disabled = state.playerCount >= 6;
+        state.players = buildPlayers(state.playerCount);
+        $('#lobby-player-list').innerHTML = state.players.map((player, index) => `
+          <div class="lobby-player">
+            ${avatarHtml(player)}
+            <span>${player.name}</span>
+            <span class="host-tag">${index === 0 ? 'HOST' : 'GRACZ TESTOWY'}</span>
+          </div>`).join('');
+      }
+
+      function enterLobby(isDemo) {
+        state.demo = isDemo;
+        state.roomCode = roomCode();
+        state.playerCount = isDemo ? 4 : 2;
+        renderLobby();
+        showScreen('lobby');
+      }
+
+      function startGame() {
+        clearAsync();
+        state.networkListing = null;
+        state.totalListings = 0;
+        state.players = buildPlayers(state.playerCount);
+        state.listings = shuffle(LISTINGS).slice(0, state.playerCount + 8);
+        state.listingIndex = 0;
+        state.settled = false;
+        showScreen('game');
+        buildTicker();
+        showReadyStage();
+      }
+
+      function currentListing() {
+        return network.active ? state.networkListing : state.listings[state.listingIndex];
+      }
+
+      function renderListing() {
+        const listing = currentListing();
+        const totalListings = network.active ? state.totalListings : state.listings.length;
+        $('#round-label').textContent = `MIESZKANIE ${state.listingIndex + 1} / ${totalListings}`;
+        $('#area-value').textContent = listing.area.toLocaleString('pl-PL') + ' m²';
+        $('#rent-value').textContent = money(listing.rent);
+        $('#location-strip').textContent = listing.city;
+        const photos = listing.photos;
+        const photoGrid = $('#photo-grid');
+        photoGrid.className = `photo-grid count-${Math.min(photos.length, 3)}`;
+        photoGrid.innerHTML = photos.map((url, index) => `
+          <div class="photo"><img src="${url}" alt="Zdjęcie ${index + 1} oferty" loading="eager" onerror="this.parentElement.classList.add('is-broken');this.remove()"></div>
+        `).join('');
+      }
+
+      function renderPlayerRail() {
+        const human = state.players.find(player => player.isHuman) || state.players[0];
+        $('#my-wallet').textContent = money(human.cash);
+        $('#player-rail').innerHTML = state.players.map(player => `
+            <div class="player-card ${player.isHuman ? 'me' : ''}">
+              <div class="player-card-top">${avatarHtml(player)}<span class="player-card-name">${player.name}</span></div>
+              <div class="houses">${player.properties.map(() => '<i class="mini-house"></i>').join('')}</div>
+              <div class="player-balance-label">Saldo</div>
+              <div class="player-balance">${money(player.cash)}</div>
+          </div>
+        `).join('');
+      }
+
+      function renderReady() {
+        $('#ready-counter').textContent = `${state.ready.size} / ${state.players.length}`;
+        $('#ready-players').innerHTML = state.players.map(player => `
+          <span class="ready-chip ${state.ready.has(player.id) ? 'ready' : ''}">${avatarHtml(player)}<span>${player.name}</span></span>
+        `).join('');
+        const human = state.players.find(player => player.isHuman) || state.players[0];
+        const humanReady = state.ready.has(human.id);
+        $('#ready-button').disabled = humanReady;
+        $('#ready-button').classList.toggle('is-ready', humanReady);
+        $('#ready-button').textContent = humanReady ? 'Czekamy na resztę…' : 'Jestem gotowy';
+      }
+
+      function networkPlayers(snapshot) {
+        return snapshot.players.map((player, index) => ({
+          ...player,
+          isHuman: player.id === snapshot.selfId,
+          avatar: AVATAR_ICONS[player.avatarIndex ?? index],
+          color: AVATAR_COLORS[player.avatarIndex ?? index],
+          properties: player.properties.map(property => ({
+            ...LISTINGS[property.listingId],
+            ...property
+          }))
+        }));
+      }
+
+      function renderNetworkLobby(snapshot) {
+        state.players = networkPlayers(snapshot);
+        state.playerCount = state.players.length;
+        state.roomCode = snapshot.roomCode;
+        $('#room-code').textContent = snapshot.roomCode;
+        $('#test-player-panel').hidden = true;
+        $('#lobby-player-list').innerHTML = state.players.map(player => `
+          <div class="lobby-player">
+            ${avatarHtml(player)}
+            <span>${player.name}</span>
+            <span class="host-tag">${player.id === snapshot.hostId ? 'HOST' : (player.isHuman ? 'TY' : 'GRACZ')}</span>
+          </div>`).join('');
+        const isHost = snapshot.selfId === snapshot.hostId;
+        $('#start-button').disabled = !isHost || state.players.length < 2;
+        $('#start-button').textContent = !isHost
+          ? 'Czekamy, aż host zacznie'
+          : state.players.length < 2
+            ? 'Czekamy na drugiego gracza…'
+            : 'Wszyscy są — zaczynamy';
+        if (screens.lobby.hidden) showScreen('lobby');
+      }
+
+      function prepareNetworkGame(snapshot) {
+        state.players = networkPlayers(snapshot);
+        state.playerCount = state.players.length;
+        state.ready = new Set(snapshot.readyIds);
+        state.listingIndex = snapshot.round;
+        state.totalListings = snapshot.totalListings;
+        state.networkListing = LISTINGS[snapshot.listingId];
+        if (screens.game.hidden) {
+          showScreen('game');
+          buildTicker();
+        }
+        renderListing();
+        renderPlayerRail();
+      }
+
+      function showNetworkReady(snapshot) {
+        prepareNetworkGame(snapshot);
+        state.phase = 'ready';
+        cancelAnimationFrame(state.auctionFrame);
+        cancelAnimationFrame(network.countdownFrame);
+        $('#countdown-overlay').hidden = true;
+        $('#result-overlay').hidden = true;
+        $('#ready-panel').hidden = false;
+        $('#auction-panel').hidden = true;
+        $('#buy-button').hidden = true;
+        $('#buy-help').textContent = 'Obejrzyj klitkę. Aukcja ruszy dopiero, gdy wszyscy będą gotowi.';
+        renderReady();
+      }
+
+      function showNetworkCountdown(snapshot) {
+        prepareNetworkGame(snapshot);
+        state.phase = 'countdown';
+        $('#ready-button').disabled = true;
+        $('#countdown-overlay').hidden = false;
+        cancelAnimationFrame(network.countdownFrame);
+        let previousValue = '';
+        const tick = () => {
+          if (!network.active || state.phase !== 'countdown') return;
+          const remaining = snapshot.auctionStartsAt - (Date.now() + network.serverOffset);
+          const value = remaining > 2_100 ? '3' : remaining > 1_400 ? '2' : remaining > 700 ? '1' : 'START';
+          const number = $('#countdown-number');
+          if (value !== previousValue) {
+            previousValue = value;
+            number.textContent = value;
+            number.style.fontSize = value === 'START' ? 'min(25vw,120px)' : '';
+            number.style.animation = 'none';
+            void number.offsetHeight;
+            number.style.animation = '';
+          }
+          if (remaining > -350) network.countdownFrame = requestAnimationFrame(tick);
+        };
+        tick();
+      }
+
+      function networkAuctionLoop() {
+        if (!network.active || state.phase !== 'auction') return;
+        const now = Date.now() + network.serverOffset;
+        const elapsed = Math.max(0, now - network.auctionStartsAt);
+        const progress = Math.min(1, elapsed / AUCTION_MS);
+        const price = Math.max(0, Math.floor(START_PRICE * (1 - progress)));
+        renderTicker(price);
+        $('#auction-progress').style.transform = `scaleX(${1 - progress})`;
+        const human = state.players.find(player => player.isHuman);
+        const affordable = price > 0 && price <= human.cash && !network.purchasePending;
+        $('#buy-button').disabled = !affordable;
+        $('#buy-help').textContent = price > human.cash
+          ? 'Cena musi spaść poniżej Twojego salda.'
+          : network.purchasePending
+            ? 'Sprawdzamy, kto był pierwszy…'
+            : 'Jedno dotknięcie kupuje po cenie z tej milisekundy.';
+        if (progress < 1) state.auctionFrame = requestAnimationFrame(networkAuctionLoop);
+      }
+
+      function showNetworkAuction(snapshot) {
+        prepareNetworkGame(snapshot);
+        state.phase = 'auction';
+        network.auctionStartsAt = snapshot.auctionStartsAt;
+        network.purchasePending = false;
+        cancelAnimationFrame(network.countdownFrame);
+        $('#countdown-overlay').hidden = true;
+        $('#ready-panel').hidden = true;
+        $('#auction-panel').hidden = false;
+        $('#buy-button').hidden = false;
+        $('#buy-button').disabled = false;
+        renderTicker(START_PRICE);
+        $('#auction-progress').style.transform = 'scaleX(1)';
+        cancelAnimationFrame(state.auctionFrame);
+        state.auctionFrame = requestAnimationFrame(networkAuctionLoop);
+      }
+
+      function showNetworkResult(snapshot) {
+        prepareNetworkGame(snapshot);
+        state.phase = 'result';
+        cancelAnimationFrame(state.auctionFrame);
+        cancelAnimationFrame(network.countdownFrame);
+        $('#countdown-overlay').hidden = true;
+        $('#ready-panel').hidden = true;
+        $('#auction-panel').hidden = false;
+        $('#buy-button').hidden = true;
+        renderTicker(snapshot.result?.price || 0);
+        const key = `${snapshot.round}:${snapshot.result?.type}:${snapshot.result?.playerId || ''}`;
+        if (network.lastResultKey === key) return;
+        network.lastResultKey = key;
+        if (snapshot.result?.type === 'sold') {
+          const winner = state.players.find(player => player.id === snapshot.result.playerId);
+          $('#result-icon').textContent = '🏠';
+          $('#result-kicker').textContent = 'Sprzedane';
+          $('#result-title').textContent = `${winner.name} bierze klitkę`;
+          $('#result-copy').textContent = `za ${money(snapshot.result.price)}`;
+        } else {
+          $('#result-icon').textContent = '🕳️';
+          $('#result-kicker').textContent = 'Cena spadła do zera';
+          $('#result-title').textContent = 'Klitka przepada';
+          $('#result-copy').textContent = 'Nikt nie odważył się jej kupić.';
+        }
+        $('#result-overlay').hidden = false;
+      }
+
+      function applyNetworkSnapshot(snapshot) {
+        const phaseChanged = snapshot.phase !== network.lastPhase;
+        network.lastPhase = snapshot.phase;
+        if (snapshot.phase === 'lobby') return renderNetworkLobby(snapshot);
+        if (snapshot.phase === 'ready') return showNetworkReady(snapshot);
+        if (snapshot.phase === 'countdown') {
+          if (phaseChanged) showNetworkCountdown(snapshot);
+          else {
+            state.players = networkPlayers(snapshot);
+            state.ready = new Set(snapshot.readyIds);
+            renderReady();
+          }
+          return;
+        }
+        if (snapshot.phase === 'auction') {
+          if (phaseChanged) showNetworkAuction(snapshot);
+          else {
+            state.players = networkPlayers(snapshot);
+            renderPlayerRail();
+          }
+          return;
+        }
+        if (snapshot.phase === 'result') return showNetworkResult(snapshot);
+        if (snapshot.phase === 'final') {
+          state.players = networkPlayers(snapshot);
+          $('#countdown-overlay').hidden = true;
+          $('#result-overlay').hidden = true;
+          showFinal();
+        }
+      }
+
+      function showReadyStage() {
+        state.phase = 'ready';
+        state.ready = new Set();
+        state.settled = false;
+        cancelAnimationFrame(state.auctionFrame);
+        state.botReadyTimers.forEach(clearTimeout);
+        state.botReadyTimers = [];
+        $('#ready-panel').hidden = false;
+        $('#auction-panel').hidden = true;
+        $('#buy-button').hidden = true;
+        $('#buy-help').textContent = 'Obejrzyj klitkę. Aukcja ruszy dopiero, gdy wszyscy będą gotowi.';
+        renderListing();
+        renderPlayerRail();
+        renderReady();
+
+        state.players.filter(player => !player.isHuman).forEach((player, index) => {
+          const delay = 650 + index * 330 + Math.random() * 900;
+          state.botReadyTimers.push(setTimeout(() => setReady(player.id), delay));
+        });
+      }
+
+      function setReady(playerId) {
+        if (state.phase !== 'ready' || state.ready.has(playerId)) return;
+        state.ready.add(playerId);
+        renderReady();
+        if (state.ready.size === state.players.length) beginCountdown();
+      }
+
+      function beginCountdown() {
+        state.phase = 'countdown';
+        $('#ready-button').disabled = true;
+        const overlay = $('#countdown-overlay');
+        const number = $('#countdown-number');
+        overlay.hidden = false;
+        const values = ['3', '2', '1', 'START'];
+        let index = 0;
+        const tick = () => {
+          number.textContent = values[index];
+          number.style.fontSize = values[index] === 'START' ? 'min(25vw,120px)' : '';
+          number.style.animation = 'none';
+          void number.offsetHeight;
+          number.style.animation = '';
+          index += 1;
+          if (index < values.length) {
+            setTimeout(tick, 620);
+          } else {
+            setTimeout(() => {
+              overlay.hidden = true;
+              number.style.fontSize = '';
+              beginAuction();
+            }, 430);
+          }
+        };
+        tick();
+      }
+
+      function buildTicker() {
+        const ticker = $('#ticker');
+        ticker.innerHTML = '';
+        for (let i = 0; i < 7; i++) {
+          if (i === 1 || i === 4) {
+            const sep = document.createElement('span');
+            sep.className = 'ticker-sep';
+            sep.textContent = ' '; // spacing between thousands groups
+            ticker.appendChild(sep);
+          }
+          const cell = document.createElement('span');
+          cell.className = 'ticker-digit';
+          cell.dataset.value = '-';
+          cell.innerHTML = '<span>0</span>';
+          ticker.appendChild(cell);
+        }
+        renderTicker(START_PRICE);
+      }
+
+      function renderTicker(price) {
+        const digits = String(Math.max(0, Math.floor(price))).padStart(7, '0');
+        const cells = [...document.querySelectorAll('.ticker-digit')];
+        cells.forEach((cell, index) => {
+          const next = digits[index];
+          if (cell.dataset.value === next) return;
+          cell.dataset.value = next;
+          cell.querySelector('span').textContent = next;
+          cell.classList.remove('snap');
+          void cell.offsetHeight;
+          cell.classList.add('snap');
+        });
+      }
+
+      function priceAt(timestamp) {
+        if (!state.auctionStart) return START_PRICE;
+        const elapsed = Math.max(0, timestamp - state.auctionStart);
+        return Math.max(0, Math.floor(START_PRICE * (1 - elapsed / AUCTION_MS)));
+      }
+
+      function makeBotTargets() {
+        const listing = currentListing();
+        const remaining = state.listings.length - state.listingIndex;
+        return state.players.filter(player => !player.isHuman).map((player, index) => {
+          const marketValue = listing.rent * 12 * (15.5 + Math.random() * 10.5);
+          const scarcity = remaining <= 4 ? 1.22 : remaining <= 7 ? 1.09 : .94;
+          const portfolioDrag = Math.max(.72, 1 - player.properties.length * .055);
+          const personality = [.92, 1.08, .8, 1.17, .98][index] || 1;
+          const imperfectRead = .84 + Math.random() * .34;
+          const target = Math.round(marketValue * scarcity * portfolioDrag * personality * imperfectRead);
+          return { playerId: player.id, target: Math.min(player.cash, Math.max(115_000, target)) };
+        });
+      }
+
+      function beginAuction() {
+        state.phase = 'auction';
+        state.settled = false;
+        state.botTargets = makeBotTargets();
+        state.auctionStart = performance.now();
+        $('#ready-panel').hidden = true;
+        $('#auction-panel').hidden = false;
+        $('#buy-button').hidden = false;
+        $('#buy-button').disabled = false;
+        $('#buy-help').textContent = 'Jedno dotknięcie kupuje po cenie z tej milisekundy.';
+        renderTicker(START_PRICE);
+        $('#auction-progress').style.transform = 'scaleX(1)';
+        state.auctionFrame = requestAnimationFrame(auctionLoop);
+      }
+
+      function auctionLoop(now) {
+        if (state.phase !== 'auction' || state.settled) return;
+        const elapsed = now - state.auctionStart;
+        const progress = Math.min(1, elapsed / AUCTION_MS);
+        const price = priceAt(now);
+        renderTicker(price);
+        $('#auction-progress').style.transform = `scaleX(${1 - progress})`;
+
+        const human = state.players[0];
+        const affordable = price <= human.cash;
+        $('#buy-button').disabled = !affordable;
+        if (!affordable) $('#buy-help').textContent = 'Cena musi spaść poniżej Twojego salda.';
+        else if ($('#buy-help').textContent.startsWith('Cena musi')) $('#buy-help').textContent = 'Jedno dotknięcie kupuje po cenie z tej milisekundy.';
+
+        const willingBots = state.botTargets
+          .filter(bot => {
+            const player = state.players.find(item => item.id === bot.playerId);
+            return player && price <= bot.target && price <= player.cash;
+          })
+          .sort((a, b) => b.target - a.target);
+
+        if (willingBots.length) {
+          settleSale(willingBots[0].playerId, price);
+          return;
+        }
+
+        if (progress >= 1 || price <= 0) {
+          settleUnsold();
+          return;
+        }
+        state.auctionFrame = requestAnimationFrame(auctionLoop);
+      }
+
+      function buyNow(event) {
+        event.preventDefault();
+        if (network.active) {
+          if (state.phase !== 'auction' || network.purchasePending) return;
+          network.purchasePending = true;
+          $('#buy-button').disabled = true;
+          $('#buy-help').textContent = 'Sprawdzamy, kto był pierwszy…';
+          networkAction('buy').catch(error => {
+            $('#buy-help').textContent = error.message;
+          }).finally(() => {
+            network.purchasePending = false;
+          });
+          return;
+        }
+        if (state.phase !== 'auction' || state.settled) return;
+        const price = priceAt(performance.now());
+        if (price <= 0 || price > state.players[0].cash) return;
+        settleSale('p0', price);
+      }
+
+      function settleSale(playerId, price) {
+        if (state.settled) return;
+        state.settled = true;
+        state.phase = 'result';
+        cancelAnimationFrame(state.auctionFrame);
+        const player = state.players.find(item => item.id === playerId);
+        const paid = Math.min(player.cash, Math.max(1, Math.floor(price)));
+        player.cash -= paid;
+        player.properties.push({ ...currentListing(), paid });
+        renderTicker(paid);
+        renderPlayerRail();
+        $('#buy-button').disabled = true;
+
+        $('#result-icon').textContent = '🏠';
+        $('#result-kicker').textContent = 'Sprzedane';
+        $('#result-title').textContent = `${player.name} bierze klitkę`;
+        $('#result-copy').textContent = `za ${money(paid)}`;
+        showResultAndAdvance(1150);
+      }
+
+      function settleUnsold() {
+        if (state.settled) return;
+        state.settled = true;
+        state.phase = 'result';
+        cancelAnimationFrame(state.auctionFrame);
+        renderTicker(0);
+        $('#buy-button').disabled = true;
+        $('#result-icon').textContent = '🕳️';
+        $('#result-kicker').textContent = 'Cena spadła do zera';
+        $('#result-title').textContent = 'Klitka przepada';
+        $('#result-copy').textContent = 'Nikt nie odważył się jej kupić.';
+        showResultAndAdvance(1150);
+      }
+
+      function showResultAndAdvance(delay) {
+        $('#result-overlay').hidden = false;
+        setTimeout(() => {
+          $('#result-overlay').hidden = true;
+          state.listingIndex += 1;
+          if (state.listingIndex >= state.listings.length) showFinal();
+          else showReadyStage();
+        }, delay);
+      }
+
+      function showFinal() {
+        state.phase = 'final';
+        const ranked = state.players.slice().sort((a, b) => {
+          const incomeA = a.properties.reduce((sum, property) => sum + property.rent, 0);
+          const incomeB = b.properties.reduce((sum, property) => sum + property.rent, 0);
+          return incomeB - incomeA || b.properties.length - a.properties.length;
+        });
+        const winner = ranked[0];
+        $('#winner-title').textContent = `Król Fliperów – ${winner.name}`;
+        $('#standings').innerHTML = ranked.map((player, index) => {
+          const income = player.properties.reduce((sum, property) => sum + property.rent, 0);
+          return `
+            <div class="standing">
+              <div class="standing-rank">${index + 1}</div>
+              ${avatarHtml(player)}
+              <div><div class="standing-name">${player.name}</div><div class="standing-meta">${player.properties.length} ${player.properties.length === 1 ? 'klitka' : 'klitek'} · zostało ${money(player.cash)}</div></div>
+              <div class="standing-income">${money(income)}<small>co miesiąc</small></div>
+            </div>`;
+        }).join('');
+        showScreen('final');
+      }
+
+      function clearAsync() {
+        cancelAnimationFrame(state.auctionFrame);
+        state.botReadyTimers.forEach(clearTimeout);
+        state.botReadyTimers = [];
+        $('#countdown-overlay').hidden = true;
+        $('#result-overlay').hidden = true;
+      }
+
+      $('#demo-button').addEventListener('click', () => {
+        closeNetwork();
+        state.playerCount = 4;
+        state.roomCode = roomCode();
+        state.players = buildPlayers(4);
+        startGame();
+      });
+      $('#create-button').addEventListener('click', createNetworkRoom);
+      $('#join-button').addEventListener('click', joinNetworkRoom);
+      $('#name-input').addEventListener('input', updateEntryState);
+      $('#join-code').addEventListener('input', event => {
+        event.target.value = event.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+        updateEntryState();
+      });
+      $('#players-minus').addEventListener('click', () => { state.playerCount = Math.max(2, state.playerCount - 1); renderLobby(); });
+      $('#players-plus').addEventListener('click', () => { state.playerCount = Math.min(6, state.playerCount + 1); renderLobby(); });
+      $('#start-button').addEventListener('click', () => {
+        if (network.active) networkAction('start').catch(error => { $('#network-status').textContent = error.message; });
+        else startGame();
+      });
+      $('#leave-lobby').addEventListener('click', () => { clearAsync(); closeNetwork(); showScreen('intro'); updateEntryState(); });
+      $('#ready-button').addEventListener('click', () => {
+        if (network.active) networkAction('ready').catch(error => { $('#buy-help').textContent = error.message; });
+        else setReady('p0');
+      });
+      $('#buy-button').addEventListener('pointerdown', buyNow, { passive: false });
+      $('#again-button').addEventListener('click', () => { clearAsync(); closeNetwork(); showScreen('intro'); updateEntryState(); });
+
+      updateEntryState();
+
+      if (typeof sessionStorage !== 'undefined' && typeof EventSource !== 'undefined') {
+        try {
+          const savedSession = JSON.parse(sessionStorage.getItem('klitka-session'));
+          if (savedSession?.roomCode && savedSession?.playerId && savedSession?.token) connectNetwork(savedSession);
+        } catch {}
+      }
+
+      // Niewielkie API diagnostyczne pozwala automatycznie testować cały flow bez klikania.
+      window.__KLITKA__ = {
+        state,
+        constants: { START_CASH, START_PRICE, AUCTION_MS },
+        listings: LISTINGS,
+        startDemo(count = 4) {
+          state.playerCount = Math.max(2, Math.min(6, count));
+          startGame();
+        },
+        ready() { setReady('p0'); },
+        buy() { buyNow({ preventDefault() {} }); },
+        beginAuction,
+        settleSale,
+        priceAt,
+        settleUnsold,
+        showFinal
+      };
+    })();
+  </script>
+</body>
+</html>
