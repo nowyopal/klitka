@@ -1289,15 +1289,15 @@
         { city: 'Bez zdjęć · aparat nie mieści się w środku', area: 7, rent: 2275, photos: [] },
         { city: 'Bez zdjęć · klucze są u sąsiada', area: 10, rent: 2400, photos: [] },
         { city: 'Bez zdjęć · oglądanie po zakupie', area: 12, rent: 2750, photos: [] },
-        { city: 'Kawalerka z oddzielną sypialnią', area: 24, rent: 3100, photos: syntheticPhoto(32), divisible: true },
-        { city: 'Mieszkanie z balkonem', area: 24, rent: 3200, photos: syntheticPhoto(33), divisible: true },
-        { city: 'Przestronne przed remontem', area: 24, rent: 3300, photos: syntheticPhoto(34), divisible: true },
-        { city: 'Jasne mieszkanie z osobną kuchnią', area: 24, rent: 3400, photos: syntheticPhoto(35), divisible: true },
-        { city: 'Klasyczna kawalerka w kamienicy', area: 24, rent: 3500, photos: syntheticPhoto(36), divisible: true },
-        { city: 'Nowoczesne, deweloperskie', area: 24, rent: 3600, photos: syntheticPhoto(37), divisible: true },
-        { city: 'Z antresolą do zaadaptowania', area: 24, rent: 3700, photos: syntheticPhoto(38), divisible: true },
-        { city: 'Przytulne, dwupokojowe', area: 24, rent: 3800, photos: syntheticPhoto(39), divisible: true },
-        { city: 'Reprezentacyjne, gotowe do wejścia', area: 24, rent: 3900, photos: syntheticPhoto(40), divisible: true }
+        { city: 'Kawalerka z oddzielną sypialnią', area: 24, rent: 3200, photos: syntheticPhoto(32), divisible: true },
+        { city: 'Mieszkanie z balkonem', area: 24, rent: 3300, photos: syntheticPhoto(33), divisible: true },
+        { city: 'Przestronne przed remontem', area: 24, rent: 3100, photos: syntheticPhoto(34), divisible: true },
+        { city: 'Jasne mieszkanie z osobną kuchnią', area: 24, rent: 3500, photos: syntheticPhoto(35), divisible: true },
+        { city: 'Klasyczna kawalerka w kamienicy', area: 24, rent: 3800, photos: syntheticPhoto(36), divisible: true },
+        { city: 'Nowoczesne, deweloperskie', area: 24, rent: 3700, photos: syntheticPhoto(37), divisible: true },
+        { city: 'Z antresolą do zaadaptowania', area: 24, rent: 3900, photos: syntheticPhoto(38), divisible: true },
+        { city: 'Przytulne, dwupokojowe', area: 24, rent: 3400, photos: syntheticPhoto(39), divisible: true },
+        { city: 'Reprezentacyjne, gotowe do wejścia', area: 24, rent: 3600, photos: syntheticPhoto(40), divisible: true }
       ];
 
       // Oferty bez zdjęć (photos: []) to "mystery listingi": zamiast dokładnej
@@ -1516,13 +1516,10 @@
             if (progress > .7) tone(730 + progress * 220, .035, { type: 'square', volume: .022 });
           },
           debit() {
-            noise(.05, .016);
-            // cha-ching: metaliczny dzwonek kasy fiskalnej.
-            tone(1760.00, .11, { type: 'square', volume: .026, to: 1975.53 });
-            tone(2093.00, .16, { delay: .09, type: 'square', volume: .024, to: 2349.32 });
-            tone(392.00, .09, { type: 'sine', volume: .03, to: 523.25 });
-            tone(523.25, .16, { delay: .07, type: 'triangle', volume: .032, to: 659.25 });
-            tone(659.25, .2, { delay: .16, type: 'sine', volume: .022 });
+            // cha-ching: dwa jasne dzwonki kasy fiskalnej + trzask szuflady.
+            tone(1567.98, .09, { type: 'square', volume: .03, to: 1760.00 });
+            tone(2093.00, .13, { delay: .1, type: 'square', volume: .028, to: 2349.32 });
+            noise(.04, .02, .22);
           },
           sold(otherPlayer = false) {
             tone(otherPlayer ? 145 : 196, .12, { type: 'triangle', volume: .025, to: otherPlayer ? 105 : 130 });
@@ -1777,7 +1774,7 @@
       }
 
       function readCustomSettings() {
-        return { listingCount: Number($('#custom-listings').value) || 15, botCount: Number($('#custom-bots').value) || 5, includeStandard: $('#custom-standard').checked, includeMystery: $('#custom-mystery').checked, includeDivisible: $('#custom-divisible').checked, aggroMin: .36, aggroMax: .75, delayMin: 2_000, delayMax: 4_600 };
+        return { listingCount: Number($('#custom-listings').value) || 15, botCount: Number($('#custom-bots').value) || 5, includeStandard: $('#custom-standard').checked, includeMystery: $('#custom-mystery').checked, includeDivisible: $('#custom-divisible').checked, aggroMin: .29, aggroMax: .60, delayMin: 2_500, delayMax: 5_400 };
       }
       function updateCustomSummary() {
         const settings = readCustomSettings();
@@ -2168,7 +2165,7 @@
             $('#result-kicker').textContent = 'Sprzedane';
             $('#result-title').textContent = `${winner.name} bierze klitkę`;
             $('#result-copy').textContent = `za ${money(snapshot.result.price)}${reveal}`;
-            sound.sold(!winner.isHuman);
+            if (!winner.isHuman) sound.sold(true);
             $('#result-overlay').hidden = false;
             if (winner.isHuman && Number.isFinite(previousHumanCash) && previousHumanCash > winner.cash) {
               animateDebit(previousHumanCash, winner.cash, snapshot.result.price);
@@ -2600,7 +2597,7 @@
         $('#result-kicker').textContent = 'Sprzedane';
         $('#result-title').textContent = `${player.name} bierze klitkę`;
         $('#result-copy').textContent = `za ${money(paid)}${soldReveal}${divideReveal}`;
-        sound.sold(!player.isHuman);
+        if (!player.isHuman) sound.sold(true);
         showResultAndAdvance(
           player.isHuman ? 1550 : 1150,
           player.isHuman ? { before: cashBefore, after: player.cash, paid } : null,
