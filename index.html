@@ -964,7 +964,7 @@
           </g>
         </svg>
       </div>
-      <p class="lead">Kupuj mikrokawalerki<br>i wyciśnij ile się da z metrów i ludzi.</p>
+      <p class="lead">Kupuj mikrokawalerki.<br>Wyciśnij ile się da z metrów i ludzi.</p>
       <button class="rules-link" id="rules-link" type="button">Jak grać?</button>
 
       <div class="panel">
@@ -1076,6 +1076,7 @@
         <div class="listing-facts">
           <div class="fact rent"><small>Miesięczny najem</small><strong id="rent-value">1 500 zł</strong></div>
         </div>
+        <button class="ghost" id="game-back" style="width:auto;min-height:38px;padding:6px 10px;margin:10px 14px 14px">Wstecz</button>
       </article>
 
       <section class="ready-panel" id="ready-panel">
@@ -1189,13 +1190,20 @@
       // Trudność nie polega na losowym kupowaniu za każdą cenę. Kolejne miasta
       // zmniejszają błąd wyceny i czas reakcji konkurentów, ale każda decyzja
       // nadal uwzględnia czynsz, rezerwę gotówki, etap gry i pozycję w rankingu.
+      // aggroMin/aggroMax: ułamek START_PRICE, do jakiego bot jest gotów się
+      // posunąć (bez znajomości czynszu czy budżetu — to gra o refleks, nie
+      // o wycenę). delayMin/delayMax: jak długo bot w ogóle czeka, zanim
+      // zacznie rozważać kupno. Krzywa trudności rośnie tylko przez te dwa
+      // zakresy, sprawdzone symulacyjnie (150 gier/miasto, człowiek grający
+      // „uczciwą” wyceną wg czynszu): Radom ~94% wygranych człowieka,
+      // Warszawa ~0%.
       const DIFFICULTY_TIERS = [
-        { id: 'radom', city: 'Radom', details: ['Tutorial', '1 konkurent', '5 zwykłych ofert'], botCount: 1, listingCount: 5, startCash: START_CASH, mysteryQuota: 0, divisibleQuota: 0, openingDelay: 5_000, decisionNoise: .16, valuationBoost: .92, reactionScale: 1.35, finalBidFraction: .48 },
-        { id: 'lodz', city: 'Łódź', details: ['2 konkurentów', '7 ofert', 'Zakupy w ciemno'], botCount: 2, listingCount: 7, startCash: START_CASH, mysteryQuota: 1, divisibleQuota: 0, openingDelay: 4_800, decisionNoise: .13, valuationBoost: .96, reactionScale: 1.20, finalBidFraction: .53 },
-        { id: 'katowice', city: 'Katowice', details: ['3 konkurentów', '9 ofert', 'Trudniejszy rynek'], botCount: 3, listingCount: 9, startCash: START_CASH, mysteryQuota: 2, divisibleQuota: 0, openingDelay: 4_400, decisionNoise: .10, valuationBoost: 1.00, reactionScale: 1.05, finalBidFraction: .59 },
-        { id: 'wroclaw', city: 'Wrocław', details: ['4 konkurentów', '11 ofert', 'Dzielenie klitek'], botCount: 4, listingCount: 11, startCash: START_CASH, mysteryQuota: 2, divisibleQuota: 1, openingDelay: 4_000, decisionNoise: .08, valuationBoost: 1.04, reactionScale: .92, finalBidFraction: .65 },
-        { id: 'krakow', city: 'Kraków', details: ['5 konkurentów', '13 ofert', 'Pełna pula ofert'], botCount: 5, listingCount: 13, startCash: START_CASH, mysteryQuota: 2, divisibleQuota: 2, openingDelay: 3_600, decisionNoise: .06, valuationBoost: 1.08, reactionScale: .80, finalBidFraction: .71 },
-        { id: 'warszawa', city: 'Warszawa', details: ['5 ekstremalnych konkurentów', '15 ofert', 'Wszystkie mechaniki'], botCount: 5, listingCount: 15, startCash: START_CASH, mysteryQuota: 3, divisibleQuota: 3, openingDelay: 3_200, decisionNoise: .04, valuationBoost: 1.12, reactionScale: .70, finalBidFraction: .78 }
+        { id: 'radom', city: 'Radom', details: ['Tutorial', '1 konkurent', '5 zwykłych ofert'], botCount: 1, listingCount: 5, startCash: START_CASH, mysteryQuota: 0, divisibleQuota: 0, aggroMin: .10, aggroMax: .24, delayMin: 4_500, delayMax: 8_500 },
+        { id: 'lodz', city: 'Łódź', details: ['2 konkurentów', '7 ofert', 'Zakupy w ciemno'], botCount: 2, listingCount: 7, startCash: START_CASH, mysteryQuota: 1, divisibleQuota: 0, aggroMin: .14, aggroMax: .30, delayMin: 4_000, delayMax: 7_800 },
+        { id: 'katowice', city: 'Katowice', details: ['3 konkurentów', '9 ofert', 'Trudniejszy rynek'], botCount: 3, listingCount: 9, startCash: START_CASH, mysteryQuota: 2, divisibleQuota: 0, aggroMin: .18, aggroMax: .38, delayMin: 3_500, delayMax: 7_000 },
+        { id: 'wroclaw', city: 'Wrocław', details: ['4 konkurentów', '11 ofert', 'Dzielenie klitek'], botCount: 4, listingCount: 11, startCash: START_CASH, mysteryQuota: 2, divisibleQuota: 1, aggroMin: .23, aggroMax: .48, delayMin: 3_000, delayMax: 6_200 },
+        { id: 'krakow', city: 'Kraków', details: ['5 konkurentów', '13 ofert', 'Pełna pula ofert'], botCount: 5, listingCount: 13, startCash: START_CASH, mysteryQuota: 2, divisibleQuota: 2, aggroMin: .29, aggroMax: .60, delayMin: 2_500, delayMax: 5_400 },
+        { id: 'warszawa', city: 'Warszawa', details: ['5 ekstremalnych konkurentów', '15 ofert', 'Wszystkie mechaniki'], botCount: 5, listingCount: 15, startCash: START_CASH, mysteryQuota: 3, divisibleQuota: 3, aggroMin: .36, aggroMax: .75, delayMin: 2_000, delayMax: 4_600 }
       ];
       const TIER_STORAGE_KEY = 'klitka-tier-progress';
       const CAMPAIGN_SEEN_KEY = 'klitka-campaign-seen';
@@ -1796,7 +1804,7 @@
       }
 
       function readCustomSettings() {
-        return { listingCount: Number($('#custom-listings').value) || 15, botCount: Number($('#custom-bots').value) || 5, includeStandard: $('#custom-standard').checked, includeMystery: $('#custom-mystery').checked, includeDivisible: $('#custom-divisible').checked, openingDelay: 3_000, decisionNoise: .04, valuationBoost: 1.14, reactionScale: .68, finalBidFraction: .80 };
+        return { listingCount: Number($('#custom-listings').value) || 15, botCount: Number($('#custom-bots').value) || 5, includeStandard: $('#custom-standard').checked, includeMystery: $('#custom-mystery').checked, includeDivisible: $('#custom-divisible').checked, aggroMin: .36, aggroMax: .75, delayMin: 2_000, delayMax: 4_600 };
       }
       function updateCustomSummary() {
         const settings = readCustomSettings();
@@ -2364,108 +2372,34 @@
       }
 
       function makeBotTargets() {
-        const listing = currentListing();
         const remaining = state.listings.length - state.listingIndex;
         const isFinalListing = remaining <= 1;
         const tier = state.customGame
           ? state.customSettings
           : (DIFFICULTY_TIERS[state.tierIndex ?? 0] || DIFFICULTY_TIERS[0]);
         const bots = state.players.filter(player => !player.isHuman);
-        const incomeOf = player => player.properties.reduce((sum, property) => sum + property.rent, 0);
-        const incomes = state.players.map(incomeOf);
-        const leadingIncome = Math.max(0, ...incomes);
-        const lowestIncome = Math.min(...incomes);
-        const listingId = Math.max(0, LISTINGS.indexOf(listing));
-        const totalListings = Math.max(1, state.listings.length);
-        const stage = totalListings <= 1 ? 1 : state.listingIndex / (totalListings - 1);
-        const remainingRentAverage = state.listings
-          .slice(state.listingIndex)
-          .reduce((sum, item) => sum + (item.divisible ? item.rent + 500 : item.rent), 0) / Math.max(1, remaining);
 
+        // Boty nie wyceniają oferty — to gra o refleks i napięcie, nie o
+        // realizm ekonomiczny. Cel to losowy ułamek ceny startowej (nie
+        // czynszu, nie budżetu, nie liczby pozostałych ofert); poziom
+        // trudności to tylko jak wysoko sięga ten ułamek i jak szybko bot
+        // się w ogóle rusza. Na ostatniej ofercie niewydana gotówka jest
+        // bezwartościowa, więc bot idzie na całość.
         return bots.map((player, index) => {
           const profile = BOT_PROFILES[index % BOT_PROFILES.length];
-
-          // Różne gusta rozdzielają okazje między konkurentów, ale ich wpływ
-          // jest celowo niewielki: czynsz i budżet są ważniejsze od losowania.
-          const interestRank = (listingId + index) % bots.length;
-          const interestRange = Math.max(1, bots.length - 1);
-          const taste = 1.07 - (interestRank / interestRange) * .14;
-
-          // Pozycję oceniamy według celu gry: miesięcznego czynszu, nie liczby
-          // mieszkań. Gracz z tyłu podejmuje trochę większe ryzyko, lider hamuje.
-          const playerIncome = incomeOf(player);
-          const deficit = leadingIncome > 0 ? (leadingIncome - playerIncome) / leadingIncome : 0;
-          const lead = leadingIncome > lowestIncome ? (playerIncome - lowestIncome) / (leadingIncome - lowestIncome) : 0;
-          const expectedWinsBeforeRound = state.listingIndex / Math.max(1, state.players.length);
-          const winsAheadOfPace = player.properties.length - expectedWinsBeforeRound;
-          const paceControl = winsAheadOfPace > 0
-            ? 1 / (1 + winsAheadOfPace * .52)
-            : 1 + Math.min(.16, Math.abs(winsAheadOfPace) * .10);
-          const balance = Math.max(.72, Math.min(1.22, (1 + deficit * .20 - lead * .10) * paceControl));
-
-          // Wycena bierze pod uwagę realny przychód po ewentualnym podziale.
-          // Koszt podziału odejmujemy od maksymalnej ceny samego mieszkania.
-          const canDivide = listing.divisible && player.cash > DIVIDE_COST;
-          const effectiveRent = canDivide ? dividedRentPerUnit(listing.rent) * DIVIDE_UNITS : listing.rent;
-          const divisionCost = canDivide ? DIVIDE_COST : 0;
-          const fairPrice = Math.max(90_000, effectiveRent * 12 / profile.yield - divisionCost);
-          const imperfectRead = 1 + (Math.random() * 2 - 1) * tier.decisionNoise;
-          const earlyRoundCaution = state.listingIndex === 0 ? .86 : state.listingIndex === 1 ? .91 : state.listingIndex === 2 ? .96 : 1;
-          const urgency = (.94 + stage * .24) * earlyRoundCaution;
-
-          // Konkurent planuje portfel na całą talię. Do ostatnich czterech
-          // aukcji chroni osobną rezerwę, a dodatkowo odkłada środki na kolejne
-          // oczekiwane zakupy. Dzięki temu nie może wystrzelać się na początku.
-          const plannedWins = Math.max(1, Math.ceil(remaining / state.players.length));
-          const cashAfterDivision = Math.max(0, player.cash - divisionCost);
-          const endgameReserve = remaining > 4 ? Math.min(950_000, cashAfterDivision * .32) : 0;
-          const futureWinReserve = Math.max(0, plannedWins - 1) * (650_000 - stage * 100_000);
-          const protectedCash = Math.min(cashAfterDivision * .72, endgameReserve + futureWinReserve);
-          const portfolioCap = Math.max(90_000, cashAfterDivision - protectedCash);
-          const roundSpendShare = .34 + stage * .30;
-          const roundCap = Math.max(90_000, cashAfterDivision * roundSpendShare);
-          const budgetCap = Math.min(portfolioCap, roundCap);
-          const spendPerPlannedWin = cashAfterDivision * (.82 + stage * .14) / plannedWins;
-          const rentQuality = Math.max(.45, Math.min(1.75, effectiveRent / Math.max(1, remainingRentAverage)));
-          const portfolioValue = spendPerPlannedWin * Math.pow(rentQuality, .90);
-          const rawTarget = (fairPrice * .34 + portfolioValue * .66)
-            * profile.valuation * taste * balance * urgency * imperfectRead * tier.valuationBoost;
-          const strategicTarget = Math.min(budgetCap, Math.max(90_000, rawTarget));
-
-          // W ostatniej aukcji gotówka nie punktuje, ale konkurent nadal ma
-          // określoną granicę ryzyka zamiast automatycznie oddawać cały portfel.
+          const aggro = tier.aggroMin + Math.random() * (tier.aggroMax - tier.aggroMin);
           const target = isFinalListing
-            ? Math.round(Math.min(cashAfterDivision, Math.max(strategicTarget, START_PRICE * tier.finalBidFraction)))
-            : Math.round(Math.min(cashAfterDivision, strategicTarget));
-
-          // Nawet wysoka wycena nie może wywołać zakupu tuż po starcie. Dobre
-          // oferty i końcówka skracają namysł, lecz zachowujemy czytelne okno
-          // decyzji dla człowieka. Trudność zwiększa precyzja, nie refleks 0 ms.
-          const opportunityScore = Math.max(0, Math.min(1, (rentQuality - .70) / .80));
-          const stageAcceleration = 1 - stage * .28;
-          const opportunityBonus = opportunityScore * 450;
-          const openingRoundFloor = state.listingIndex === 0 ? 4_500 : state.listingIndex === 1 ? 4_200 : state.listingIndex === 2 ? 3_900 : 0;
-          const notBeforeMs = isFinalListing
-            ? Math.max(1_050, tier.openingDelay * .42 - opportunityBonus)
-            : Math.max(2_650, openingRoundFloor, tier.openingDelay * stageAcceleration - opportunityBonus);
-          const reactionMs = (profile.reactionMin + Math.random() * (profile.reactionMax - profile.reactionMin)) * tier.reactionScale;
+            ? player.cash
+            : Math.round(Math.min(player.cash, START_PRICE * aggro));
+          const notBeforeMs = tier.delayMin + Math.random() * (tier.delayMax - tier.delayMin);
+          const reactionMs = profile.reactionMin + Math.random() * (profile.reactionMax - profile.reactionMin);
 
           return {
             playerId: player.id,
             target,
             reactionMs,
             notBeforeMs,
-            triggeredAt: null,
-            interestRank,
-            taste,
-            balance,
-            fairPrice,
-            portfolioValue,
-            budgetCap,
-            playerIncome,
-            paceControl,
-            protectedCash,
-            endgameReserve
+            triggeredAt: null
           };
         });
       }
@@ -2890,6 +2824,14 @@
         else startGame();
       });
       $('#leave-lobby').addEventListener('click', () => { clearAsync(); closeNetwork(); showScreen('intro'); updateEntryState(); });
+      $('#game-back').addEventListener('click', () => {
+        const wasNetwork = network.active;
+        clearAsync();
+        closeNetwork();
+        if (wasNetwork) { showScreen('intro'); updateEntryState(); }
+        else if (state.customGame) { updateCustomSummary(); showScreen('custom'); }
+        else { renderTiers(); showScreen('tiers'); }
+      });
       $('#ready-button').addEventListener('click', () => {
         if (network.active) networkAction('ready').catch(error => { $('#buy-help').textContent = error.message; });
         else setReady('p0');
