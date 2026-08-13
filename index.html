@@ -330,21 +330,15 @@
     .player-count-label { text-align: center; font-weight: 950; }
     .player-count-label strong { display: block; font-size: 24px; }
 
-    /* height (nie min-height) ogranicza cały ekran gry do jednego widoku —
-       to daje kontenerowi na treść realną wysokość, od której flexbox może
-       odejmować (padding ekranu odejmuje się sam, przez zwykły box model). */
-    .game-screen { padding-left: 12px; padding-right: 12px; background: #f1f4f5; height: 100dvh; overflow-y: auto; }
+    .game-screen { padding-left: 12px; padding-right: 12px; background: #f1f4f5; }
 
-    /* Wszystko, co musi być widoczne bez przewijania (zdjęcie, cena, licznik,
-       przycisk kupna, tabela graczy) siedzi w jednym kontenerze, który
-       wypełnia resztę ekranu i sam się nie przewija. Tylko "Wyjdź" jest poza
-       nim, więc trzeba po nią zjechać — celowo, żeby nie zabierała miejsca
-       ważniejszym rzeczom. */
+    /* Ten kontener sam zajmuje co najmniej cały ekran — "Wyjdź" (poza nim)
+       zawsze ląduje poniżej, trzeba po nią zjechać. Odzyskane w ten sposób
+       miejsce (to, co kiedyś zajmował przycisk) idzie na większe zdjęcie. */
     .game-viewport {
       display: flex;
       flex-direction: column;
-      flex: 1 1 auto;
-      min-height: 0;
+      min-height: 100dvh;
       overflow: hidden;
     }
     #game-back { flex: 0 0 auto; }
@@ -365,7 +359,7 @@
     }
 
     .photo-grid {
-      height: clamp(120px, 24vh, 260px);
+      height: clamp(260px, 36vh, 340px);
       padding: 7px;
       display: grid;
       grid-template-columns: 1.55fr 1fr;
@@ -492,8 +486,7 @@
       border-radius: 14px;
       flex: 0 0 auto;
     }
-    .ready-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin-bottom: 9px; }
-    .ready-heading strong { font-size: 15px; }
+    .ready-heading { display: flex; align-items: baseline; justify-content: flex-end; gap: 8px; margin-bottom: 9px; }
     .ready-heading span { color: var(--muted); font-size: 10px; font-weight: 900; }
     .ready-players { display: flex; flex-wrap: wrap; gap: 7px; }
     .ready-chip {
@@ -883,7 +876,6 @@
     @media (max-height: 760px) {
       .game-screen { padding-top: max(10px, env(safe-area-inset-top)); }
       .topbar { margin-bottom: 7px; min-height: 34px; }
-      .photo-grid { height: 218px; }
       .listing-facts .fact { padding: 9px 11px 10px; }
       .ready-panel { margin-top: 9px; padding: 9px; }
       .player-rail { margin-top: 4px; }
@@ -1069,7 +1061,7 @@
         </article>
 
         <section class="ready-panel" id="ready-panel">
-          <div class="ready-heading"><strong>Każdy musi być gotowy</strong><span id="ready-counter">0 / 4</span></div>
+          <div class="ready-heading"><span id="ready-counter">0 / 4</span></div>
           <div class="ready-players" id="ready-players"></div>
           <button class="primary ready-button" id="ready-button">Jestem gotowy</button>
         </section>
