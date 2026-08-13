@@ -325,12 +325,12 @@
     .tier-card-city-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
     .tier-card-landmark {
       width: 100%;
-      height: 70px;
-      margin: 5px 0 7px;
+      height: 88px;
+      margin: 5px 0 9px;
       color: var(--ink);
-      opacity: .18;
+      opacity: .25;
     }
-    .tier-card-landmark svg { display: block; width: 100%; height: 100%; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .tier-card-landmark svg { display: block; width: 100%; height: 100%; fill: none; stroke: currentColor; stroke-width: 1.45; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
     .tier-crown { font-size: 25px; filter: drop-shadow(0 2px 0 rgba(0,0,0,.12)); }
     .tier-card-desc { display: grid; gap: 4px; color: var(--muted); font-size: 12px; line-height: 1.25; font-weight: 800; }
     .tier-card-desc span { display: block; }
@@ -1762,12 +1762,12 @@
       }
 
       const CITY_LANDMARKS = {
-        radom: '<svg viewBox="0 0 220 72" aria-hidden="true"><path d="M12 63h196M24 63V42h19V29h17V10h24v53M60 10h24M64 6h16M67 20h10v10H67M69 35a4 4 0 1 0 8 0 4 4 0 1 0-8 0M43 42v21M84 31h91v32M175 25h22v38M179 21h14v4M91 43h10v13H91M110 43h10v13h-10M130 43h10v13h-10M150 43h10v13h-10M181 37h10v13h-10M24 51h12v12"/></svg>',
-        lodz: '<svg viewBox="0 0 220 72" aria-hidden="true"><path d="M11 63h198M24 63V22h72v41M31 22V15h58v7M38 34c0-7 10-7 10 0v17H38V34M57 34c0-7 10-7 10 0v17H57V34M76 34c0-7 10-7 10 0v17H76V34M34 57h57M105 63V35h89v28M116 35V27h43v8M166 35V23h20v12M119 47c0-6 9-6 9 0v10h-9V47M135 47c0-6 9-6 9 0v10h-9V47M151 47c0-6 9-6 9 0v10h-9V47M173 46h9v11h-9"/></svg>',
-        katowice: '<svg viewBox="0 0 220 72" aria-hidden="true"><path d="M10 63h200M31 51h158M41 48c17-5 34-7 69-7s52 2 69 7M32 31c28-10 128-10 156 0M32 31l9 17M188 31l-9 17M48 32l12-13h100l12 13M76 19c9-8 59-8 68 0M88 19c3-11 41-11 44 0M48 52v11M66 52v11M154 52v11M172 52v11M75 52v7h70v-7"/><path d="M43 35l10 9 10-11 10 9 10-11 10 10 10-11 10 11 10-10 10 11 10-9 10 11 11-9"/></svg>',
-        wroclaw: '<svg viewBox="0 0 220 72" aria-hidden="true"><path d="M11 63h198M25 63V48h170v15M35 48V39h150v9M54 39V29h112v10M67 29V20h86v9M81 20v-7h58v7M98 13V9h24v4M29 55h162M40 48v15M54 48v15M68 48v15M82 48v15M96 48v15M110 48v15M124 48v15M138 48v15M152 48v15M166 48v15M180 48v15M62 34h96M76 25h68M91 17h38"/></svg>',
-        krakow: '<svg viewBox="0 0 220 72" aria-hidden="true"><path d="M8 63h204M14 63V38h192v25M14 38c8 0 8-7 16-7s8 7 16 7 8-7 16-7 8 7 16 7 8-7 16-7 8 7 16 7 8-7 16-7 8 7 16 7 8-7 16-7 8 7 16 7 8-7 16-7 8 7 16 7M82 38V22h56v16M91 22l7-8 6 5 6-12 6 12 6-5 7 8M110 7V3M20 50h180M25 63c0-15 14-15 14 0M48 63c0-15 14-15 14 0M71 63c0-15 14-15 14 0M94 63c0-15 14-15 14 0M117 63c0-15 14-15 14 0M140 63c0-15 14-15 14 0M163 63c0-15 14-15 14 0M186 63c0-15 14-15 14 0M91 28h8v8h-8M106 25h8v11h-8M121 28h8v8h-8"/></svg>',
-        warszawa: '<svg viewBox="0 0 220 72" aria-hidden="true"><path d="M11 63h198M72 63V51h76v12M82 51V39h56v12M91 39V21h38v18M98 21V13h24v8M105 13V7h10v6M110 7V2M64 63V48h8M148 48h8v15M45 63V54h19M156 54h19v9M96 28h7v7h-7M107 28h6v7h-6M118 28h6v7h-6M91 39h38M89 44h42M91 51h38M99 55h8v8M113 55h8v8M83 39l-5-4 5-4M137 39l5-4-5-4M98 13l-4-3M122 13l4-3"/></svg>'
+        radom: '<svg viewBox="0 0 220 72" aria-hidden="true"><path d="M7 65h206M14 65V46h31V31h16V9h25v56M61 9h25M64 5h19M68 18h11v10H68M69 35a5 5 0 1 0 10 0 5 5 0 1 0-10 0M45 35h16M45 46v19M86 30h91v35M177 26h27v39M181 21h19v5M91 38h81M91 57h81M96 43h9v11h-9M113 43h9v11h-9M130 43h9v11h-9M147 43h9v11h-9M164 43h8v11h-8M184 36h12v9h-12M184 49h12v10h-12M20 51h17v14M25 54h7v7h-7"/><path d="M67 13h13M70 22h7M65 42h18M67 48h14M67 54h14M69 60h10M48 27h12M90 34h83M181 30h19"/></svg>',
+        lodz: '<svg viewBox="0 0 220 72" aria-hidden="true"><path d="M7 65h206M12 65V25h88v40M20 25V16h71v9M27 16V11h56v5M24 36c0-8 12-8 12 0v17H24V36M44 36c0-8 12-8 12 0v17H44V36M64 36c0-8 12-8 12 0v17H64V36M84 36c0-8 12-8 12 0v17H84V36M19 58h75M106 65V38h99v27M115 38V29h47v9M168 38V24h26v14M174 24V19h14v5M118 49c0-7 10-7 10 0v10h-10V49M135 49c0-7 10-7 10 0v10h-10V49M152 49c0-7 10-7 10 0v10h-10V49M176 48h11v12h-11"/><path d="M16 30h80M16 56h80M21 21h73M30 29v31M50 29v31M70 29v31M90 29v31M110 43h91M110 61h91M132 38v25M149 38v25M166 38v25M191 38v25M120 33h38M174 28h14"/></svg>',
+        katowice: '<svg viewBox="0 0 220 72" aria-hidden="true"><path d="M7 65h206M20 28c32-13 148-13 180 0M20 28c10 8 26 12 90 12s80-4 90-12M20 28l17 29h146l17-29M37 57h146M48 57v8M65 57v8M155 57v8M172 57v8M73 57v5h74v-5M58 22l15-9h74l15 9M79 13c8-8 54-8 62 0M91 13c4-10 34-10 38 0M110 5V2"/><path d="M29 34l12 15 12-13 12 13 12-12 12 12 11-11 11 11 12-11 12 11 12-12 12 12 12-13 12 15M42 31c35 6 101 6 136 0M50 45h120M57 50h106M76 17h68M84 20h52M96 9h28M102 12v8M110 11v9M118 12v8"/></svg>',
+        wroclaw: '<svg viewBox="0 0 220 72" aria-hidden="true"><path d="M7 65h206M13 65V52h194v13M23 52V43h174v9M40 43V35h140v8M54 35V27h112v8M70 27V19h80v8M84 19V13h52v6M99 13V9h22v4M17 58h186M30 52v13M44 52v13M58 52v13M72 52v13M86 52v13M100 52v13M114 52v13M128 52v13M142 52v13M156 52v13M170 52v13M184 52v13"/><path d="M28 47h164M46 39h128M60 31h100M76 23h68M91 16h38M35 55v6M49 55v6M63 55v6M77 55v6M91 55v6M105 55v6M119 55v6M133 55v6M147 55v6M161 55v6M175 55v6M189 55v6M46 43v9M60 43v9M160 43v9M174 43v9"/></svg>',
+        krakow: '<svg viewBox="0 0 220 72" aria-hidden="true"><path d="M5 65h210M8 65V40h204v25M8 40c7 0 7-7 14-7s7 7 14 7 7-7 14-7 7 7 14 7 7-7 14-7 7 7 14 7 7-7 14-7 7 7 14 7 7-7 14-7 7 7 14 7 7-7 14-7 7 7 14 7 7-7 14-7 7 7 14 7 7-7 14-7 7 7 14 7M80 40V23h60v17M88 23l7-8 7 5 8-13 8 13 7-5 7 8M110 7V2M14 51h192M20 65c0-16 15-16 15 0M43 65c0-16 15-16 15 0M66 65c0-16 15-16 15 0M89 65c0-16 15-16 15 0M116 65c0-16 15-16 15 0M139 65c0-16 15-16 15 0M162 65c0-16 15-16 15 0M185 65c0-16 15-16 15 0"/><path d="M13 45h194M85 28h10v9H85M101 26h8v11h-8M113 26h8v11h-8M127 28h8v9h-8M18 54v8M39 54v8M62 54v8M84 54v8M136 54v8M158 54v8M181 54v8M202 54v8M94 18h32M99 14h22M15 36l7-5 7 5M191 36l7-5 7 5"/></svg>',
+        warszawa: '<svg viewBox="0 0 220 72" aria-hidden="true"><path d="M7 65h206M63 65V54h94v11M74 54V43h72v11M84 43V23h52v20M94 23V14h32v9M103 14V8h14v6M110 8V2M55 65V49h8M157 49h8v16M35 65V57h20M165 57h20v8M89 31h8v8h-8M101 31h7v8h-7M112 31h7v8h-7M123 31h8v8h-8M84 43h52M80 48h60M74 54h72M91 58h9v7M106 58h8v7M121 58h9v7M84 43l-7-5 7-5M136 43l7-5-7-5M94 23l-6-4M126 23l6-4"/><path d="M99 18h22M102 11h16M89 27h42M92 43V23M100 43V23M108 43V23M116 43V23M124 43V23M80 51h60M68 58h8v7M144 58h8v7M42 59v6M49 59v6M171 59v6M178 59v6M106 5h8"/></svg>'
       };
 
       function renderTiers() {
@@ -2396,7 +2396,12 @@
           const playerIncome = incomeOf(player);
           const deficit = leadingIncome > 0 ? (leadingIncome - playerIncome) / leadingIncome : 0;
           const lead = leadingIncome > lowestIncome ? (playerIncome - lowestIncome) / (leadingIncome - lowestIncome) : 0;
-          const balance = Math.max(.86, Math.min(1.20, 1 + deficit * .20 - lead * .10));
+          const expectedWinsBeforeRound = state.listingIndex / Math.max(1, state.players.length);
+          const winsAheadOfPace = player.properties.length - expectedWinsBeforeRound;
+          const paceControl = winsAheadOfPace > 0
+            ? 1 / (1 + winsAheadOfPace * .52)
+            : 1 + Math.min(.16, Math.abs(winsAheadOfPace) * .10);
+          const balance = Math.max(.72, Math.min(1.22, (1 + deficit * .20 - lead * .10) * paceControl));
 
           // Wycena bierze pod uwagę realny przychód po ewentualnym podziale.
           // Koszt podziału odejmujemy od maksymalnej ceny samego mieszkania.
@@ -2405,15 +2410,18 @@
           const divisionCost = canDivide ? DIVIDE_COST : 0;
           const fairPrice = Math.max(90_000, effectiveRent * 12 / profile.yield - divisionCost);
           const imperfectRead = 1 + (Math.random() * 2 - 1) * tier.decisionNoise;
-          const urgency = .94 + stage * .24;
+          const earlyRoundCaution = state.listingIndex === 0 ? .86 : state.listingIndex === 1 ? .91 : state.listingIndex === 2 ? .96 : 1;
+          const urgency = (.94 + stage * .24) * earlyRoundCaution;
 
-          // Konkurent planuje portfel: odkłada pieniądze na kolejne spodziewane
-          // zakupy i uwalnia tę rezerwę stopniowo wraz z końcem miasta.
+          // Konkurent planuje portfel na całą talię. Do ostatnich czterech
+          // aukcji chroni osobną rezerwę, a dodatkowo odkłada środki na kolejne
+          // oczekiwane zakupy. Dzięki temu nie może wystrzelać się na początku.
           const plannedWins = Math.max(1, Math.ceil(remaining / state.players.length));
-          const reservePerWin = 360_000 + stage * 90_000;
-          const reserve = Math.max(0, plannedWins - 1) * reservePerWin * (1 - stage * .55);
           const cashAfterDivision = Math.max(0, player.cash - divisionCost);
-          const portfolioCap = Math.max(90_000, cashAfterDivision - reserve);
+          const endgameReserve = remaining > 4 ? Math.min(950_000, cashAfterDivision * .32) : 0;
+          const futureWinReserve = Math.max(0, plannedWins - 1) * (650_000 - stage * 100_000);
+          const protectedCash = Math.min(cashAfterDivision * .72, endgameReserve + futureWinReserve);
+          const portfolioCap = Math.max(90_000, cashAfterDivision - protectedCash);
           const roundSpendShare = .34 + stage * .30;
           const roundCap = Math.max(90_000, cashAfterDivision * roundSpendShare);
           const budgetCap = Math.min(portfolioCap, roundCap);
@@ -2436,9 +2444,10 @@
           const opportunityScore = Math.max(0, Math.min(1, (rentQuality - .70) / .80));
           const stageAcceleration = 1 - stage * .28;
           const opportunityBonus = opportunityScore * 450;
+          const openingRoundFloor = state.listingIndex === 0 ? 4_500 : state.listingIndex === 1 ? 4_200 : state.listingIndex === 2 ? 3_900 : 0;
           const notBeforeMs = isFinalListing
             ? Math.max(1_050, tier.openingDelay * .42 - opportunityBonus)
-            : Math.max(2_450, tier.openingDelay * stageAcceleration - opportunityBonus);
+            : Math.max(2_650, openingRoundFloor, tier.openingDelay * stageAcceleration - opportunityBonus);
           const reactionMs = (profile.reactionMin + Math.random() * (profile.reactionMax - profile.reactionMin)) * tier.reactionScale;
 
           return {
@@ -2453,7 +2462,10 @@
             fairPrice,
             portfolioValue,
             budgetCap,
-            playerIncome
+            playerIncome,
+            paceControl,
+            protectedCash,
+            endgameReserve
           };
         });
       }
