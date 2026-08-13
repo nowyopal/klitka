@@ -11,6 +11,10 @@ export const COUNTDOWN_MS = 2_900;
 export const RESULT_MS = 1_300;
 export const MIN_PLAYERS = 2;
 export const MAX_PLAYERS = 6;
+export const MIN_HUMAN_PLAYERS = 2;
+export const MAX_BOTS = 4;
+// Te same imiona co boty w trybie dla jednego gracza (BOT_NAMES w index.html).
+export const BOT_NAMES = ['Piotr', 'Wojciech', 'Kuba', 'Aneta'];
 
 // Kolejność musi odpowiadać LISTINGS w index.html.
 export const LISTING_RENTS = [
@@ -126,13 +130,14 @@ const createCode = () => {
   throw new Error('Nie udało się utworzyć kodu pokoju.');
 };
 
-const makePlayer = (name, index) => ({
+const makePlayer = (name, index, isBot = false) => ({
   id: crypto.randomUUID(),
   token: crypto.randomBytes(24).toString('hex'),
   name,
   cash: START_CASH,
   properties: [],
-  avatarIndex: index % MAX_PLAYERS
+  avatarIndex: index % MAX_PLAYERS,
+  isBot
 });
 
 const publicPlayer = player => ({
@@ -140,7 +145,8 @@ const publicPlayer = player => ({
   name: player.name,
   cash: player.cash,
   properties: player.properties,
-  avatarIndex: player.avatarIndex
+  avatarIndex: player.avatarIndex,
+  isBot: Boolean(player.isBot)
 });
 
 const snapshot = (room, selfId) => ({
@@ -186,6 +192,36 @@ const schedule = (room, callback, delay) => {
   room.timers.add(timer);
 };
 
+// Boty w pokoju sieciowym licytują dokładnie tak samo jak w trybie solo: bez
+// znajomości czynszu, cel to losowy ułamek ceny startowej. Każdy bot dostaje
+// jeden zaplanowany "zakup" o wyliczonym czasie; jeśli ktoś kupi wcześniej,
+// settleBuy sam odrzuci spóźnioną próbę (faza nie będzie już 'auction').
+const NETWORK_BOT_AGGRO_MIN = .18;
+const NETWORK_BOT_AGGRO_MAX = .38;
+const NETWORK_BOT_DELAY_MIN = 3_500;
+const NETWORK_BOT_DELAY_MAX = 7_000;
+const NETWORK_BOT_REACTION_MIN = 150;
+const NETWORK_BOT_REACTION_MAX = 400;
+
+const scheduleBotBids = room => {
+  const bots = room.players.filter(player => player.isBot);
+  if (!bots.length) return;
+  const isFinalRound = room.round >= room.deck.length - 1;
+  for (const bot of bots) {
+    const aggro = NETWORK_BOT_AGGRO_MIN + Math.random() * (NETWORK_BOT_AGGRO_MAX - NETWORK_BOT_AGGRO_MIN);
+    const target = isFinalRound ? bot.cash : Math.round(Math.min(bot.cash, START_PRICE * aggro));
+    const notBeforeMs = NETWORK_BOT_DELAY_MIN + Math.random() * (NETWORK_BOT_DELAY_MAX - NETWORK_BOT_DELAY_MIN);
+    const reactionMs = NETWORK_BOT_REACTION_MIN + Math.random() * (NETWORK_BOT_REACTION_MAX - NETWORK_BOT_REACTION_MIN);
+    const elapsedForTarget = target >= START_PRICE ? 0 : AUCTION_MS * (1 - target / START_PRICE);
+    const commitMs = Math.max(notBeforeMs, elapsedForTarget) + reactionMs;
+    if (commitMs >= AUCTION_MS) continue;
+    schedule(room, () => {
+      const outcome = settleBuy(room, bot);
+      if (outcome.ok && room.result?.divisible) resolveDivide(room, bot.cash >= DIVIDE_COST);
+    }, commitMs);
+  }
+};
+
 const beginAuction = room => {
   if (room.phase !== 'countdown') return;
   room.phase = 'auction';
@@ -193,6 +229,7 @@ const beginAuction = room => {
   room.auctionEndsAt = room.auctionStartsAt + AUCTION_MS;
   broadcast(room);
   schedule(room, () => settleUnsold(room), AUCTION_MS + 25);
+  scheduleBotBids(room);
 };
 
 const beginCountdown = room => {
@@ -204,10 +241,17 @@ const beginCountdown = room => {
   schedule(room, () => beginAuction(room), COUNTDOWN_MS);
 };
 
+// Boty nie mają klienta, więc nigdy same nie wywołają /ready — bez tego pokój
+// czekałby na nie w nieskończoność.
+const markBotsReady = room => {
+  for (const player of room.players) if (player.isBot) room.ready.add(player.id);
+};
+
 const advanceRound = room => {
   if (room.phase !== 'result') return;
   room.round += 1;
   room.ready.clear();
+  markBotsReady(room);
   room.result = null;
   room.auctionStartsAt = null;
   room.auctionEndsAt = null;
@@ -472,7 +516,7 @@ export const createRequestHandler = () => async (request, response) => {
     }
   }
 
-  const actionMatch = requestUrl.pathname.match(/^\/api\/rooms\/([A-Z0-9]{5})\/(join|options|start|again|ready|buy|divide)$/);
+  const actionMatch = requestUrl.pathname.match(/^\/api\/rooms\/([A-Z0-9]{5})\/(join|options|start|addbot|again|ready|buy|divide)$/);
   if (request.method === 'POST' && actionMatch) {
     const room = rooms.get(actionMatch[1]);
     if (!room) return json(response, 404, { error: 'Nie ma pokoju o takim kodzie.' });
@@ -503,14 +547,29 @@ export const createRequestHandler = () => async (request, response) => {
         return json(response, 200, { ok: true });
       }
 
+      if (action === 'addbot') {
+        if (player.id !== room.hostId) return json(response, 403, { error: 'Tylko gospodarz może dodawać boty.' });
+        if (room.phase !== 'lobby') return json(response, 409, { error: 'Boty można dodawać tylko w poczekalni.' });
+        if (room.players.length >= MAX_PLAYERS) return json(response, 409, { error: 'Pokój jest pełny.' });
+        const botCount = room.players.filter(item => item.isBot).length;
+        if (botCount >= MAX_BOTS) return json(response, 409, { error: `Maksymalnie ${MAX_BOTS} boty — reszta miejsc jest dla prawdziwych graczy.` });
+        const bot = makePlayer(BOT_NAMES[botCount] || `Bot ${botCount + 1}`, room.players.length, true);
+        room.players.push(bot);
+        broadcast(room);
+        return json(response, 201, { ok: true, playerId: bot.id });
+      }
+
       if (action === 'start') {
         if (player.id !== room.hostId) return json(response, 403, { error: 'Tylko gospodarz może rozpocząć grę.' });
         if (room.phase !== 'lobby') return json(response, 409, { error: 'Gra już się rozpoczęła.' });
         if (room.players.length < MIN_PLAYERS) return json(response, 409, { error: 'Potrzeba co najmniej 2 graczy.' });
+        const humanCount = room.players.filter(item => !item.isBot).length;
+        if (humanCount < MIN_HUMAN_PLAYERS) return json(response, 409, { error: 'Potrzeba co najmniej 2 prawdziwych graczy — boty same nie wystarczą.' });
         room.deck = createVariedDeck(room.players.length + 8, room.options);
         room.round = 0;
         room.phase = 'ready';
         room.ready.clear();
+        markBotsReady(room);
         room.result = null;
         broadcast(room);
         return json(response, 200, { ok: true });
@@ -528,6 +587,7 @@ export const createRequestHandler = () => async (request, response) => {
         room.round = 0;
         room.phase = 'ready';
         room.ready.clear();
+        markBotsReady(room);
         room.result = null;
         room.auctionStartsAt = null;
         room.auctionEndsAt = null;
@@ -579,6 +639,7 @@ export const __test = {
   settleUnsold,
   resolveDivide,
   beginCountdown,
+  beginAuction,
   clearRoomTimers,
   createVariedDeck
 };

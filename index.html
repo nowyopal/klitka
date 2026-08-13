@@ -218,18 +218,6 @@
       border-bottom: 1px solid var(--line);
       border-radius: var(--radius) var(--radius) 0 0;
     }
-    .entry-number {
-      display: inline-grid;
-      place-items: center;
-      width: 24px;
-      height: 24px;
-      margin-right: 6px;
-      color: white;
-      background: var(--blue);
-      border-radius: 50%;
-      font-size: 12px;
-      font-weight: 900;
-    }
     .entry-divider {
       display: flex;
       align-items: center;
@@ -969,7 +957,7 @@
 
       <div class="panel">
         <div class="identity-block">
-          <label class="label" for="name-input"><span class="entry-number">1</span>Podaj imię albo przezwisko</label>
+          <label class="label" for="name-input">Podaj imię albo przezwisko</label>
           <input class="text-input" id="name-input" maxlength="16" autocomplete="nickname" placeholder="np. Fliper">
           <p class="entry-hint">Ta nazwa będzie widoczna dla pozostałych graczy.</p>
         </div>
@@ -1036,6 +1024,7 @@
 
       <span class="label">Gracze w pokoju</span>
       <div class="player-list" id="lobby-player-list"></div>
+      <button class="ghost" id="add-bot-button" style="width:auto;min-height:38px;padding:6px 10px;margin:8px 0 0" hidden>+ Dodaj bota</button>
 
       <div class="panel" id="test-player-panel" style="padding:14px;margin-bottom:16px">
         <span class="label">W trybie demo dobierz graczy testowych</span>
@@ -1998,9 +1987,13 @@
         $('#lobby-player-list').innerHTML = alphabetical.map(player => `
           <div class="lobby-player">
             <span>${player.name}</span>
-            <span class="host-tag">${player.id === snapshot.hostId ? 'HOST' : (player.isHuman ? 'TY' : 'GRACZ')}</span>
+            <span class="host-tag">${player.id === snapshot.hostId ? 'HOST' : player.isBot ? 'BOT' : (player.isHuman ? 'TY' : 'GRACZ')}</span>
           </div>`).join('');
         const isHost = snapshot.selfId === snapshot.hostId;
+        const botCount = state.players.filter(player => player.isBot).length;
+        $('#add-bot-button').hidden = !isHost;
+        $('#add-bot-button').disabled = state.players.length >= 6 || botCount >= 4;
+        $('#add-bot-button').textContent = botCount >= 4 ? 'Maksymalnie 4 boty' : '+ Dodaj bota';
         $('#network-options-panel').hidden = false;
         $('#network-mystery-option').checked = Boolean(snapshot.options?.includeMystery);
         $('#network-divisible-option').checked = Boolean(snapshot.options?.includeDivisible);
@@ -2009,10 +2002,11 @@
         $('#network-options-note').textContent = isHost
           ? 'Możesz zmienić opcje do chwili rozpoczęcia gry.'
           : 'Opcje ustawia host. Tutaj widzisz jego wybór.';
-        $('#start-button').disabled = !isHost || state.players.length < 2;
+        const humanCount = state.players.filter(player => !player.isBot).length;
+        $('#start-button').disabled = !isHost || humanCount < 2;
         $('#start-button').textContent = !isHost
           ? 'Czekamy, aż host zacznie'
-          : state.players.length < 2
+          : humanCount < 2
             ? 'Czekamy na drugiego gracza…'
             : 'Wszyscy są — zaczynamy';
         if (screens.lobby.hidden) showScreen('lobby');
@@ -2822,6 +2816,9 @@
       $('#start-button').addEventListener('click', () => {
         if (network.active) networkAction('start').catch(error => { $('#network-status').textContent = error.message; });
         else startGame();
+      });
+      $('#add-bot-button').addEventListener('click', () => {
+        networkAction('addbot').catch(error => { $('#network-status').textContent = error.message; });
       });
       $('#leave-lobby').addEventListener('click', () => { clearAsync(); closeNetwork(); showScreen('intro'); updateEntryState(); });
       $('#game-back').addEventListener('click', () => {
