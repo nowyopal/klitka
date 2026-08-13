@@ -104,7 +104,20 @@
       border-radius: 1px;
     }
 
-    .hero { padding: 6vh 2px 15px; }
+    .hero { padding: 2.8vh 0 10px; }
+    .klitka-logo {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+    #intro-screen > .brand { align-self: center; text-align: center; }
+    #intro-screen > .lead {
+      margin-left: auto;
+      margin-right: auto;
+      max-width: 350px;
+      text-align: center;
+    }
+    #intro-screen > .tiny-note { text-align: center; }
     .hero h1 {
       margin: 0;
       font-size: clamp(62px, 19vw, 102px);
@@ -117,11 +130,23 @@
     }
 
     .lead {
-      margin: 0 2px 26px;
+      margin: 0 2px 10px;
       font-size: 19px;
       line-height: 1.26;
       font-weight: 720;
       max-width: 420px;
+    }
+    .rules-link {
+      display: inline-block;
+      margin: 0 2px 26px;
+      padding: 2px 0;
+      background: none;
+      border: none;
+      color: var(--blue);
+      font-size: 13px;
+      font-weight: 900;
+      text-decoration: underline;
+      text-underline-offset: 3px;
     }
 
     .panel {
@@ -156,6 +181,7 @@
     }
 
     .text-input:focus { border-color: var(--blue); box-shadow: 0 0 0 4px rgba(35,103,201,.14); }
+    .text-input::placeholder { color: var(--muted); font-weight: 500; opacity: .7; }
 
     .primary, .secondary, .danger, .ghost {
       width: 100%;
@@ -179,6 +205,7 @@
     .secondary { background: #e4edf2; color: var(--ink); border: 2px solid #a9bac3; box-shadow: none; }
     .danger { background: var(--red); color: white; box-shadow: 0 5px 14px rgba(173, 42, 31, .24); }
     .ghost { min-height: 48px; background: transparent; border: 2px solid #9eacb4; box-shadow: none; }
+    .skip-end-button { margin-top: 8px; min-height: 42px; font-size: 12px; color: var(--muted); }
     button:active:not(:disabled) { transform: translateY(2px); box-shadow: none; }
     button:disabled { cursor: default; opacity: .36; filter: grayscale(.35); }
     .button-stack { display: grid; gap: 10px; margin-top: 15px; }
@@ -232,19 +259,81 @@
       margin-bottom: 13px;
     }
 
-    .round-pill, .room-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      border: 1px solid var(--line);
-      border-radius: 999px;
-      padding: 8px 11px;
-      background: white;
-      font-size: 12px;
-      font-weight: 950;
+    .round-progress {
+      flex: 1 1 auto;
+      display: flex;
+      align-items: flex-end;
+      gap: 3px;
+      height: 20px;
+    }
+    .round-progress-seg {
+      position: relative;
+      flex: 1 1 0;
+      min-width: 3px;
+      height: 6px;
+      border-radius: 99px;
+      background: var(--line);
+    }
+    .round-progress-seg.is-done { background: #f0c2ba; }
+    .round-progress-seg.is-current { background: var(--red); }
+    .round-progress-seg.is-current::before {
+      content: "";
+      position: absolute;
+      left: 50%;
+      bottom: 100%;
+      width: 0;
+      height: 0;
+      margin-bottom: 3px;
+      transform: translateX(-50%);
+      border-left: 4px solid transparent;
+      border-right: 4px solid transparent;
+      border-top: 5px solid var(--red);
     }
 
     .lobby-title { margin: 30px 0 4px; font-size: 34px; line-height: .95; letter-spacing: -.04em; }
+    .tier-list {
+      display: grid;
+      grid-auto-flow: column;
+      grid-auto-columns: minmax(248px, 82%);
+      gap: 12px;
+      margin: 0 -18px;
+      padding: 4px 18px 18px;
+      overflow-x: auto;
+      overflow-y: hidden;
+      scroll-snap-type: x mandatory;
+      scroll-padding-inline: 18px;
+      overscroll-behavior-inline: contain;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+    }
+    .tier-list::-webkit-scrollbar { display: none; }
+    .tier-card {
+      display: block;
+      width: 100%;
+      text-align: left;
+      padding: 18px;
+      border: 2px solid var(--ink);
+      border-radius: 16px;
+      background: var(--paper);
+      box-shadow: 4px 5px 0 rgba(23,23,18,.12);
+      scroll-snap-align: start;
+    }
+    .tier-card-city { font-size: 25px; font-weight: 1000; letter-spacing: -.02em; }
+    .tier-card-city-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .tier-crown { font-size: 25px; filter: drop-shadow(0 2px 0 rgba(0,0,0,.12)); }
+    .tier-card-desc { margin-top: 4px; color: var(--muted); font-size: 12px; font-weight: 800; }
+    .tier-card-record { margin-top: 10px; color: var(--green-dark); font-size: 13px; font-weight: 1000; }
+    .tier-card-status { margin-top: 12px; font-size: 11px; font-weight: 1000; letter-spacing: .07em; text-transform: uppercase; color: var(--red); }
+    .tier-card.is-cleared { background: #dff5e7; border-color: #89cda5; }
+    .tier-card.is-cleared .tier-card-status { color: var(--green-dark); }
+    .tier-card.is-locked { opacity: .5; filter: grayscale(.5); box-shadow: none; }
+    .tier-card.is-locked .tier-card-status { color: var(--muted); }
+    .final-unlock { margin: -8px 0 18px; text-align: center; color: var(--green-dark); font-size: 13px; font-weight: 1000; }
+    .custom-options { display: grid; gap: 14px; margin: 22px 0; }
+    .custom-option { padding: 14px; background: white; border: 1px solid var(--line); border-radius: 12px; }
+    .custom-option select { width: 100%; height: 48px; padding: 0 12px; border: 2px solid #9eacb4; border-radius: 9px; background: white; color: var(--ink); font: inherit; font-weight: 850; }
+    .custom-check { display: flex; align-items: flex-start; gap: 10px; margin: 10px 0; font-weight: 850; }
+    .custom-check input { width: 20px; height: 20px; flex: 0 0 auto; }
     .code-card {
       margin: 20px 0;
       padding: 20px;
@@ -269,19 +358,6 @@
       background: white;
       font-weight: 900;
     }
-    .avatar {
-      width: 42px;
-      height: 42px;
-      flex: 0 0 auto;
-      display: grid;
-      place-items: center;
-      border: 2px solid white;
-      box-shadow: 0 0 0 1px #9dabb2;
-      border-radius: 50%;
-      background: var(--avatar, var(--yellow));
-      font-size: 21px;
-      font-weight: 1000;
-    }
     .host-tag { margin-left: auto; color: var(--muted); font-size: 10px; letter-spacing: .08em; }
 
     .player-count-control {
@@ -304,6 +380,10 @@
       border-radius: 16px;
       overflow: hidden;
       box-shadow: var(--shadow);
+    }
+
+    .photo-wrap {
+      position: relative;
     }
 
     .photo-grid {
@@ -345,19 +425,69 @@
       letter-spacing: .08em;
       background: repeating-linear-gradient(45deg,#e7e3d8 0 10px,#d8d3c7 10px 20px);
     }
+    .photo.is-mystery::after {
+      content: "BEZ ZDJĘĆ · KUPUJESZ W CIEMNO";
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      padding: 20px;
+      color: #5d594f;
+      font-size: 13px;
+      font-weight: 1000;
+      letter-spacing: .04em;
+      line-height: 1.4;
+      background: repeating-linear-gradient(45deg,#e7e3d8 0 10px,#d8d3c7 10px 20px);
+    }
+    .photo.is-divisible-placeholder::after {
+      content: "DUŻE MIESZKANIE · ZDJĘCIE WKRÓTCE";
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      padding: 20px;
+      color: #5d594f;
+      font-size: 13px;
+      font-weight: 1000;
+      letter-spacing: .04em;
+      line-height: 1.4;
+      background: repeating-linear-gradient(45deg,#e7e3d8 0 10px,#d8d3c7 10px 20px);
+    }
+    .divisible-badge {
+      position: absolute;
+      bottom: 14px;
+      right: 14px;
+      max-width: calc(100% - 28px);
+      padding: 7px 10px;
+      border: 0;
+      border-radius: 7px;
+      background: var(--red);
+      color: white;
+      box-shadow: 0 2px 10px rgba(20,45,60,.16);
+      font-size: 10px;
+      font-weight: 1000;
+      letter-spacing: .02em;
+      text-align: right;
+      line-height: 1.25;
+      text-transform: uppercase;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
 
     .listing-facts {
       display: grid;
-      grid-template-columns: 1fr 1.25fr;
+      grid-template-columns: 1fr;
       border-top: 1px solid var(--line);
     }
-    .fact { padding: 13px 14px 14px; }
-    .fact + .fact { border-left: 1px solid var(--line); }
-    .fact small { display: block; margin-bottom: 2px; color: var(--muted); font-size: 9px; font-weight: 1000; letter-spacing: .09em; text-transform: uppercase; }
+    .fact { padding: 14px 16px 16px; text-align: center; }
+    .fact small { display: block; margin-bottom: 3px; color: var(--muted); font-size: 10px; font-weight: 1000; letter-spacing: .09em; text-transform: uppercase; }
     .fact strong { font-size: clamp(23px, 7vw, 34px); line-height: .95; letter-spacing: -.045em; white-space: nowrap; }
     .fact.rent { background: #edf7f1; }
-    .fact.rent strong { color: var(--green-dark); }
-    .fact.rent strong { font-size: clamp(20px, 6.1vw, 30px); }
+    .fact.rent strong { color: var(--green-dark); font-size: clamp(30px, 10vw, 46px); }
+    .fact.rent strong#rent-value.is-hint { font-size: clamp(19px, 6.4vw, 27px); white-space: normal; }
 
     .location-strip {
       position: absolute;
@@ -400,37 +530,40 @@
       font-weight: 950;
       transition: background .2s ease, transform .2s ease;
     }
-    .ready-chip .avatar { width: 24px; height: 24px; border-width: 1px; font-size: 12px; }
     .ready-chip.ready { background: #a7f2b9; transform: translateY(-1px); }
     .ready-chip.ready::after { content: "✓"; color: var(--green-dark); font-size: 15px; }
     .ready-button { margin-top: 10px; }
     .ready-button.is-ready { background: #b4e9c0; }
 
     .player-rail {
-      margin: 5px -12px 0;
-      padding: 2px 12px 8px;
-      display: flex;
+      margin: 5px 0 0;
+      padding: 2px 0 8px;
+      display: grid;
       gap: 8px;
-      overflow-x: auto;
-      scrollbar-width: none;
     }
-    .player-rail::-webkit-scrollbar { display: none; }
     .player-card {
-      width: 150px;
-      flex: 0 0 150px;
-      padding: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 10px 12px;
       border: 1px solid var(--line);
       border-radius: 11px;
       background: white;
     }
     .player-card.me { background: #eaf2ff; border-color: #9bb9e7; }
-    .player-card-top { display: flex; align-items: center; gap: 6px; min-width: 0; }
-    .player-card .avatar { width: 36px; height: 36px; border-width: 1.5px; font-size: 17px; }
-    .player-card-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; font-weight: 1000; }
-    .player-balance-label { margin-top: 8px; color: var(--muted); font-size: 8px; font-weight: 1000; letter-spacing: .1em; text-transform: uppercase; }
-    .player-balance { margin-top: 2px; color: var(--ink); font-size: 15px; line-height: 1; font-weight: 1000; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .player-card.me.balance-hit { animation: balance-hit .82s cubic-bezier(.2,.9,.25,1); }
+    @keyframes balance-hit {
+      0%, 100% { background: #eaf2ff; box-shadow: none; transform: none; }
+      30% { background: #ffd6d1; box-shadow: 0 0 0 4px rgba(220,47,37,.2); transform: translateY(-3px) scale(1.025); }
+    }
+    .player-card-main { display: flex; align-items: center; gap: 10px; min-width: 0; flex: 1 1 auto; }
+    .player-card-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 14px; font-weight: 1000; }
+    .player-balance-wrap { flex: 0 0 auto; min-width: 118px; text-align: center; }
+    .player-balance { color: var(--ink); font-size: 15px; line-height: 1; font-weight: 1000; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .player-rent { margin-top: 3px; color: var(--green-dark); font-size: 10px; font-weight: 1000; letter-spacing: .02em; white-space: nowrap; }
     .balances-heading { margin: 13px 1px 0; font-size: 10px; font-weight: 1000; letter-spacing: .1em; text-transform: uppercase; }
-    .houses { min-height: 15px; margin: 5px 0 0 2px; display: flex; flex-wrap: wrap; gap: 2px; }
+    .houses { min-height: 15px; margin: 0; display: flex; flex-wrap: wrap; gap: 2px; }
     .mini-house {
       position: relative;
       width: 17px;
@@ -462,6 +595,11 @@
       border-radius: 19px;
       box-shadow: 0 6px 18px rgba(17,31,39,.18);
     }
+    .auction-wrap.is-critical { animation: auction-critical-pulse .55s ease-in-out infinite; }
+    @keyframes auction-critical-pulse {
+      0%, 100% { box-shadow: 0 6px 18px rgba(17,31,39,.18), 0 0 0 0 rgba(237,76,59,.55); }
+      50% { box-shadow: 0 6px 18px rgba(17,31,39,.18), 0 0 0 7px rgba(237,76,59,0); }
+    }
     .auction-label { text-align: center; font-size: 10px; font-weight: 1000; letter-spacing: .13em; color: #aaa99f; }
     .ticker {
       display: flex;
@@ -473,9 +611,10 @@
     }
     .ticker-sep { width: 7px; align-self: flex-end; padding-bottom: 5px; color: #a5a397; font-size: 22px; font-weight: 900; }
     .ticker-digit {
+      --ticker-digit-height: clamp(49px, 14vw, 70px);
       position: relative;
       width: clamp(30px, 9.4vw, 47px);
-      height: clamp(49px, 14vw, 70px);
+      height: var(--ticker-digit-height);
       overflow: hidden;
       display: grid;
       place-items: center;
@@ -487,6 +626,39 @@
       font: 950 clamp(31px, 9vw, 47px)/1 ui-monospace, "SFMono-Regular", Menlo, monospace;
       perspective: 110px;
     }
+    .ticker-value {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      place-items: center;
+      width: 100%;
+      height: 100%;
+    }
+    .ticker-reel {
+      position: absolute;
+      z-index: 1;
+      top: 0;
+      left: 0;
+      width: 100%;
+      display: none;
+      flex-direction: column;
+      align-items: stretch;
+      will-change: transform;
+      transform: translate3d(0,0,0);
+    }
+    .ticker-reel b {
+      flex: 0 0 var(--ticker-digit-height);
+      height: var(--ticker-digit-height);
+      display: grid;
+      place-items: center;
+      font: inherit;
+    }
+    .ticker-digit.is-spinning .ticker-value { visibility: hidden; }
+    .ticker-digit.is-spinning .ticker-reel {
+      display: flex;
+      animation: reel-scroll var(--reel-duration, .8s) linear infinite;
+      animation-delay: var(--reel-delay, 0s);
+    }
     .ticker-digit::before, .ticker-digit::after {
       content: "";
       position: absolute;
@@ -497,7 +669,11 @@
       background: rgba(0,0,0,.9);
       top: 50%;
     }
-    .ticker-digit.snap span { animation: split-flip .095s linear; }
+    .ticker-digit.snap .ticker-value { animation: split-flip .13s cubic-bezier(.2,.8,.4,1); }
+    @keyframes reel-scroll {
+      from { transform: translate3d(0,0,0); }
+      to { transform: translate3d(0,calc(var(--ticker-digit-height) * -10),0); }
+    }
     @keyframes split-flip {
       0% { transform: translateY(-46%) rotateX(-72deg); filter: brightness(1.9); }
       55% { transform: translateY(12%) rotateX(20deg); }
@@ -564,7 +740,113 @@
     .result-kicker { margin-top: 10px; color: var(--muted); font-size: 11px; font-weight: 1000; letter-spacing: .12em; text-transform: uppercase; }
     .result-card h2 { margin: 5px 0 4px; font-size: 33px; line-height: .95; }
     .result-card p { margin: 8px 0 0; font-weight: 900; }
+    .purchase-debit {
+      margin-top: 17px;
+      padding: 12px 10px 13px;
+      overflow: hidden;
+      background: #fff1ef;
+      border: 2px solid var(--red);
+      border-radius: 13px;
+      color: var(--ink);
+    }
+    .purchase-debit.is-animating { animation: debit-card-pulse .9s cubic-bezier(.2,.9,.25,1); }
+    .purchase-debit small { display: block; color: var(--red); font-size: 9px; font-weight: 1000; letter-spacing: .12em; }
+    .purchase-debit strong { display: block; margin: 4px 0 2px; color: var(--red); font-size: 25px; font-variant-numeric: tabular-nums; }
+    .purchase-debit-row { display: flex; justify-content: center; align-items: center; gap: 7px; font-size: 12px; font-weight: 900; font-variant-numeric: tabular-nums; }
+    .purchase-debit-row .before { color: var(--muted); text-decoration: line-through; }
+    .purchase-debit-row .arrow { color: var(--red); }
+    .purchase-debit-row .after { font-size: 15px; }
+    @keyframes debit-card-pulse {
+      0% { opacity: 0; transform: translateY(-16px) scale(.94); }
+      45% { opacity: 1; transform: translateY(0) scale(1.04); }
+      100% { transform: none; }
+    }
+    .debit-flyer {
+      position: fixed;
+      z-index: 40;
+      top: 32%;
+      left: 50%;
+      min-width: 170px;
+      padding: 10px 14px;
+      text-align: center;
+      pointer-events: none;
+      color: white;
+      background: var(--red);
+      border: 3px solid var(--ink);
+      border-radius: 999px;
+      box-shadow: 6px 7px 0 rgba(23,23,18,.35);
+      font-size: 19px;
+      font-weight: 1000;
+      font-variant-numeric: tabular-nums;
+      opacity: 0;
+      transform: translate(-50%, -25px) rotate(-4deg) scale(.85);
+    }
+    .debit-flyer.is-flying { animation: debit-flight .92s cubic-bezier(.18,.75,.28,1) both; }
+    @keyframes debit-flight {
+      0% { opacity: 0; transform: translate(-50%, -35px) rotate(-7deg) scale(.75); }
+      18%, 65% { opacity: 1; }
+      100% { opacity: 0; transform: translate(-50%, 31vh) rotate(3deg) scale(.9); }
+    }
 
+    .halfway-overlay {
+      position: fixed;
+      z-index: 20;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      padding: 25px;
+      background: rgba(23,23,18,.76);
+      backdrop-filter: blur(3px);
+    }
+    .halfway-card {
+      width: min(100%, 420px);
+      max-height: 86vh;
+      overflow-y: auto;
+      padding: 24px 18px 20px;
+      text-align: center;
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      box-shadow: 0 18px 48px rgba(8,27,37,.28);
+      animation: result-pop .32s cubic-bezier(.2,1.3,.5,1) both;
+    }
+    .halfway-kicker { color: var(--muted); font-size: 11px; font-weight: 1000; letter-spacing: .12em; text-transform: uppercase; }
+    .halfway-card h2 { margin: 5px 0 14px; font-size: 25px; line-height: .98; }
+    .halfway-standings { display: grid; gap: 8px; margin-bottom: 8px; text-align: left; }
+    .standing-count { text-align: right; font-size: 13px; font-weight: 900; color: var(--muted); white-space: nowrap; }
+    .halfway-note { margin: 10px 0 16px; color: var(--muted); font-size: 11px; font-weight: 800; }
+    .rules-list { display: grid; gap: 11px; margin: 4px 0 20px; padding: 0; list-style: none; text-align: left; }
+    .rules-list li { position: relative; padding-left: 18px; font-size: 13.5px; font-weight: 800; line-height: 1.45; color: var(--ink); }
+    .rules-list li::before { content: "•"; position: absolute; left: 2px; color: var(--red); font-weight: 1000; }
+    .divide-photo { position: relative; height: 120px; margin: 6px 0 16px; }
+    .divide-photo-half {
+      position: absolute;
+      inset: 0;
+      border-radius: 10px;
+      background: repeating-linear-gradient(45deg,#e7e3d8 0 10px,#d8d3c7 10px 20px);
+      background-size: cover;
+      background-position: center;
+      transition: transform .5s cubic-bezier(.2,.85,.3,1);
+    }
+    .divide-photo-left { clip-path: inset(0 50% 0 0); }
+    .divide-photo-right { clip-path: inset(0 0 0 50%); }
+    .divide-photo::after {
+      content: "";
+      position: absolute;
+      top: 0; bottom: 0; left: 50%;
+      width: 3px;
+      margin-left: -1.5px;
+      background: var(--red);
+      opacity: 0;
+      transition: opacity .15s ease;
+    }
+    .divide-photo.is-cut .divide-photo-left { transform: translateX(-16px) rotate(-4deg); }
+    .divide-photo.is-cut .divide-photo-right { transform: translateX(16px) rotate(4deg); }
+    .divide-photo.is-cut::after { opacity: 1; }
+    .divide-options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+    .divide-option { padding: 10px; background: var(--cream); border: 1px solid var(--line); border-radius: 11px; text-align: center; }
+    .divide-option-label { color: var(--muted); font-size: 9px; font-weight: 1000; letter-spacing: .06em; text-transform: uppercase; }
+    .divide-option-value { margin-top: 4px; font-size: 14px; font-weight: 1000; line-height: 1.25; }
     .final-screen { background: linear-gradient(180deg, #edf7f1, #f4f6f7 62%); }
     .final-crown { margin: 6vh 0 8px; text-align: center; font-size: 74px; line-height: 1; transform: rotate(-6deg); }
     .final-title { margin: 0; text-align: center; font-size: 48px; line-height: .88; letter-spacing: -.055em; }
@@ -572,7 +854,7 @@
     .standings { display: grid; gap: 10px; margin-bottom: 18px; }
     .standing {
       display: grid;
-      grid-template-columns: 36px 42px minmax(0,1fr) auto;
+      grid-template-columns: 30px minmax(0,1fr) auto;
       align-items: center;
       gap: 9px;
       padding: 10px;
@@ -583,13 +865,11 @@
     }
     .standing:first-child { background: #dff5e7; border-color: #89cda5; }
     .standing-rank { font-size: 22px; font-weight: 1000; text-align: center; }
-    .standing .avatar { width: 38px; height: 38px; font-size: 18px; }
     .standing-name { min-width: 0; font-weight: 1000; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .standing-meta { margin-top: 2px; color: var(--muted); font-size: 9px; font-weight: 850; }
     .standing-income { text-align: right; font-size: 16px; font-weight: 1000; }
     .standing-income small { display: block; color: var(--muted); font-size: 8px; text-transform: uppercase; }
 
-    .legal-line { margin-top: auto; padding-top: 15px; text-align: center; color: rgba(23,23,18,.57); font-size: 9px; line-height: 1.35; font-weight: 750; }
 
     @media (max-height: 760px) {
       .game-screen { padding-top: max(10px, env(safe-area-inset-top)); }
@@ -618,25 +898,76 @@
 <body>
   <main class="app" id="app">
     <section class="screen" id="intro-screen">
-      <div class="brand"><span class="brand-house" aria-hidden="true"></span> gra mieszkaniowa</div>
       <div class="hero">
-        <h1>KLITKA</h1>
+        <svg class="klitka-logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 520" role="img" aria-labelledby="klitka-logo-title klitka-logo-desc">
+          <title id="klitka-logo-title">KLITKA</title>
+          <desc id="klitka-logo-desc">Napis KLITKA ściśnięty wewnątrz rzutu pomieszczenia o wymiarach trzy na cztery metry.</desc>
+          <defs>
+            <marker id="klitka-arrow" markerWidth="9" markerHeight="9" refX="4.5" refY="4.5" orient="auto-start-reverse">
+              <path d="M1 1 8 4.5 1 8" fill="none" stroke="#7c858b" stroke-width="1.3"/>
+            </marker>
+            <clipPath id="klitka-letter-l-clip">
+              <rect x="366" y="136" width="42" height="248"/>
+              <rect x="366" y="342" width="102" height="42"/>
+            </clipPath>
+          </defs>
+          <rect width="1200" height="520" fill="#f4f6f7"/>
+          <g fill="none" stroke="#7c858b" stroke-width="2" stroke-linecap="round" opacity=".78">
+            <path d="M170 72V42M1030 72V42M180 50H1020" marker-start="url(#klitka-arrow)" marker-end="url(#klitka-arrow)"/>
+            <path d="M132 105H96M132 415H96M108 115V405" marker-start="url(#klitka-arrow)" marker-end="url(#klitka-arrow)"/>
+          </g>
+          <g fill="#6e777d" font-family="Arial, sans-serif" font-size="23" font-style="italic">
+            <text x="600" y="40" text-anchor="middle">4,00 m</text>
+            <text x="77" y="260" text-anchor="middle" transform="rotate(-90 77 260)">3,00 m</text>
+          </g>
+          <rect x="170" y="105" width="860" height="310" rx="2" fill="#fff" stroke="#183b4d" stroke-width="9"/>
+          <rect x="190" y="125" width="820" height="270" fill="none" stroke="#183b4d" stroke-width="2" opacity=".38"/>
+          <g fill="#183b4d">
+            <rect x="200" y="136" width="42" height="248"/>
+            <path d="m269 272 78-112-34-24-78 112z"/>
+            <path d="m235 272 78 112 34-24-78-112z"/>
+            <rect x="235" y="248" width="34" height="24"/>
+            <rect x="366" y="136" width="42" height="248"/>
+            <rect x="366" y="342" width="102" height="42"/>
+            <rect x="488" y="136" width="42" height="248"/>
+            <rect x="548" y="136" width="126" height="42"/>
+            <rect x="590" y="136" width="42" height="248"/>
+            <rect x="692" y="136" width="42" height="248"/>
+            <path d="m761 272 78-112-34-24-78 112z"/>
+            <path d="m727 272 78 112 34-24-78-112z"/>
+            <rect x="727" y="248" width="34" height="24"/>
+            <path d="m905 136 41 10-56 238-41-10z"/>
+            <path d="m905 146 41-10 55 238-41 10z"/>
+            <rect x="905" y="136" width="41" height="24"/>
+            <path d="M874 292h102v40H874z"/>
+          </g>
+          <g fill="none" stroke="#183b4d" stroke-width="5">
+            <path d="M382 415h105" stroke="#f4f6f7" stroke-width="18"/>
+            <path d="M387 414V314"/>
+            <path d="M387 314a100 100 0 0 1 100 100" stroke-width="2" opacity=".5"/>
+          </g>
+          <g fill="none" stroke="#fff" stroke-linecap="round" clip-path="url(#klitka-letter-l-clip)">
+            <path d="M387 414V314" stroke-width="5"/>
+            <path d="M387 314a100 100 0 0 1 100 100" stroke-width="2"/>
+          </g>
+        </svg>
       </div>
-      <p class="lead">Kupuj metry, których prawie nie ma. Wygrywa, kto zgarnie największy czynsz.</p>
+      <p class="lead">Kupuj mikrokawalerki<br>i wyciśnij ile się da z metrów i ludzi.</p>
+      <button class="rules-link" id="rules-link" type="button">Jak grać?</button>
 
       <div class="panel">
         <div class="identity-block">
           <label class="label" for="name-input"><span class="entry-number">1</span>Podaj imię albo przezwisko</label>
-          <input class="text-input" id="name-input" maxlength="16" autocomplete="nickname" placeholder="np. Rafał">
+          <input class="text-input" id="name-input" maxlength="16" autocomplete="nickname" placeholder="np. Fliper">
           <p class="entry-hint">Ta nazwa będzie widoczna dla pozostałych graczy.</p>
         </div>
         <div class="entry-divider"><span>wybierz grę</span></div>
         <div class="button-stack">
-          <button class="primary" id="demo-button" disabled>Zagraj demo</button>
-          <button class="secondary" id="create-button" disabled>Załóż pokój</button>
+          <button class="primary" id="demo-button" disabled>Podbijaj miasta</button>
+          <button class="secondary" id="create-button" disabled>Zaproś znajomych</button>
         </div>
         <div class="join-box">
-          <label class="label" for="join-code">Dołącz do pokoju</label>
+          <label class="label" for="join-code">Dołącz do gry</label>
           <div class="join-row">
             <input class="text-input" id="join-code" maxlength="5" inputmode="text" placeholder="K7M2X">
             <button class="ghost" id="join-button" disabled>Dołącz</button>
@@ -644,7 +975,38 @@
         </div>
         <div class="entry-error" id="entry-error" role="alert"></div>
       </div>
-      <p class="tiny-note">Prototyp lokalny: tryb demo symuluje pozostałe telefony botami. Pokój sieciowy będzie kolejną warstwą — reguły i ekrany są już wspólne dla obu trybów.</p>
+      <p class="tiny-note">Mikrokawalerki są łudząco podobne do prawdziwych, ale nie przedstawiają rzeczywistych ofert.<br>Gra ma charakter satyryczny.</p>
+    </section>
+
+    <section class="screen" id="tiers-screen" hidden>
+      <div class="topbar">
+        <div class="brand"><span class="brand-house" aria-hidden="true"></span> KLITKA</div>
+        <button class="ghost" id="tiers-back" style="width:auto;min-height:38px;padding:6px 10px">Wstecz</button>
+      </div>
+      <h2 class="lobby-title">Wybierz miasto.</h2>
+      <p style="margin:5px 0 22px;font-weight:750;color:var(--muted)">Im większe miasto, tym twardsza konkurencja.</p>
+      <div class="tier-list" id="tier-list"></div>
+    </section>
+
+    <section class="screen" id="custom-screen" hidden>
+      <div class="topbar">
+        <div class="brand"><span class="brand-house" aria-hidden="true"></span> KLITKA</div>
+        <button class="ghost" id="custom-back" style="width:auto;min-height:38px;padding:6px 10px">Wstecz</button>
+      </div>
+      <h2 class="lobby-title">Własna gra.</h2>
+      <p style="margin:5px 0 0;font-weight:750;color:var(--muted)">Ustaw rynek i pobij swój rekord miesięcznego czynszu.</p>
+      <div class="custom-options">
+        <div class="custom-option"><label class="label" for="custom-listings">Mieszkania na sprzedaż</label><select id="custom-listings"><option value="5">5 mieszkań</option><option value="10">10 mieszkań</option><option value="15" selected>15 mieszkań</option><option value="20">20 mieszkań</option><option value="25">25 mieszkań</option><option value="30">30 mieszkań</option></select></div>
+        <div class="custom-option"><label class="label" for="custom-bots">Liczba botów</label><select id="custom-bots"><option value="1">1 bot</option><option value="2">2 boty</option><option value="3">3 boty</option><option value="4">4 boty</option><option value="5" selected>5 botów</option></select></div>
+        <div class="custom-option">
+          <span class="label">Rodzaje ofert</span>
+          <label class="custom-check"><input type="checkbox" id="custom-standard" checked><span>Zwykłe oferty ze zdjęciami</span></label>
+          <label class="custom-check"><input type="checkbox" id="custom-mystery" checked><span>Oferty w ciemno</span></label>
+          <label class="custom-check"><input type="checkbox" id="custom-divisible" checked><span>Mieszkania do podziału</span></label>
+        </div>
+      </div>
+      <p class="tiny-note" id="custom-summary" style="margin:0 4px 16px"></p>
+      <button class="primary" id="custom-start">Zaczynam własną grę</button>
     </section>
 
     <section class="screen" id="lobby-screen" hidden>
@@ -664,28 +1026,42 @@
       <div class="player-list" id="lobby-player-list"></div>
 
       <div class="panel" id="test-player-panel" style="padding:14px;margin-bottom:16px">
-        <span class="label">W prototypie dobierz graczy testowych</span>
+        <span class="label">W trybie demo dobierz graczy testowych</span>
         <div class="player-count-control">
           <button id="players-minus" aria-label="Mniej graczy">−</button>
           <div class="player-count-label"><strong id="player-count">4</strong><span id="listing-count-label">12 mieszkań</span></div>
           <button id="players-plus" aria-label="Więcej graczy">+</button>
         </div>
-        <p class="tiny-note" style="margin:0">Liczba ofert = liczba graczy + 8. Każdy zaczyna z 5 000 000 zł.</p>
+        <p class="tiny-note" style="margin:0">Liczba ofert = liczba graczy + 8. Każdy zaczyna z 4 000 000 zł.</p>
+      </div>
+      <div class="panel" id="network-options-panel" style="padding:14px;margin-bottom:16px" hidden>
+        <span class="label">Opcje dodatkowe</span>
+        <label style="display:flex;gap:10px;align-items:flex-start;margin:10px 0;font-weight:850;cursor:pointer">
+          <input type="checkbox" id="network-mystery-option" style="width:20px;height:20px;flex:0 0 auto">
+          <span>Oferty w ciemno<small style="display:block;color:var(--muted);font-weight:700;margin-top:2px">Bez zdjęcia i bez pełnej informacji o czynszu.</small></span>
+        </label>
+        <label style="display:flex;gap:10px;align-items:flex-start;margin:10px 0 0;font-weight:850;cursor:pointer">
+          <input type="checkbox" id="network-divisible-option" style="width:20px;height:20px;flex:0 0 auto">
+          <span>Mieszkania do podziału<small style="display:block;color:var(--muted);font-weight:700;margin-top:2px">Kupujący może dopłacić 500 000 zł i zrobić 2 klitki.</small></span>
+        </label>
+        <p class="tiny-note" id="network-options-note" style="margin:10px 0 0">Opcje ustawia host przed rozpoczęciem gry.</p>
       </div>
       <button class="primary" id="start-button">Wszyscy są — zaczynamy</button>
     </section>
 
     <section class="screen game-screen" id="game-screen" hidden>
       <div class="topbar">
-        <div class="round-pill"><span id="round-label">MIESZKANIE 1 / 12</span></div>
-        <strong id="my-wallet" hidden>5 000 000 zł</strong>
+        <div class="round-progress" id="round-progress"></div>
+        <strong id="my-wallet" hidden>4 000 000 zł</strong>
       </div>
 
       <article class="listing-card" id="listing-card">
-        <div class="photo-grid" id="photo-grid"></div>
-        <div class="location-strip" id="location-strip">Lublin · centrum</div>
+        <div class="photo-wrap">
+          <div class="photo-grid" id="photo-grid"></div>
+          <div class="location-strip" id="location-strip">Lublin · centrum</div>
+          <div class="divisible-badge" id="divisible-badge" hidden>Prosi się o podział</div>
+        </div>
         <div class="listing-facts">
-          <div class="fact"><small>Metraż</small><strong id="area-value">9 m²</strong></div>
           <div class="fact rent"><small>Miesięczny najem</small><strong id="rent-value">1 500 zł</strong></div>
         </div>
       </article>
@@ -704,19 +1080,19 @@
       </section>
       <button class="danger buy-button" id="buy-button" hidden>Kupuję!</button>
       <div class="buy-help" id="buy-help"></div>
+      <button class="ghost skip-end-button" id="skip-end-button" hidden>Przeskocz do końca</button>
 
-      <div class="balances-heading">Salda graczy</div>
+      <div class="balances-heading">Pozostała gotówka graczy</div>
       <div class="player-rail" id="player-rail"></div>
-      <div class="legal-line">Wnętrza są fikcyjne i zostały wygenerowane syntetycznie na potrzeby gry.</div>
     </section>
 
     <section class="screen final-screen" id="final-screen" hidden>
-      <div class="brand"><span class="brand-house" aria-hidden="true"></span> KLITKA</div>
       <div class="final-crown">👑</div>
       <h1 class="final-title" id="winner-title">Król Fliperów</h1>
       <p class="final-subtitle">Wygrywa najwyższy miesięczny przychód. Niewydane miliony właśnie przepadły.</p>
+      <p class="final-unlock" id="final-unlock" hidden></p>
       <div class="standings" id="standings"></div>
-      <button class="primary" id="again-button">Jeszcze raz</button>
+      <button class="primary" id="again-button">Wróć do listy miast</button>
     </section>
 
     <div class="countdown-overlay" id="countdown-overlay" hidden><div class="countdown-number" id="countdown-number">3</div></div>
@@ -726,6 +1102,59 @@
         <div class="result-kicker" id="result-kicker">Sprzedane</div>
         <h2 id="result-title">Rafał bierze klitkę</h2>
         <p id="result-copy">za 456 250 zł</p>
+        <div class="purchase-debit" id="purchase-debit" hidden>
+          <small>Z TWOJEGO KONTA</small>
+          <strong id="debit-amount">−456 250 zł</strong>
+          <div class="purchase-debit-row"><span class="before" id="debit-before">4 000 000 zł</span><span class="arrow">→</span><span class="after" id="debit-after">3 543 750 zł</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="debit-flyer" id="debit-flyer" aria-hidden="true">−456 250 zł</div>
+    <div class="halfway-overlay" id="halfway-overlay" hidden>
+      <div class="halfway-card">
+        <div class="halfway-kicker">Połowa mieszkań sprzedana</div>
+        <h2>Kto teraz rządzi?</h2>
+        <div class="halfway-standings" id="halfway-standings"></div>
+        <p class="halfway-note">Wysokość dochodów poznamy dopiero na koniec gry.</p>
+        <button class="primary" id="halfway-skip">Dalej</button>
+      </div>
+    </div>
+    <div class="halfway-overlay" id="rules-overlay" hidden>
+      <div class="halfway-card">
+        <div class="halfway-kicker">Zanim zaczniesz</div>
+        <h2>Jak grać?</h2>
+        <ul class="rules-list">
+          <li>Cena klitki spada. Kto pierwszy kliknie „Kupuję!”, płaci cenę z tej sekundy.</li>
+          <li>Wygrywa gracz z najwyższym łącznym czynszem z kupionych klitek — nie ten z największym saldem.</li>
+          <li>Niewydane pieniądze nic nie dają na koniec gry.</li>
+          <li>Kilkanaście rund, każda to inna oferta.</li>
+        </ul>
+        <button class="primary" id="rules-close">Zrozumiałem, gramy</button>
+      </div>
+    </div>
+    <div class="halfway-overlay" id="divide-overlay" hidden>
+      <div class="halfway-card">
+        <div class="halfway-kicker" id="divide-kicker">Duże mieszkanie</div>
+        <h2 id="divide-title">Podzielić na klitki?</h2>
+        <div class="divide-photo" id="divide-photo">
+          <div class="divide-photo-half divide-photo-left" id="divide-photo-left"></div>
+          <div class="divide-photo-half divide-photo-right" id="divide-photo-right"></div>
+        </div>
+        <div class="divide-options">
+          <div class="divide-option">
+            <div class="divide-option-label">Zostaw jak jest</div>
+            <div class="divide-option-value" id="divide-keep-value">0 zł/mies.</div>
+          </div>
+          <div class="divide-option">
+            <div class="divide-option-label">Podziel na 2</div>
+            <div class="divide-option-value" id="divide-split-value">0 zł/mies.</div>
+          </div>
+        </div>
+        <div class="button-stack" id="divide-actions">
+          <button class="secondary" id="divide-keep-button">Zostaw jak jest</button>
+          <button class="primary" id="divide-split-button">Podziel za 500 000 zł</button>
+        </div>
+        <p class="halfway-note" id="divide-waiting-note" hidden>Czeka na decyzję kupującego…</p>
       </div>
     </div>
   </main>
@@ -734,13 +1163,62 @@
     (() => {
       'use strict';
 
-      const START_CASH = 5_000_000;
+      const START_CASH = 4_000_000;
       const START_PRICE = 2_000_000;
-      const AUCTION_MS = 8_000;
+      const AUCTION_MS = 10_000;
       const BOT_NAMES = ['Piotr', 'Wojciech', 'Kuba', 'Aneta', 'Marek'];
-      const AVATAR_COLORS = ['#ffd934', '#78d9ff', '#d69cff', '#ff9c8c', '#8ce09f', '#ffb15c'];
-      const AVATAR_ICONS = ['😎', '🤑', '🤓', '🥸', '😏', '🤠'];
-
+      const BOT_PROFILES = [
+        { yield: .054, valuation: 1, reactionMin: 140, reactionMax: 360 },
+        { yield: .058, valuation: .98, reactionMin: 80, reactionMax: 280 },
+        { yield: .051, valuation: 1.02, reactionMin: 190, reactionMax: 430 },
+        { yield: .056, valuation: 1.01, reactionMin: 110, reactionMax: 330 },
+        { yield: .053, valuation: .97, reactionMin: 160, reactionMax: 390 }
+      ];
+      // Szansa, że bot olewa wyliczoną wartość opłacalności i chwyta ofertę
+      // pod wpływem impulsu, przy znacznie wyższej cenie. Bez tego boty nigdy
+      // nie reagują, dopóki cena nie spadnie poniżej progu opłacalności z
+      // czynszu — a to jest zwykle mniej niż połowa ceny startowej, więc
+      // człowiek klikający wcześnie i tak wygrywa każdą licytację bez ryzyka.
+      const DIFFICULTY_TIERS = [
+        { id: 'radom', city: 'Radom', desc: 'Tutorial · 1 bot · 5 zwykłych ofert.', botCount: 1, listingCount: 5, startCash: 1_200_000, mysteryQuota: 0, divisibleQuota: 0, impulsiveChance: .30, aggressionBoost: 1.12 },
+        { id: 'lodz', city: 'Łódź', desc: '2 boty · 7 ofert · zakupy w ciemno.', botCount: 2, listingCount: 7, startCash: 1_650_000, mysteryQuota: 1, divisibleQuota: 0, impulsiveChance: .40, aggressionBoost: 1.27 },
+        { id: 'katowice', city: 'Katowice', desc: '3 boty · 9 ofert · trudniejszy rynek.', botCount: 3, listingCount: 9, startCash: 2_100_000, mysteryQuota: 2, divisibleQuota: 0, impulsiveChance: .50, aggressionBoost: 1.42 },
+        { id: 'wroclaw', city: 'Wrocław', desc: '4 boty · 11 ofert · dochodzi podział.', botCount: 4, listingCount: 11, startCash: 2_700_000, mysteryQuota: 2, divisibleQuota: 1, impulsiveChance: .60, aggressionBoost: 1.58 },
+        { id: 'krakow', city: 'Kraków', desc: '5 botów · 13 ofert · pełna pula.', botCount: 5, listingCount: 13, startCash: 3_300_000, mysteryQuota: 2, divisibleQuota: 2, impulsiveChance: .70, aggressionBoost: 1.74 },
+        { id: 'warszawa', city: 'Warszawa', desc: '5 ekstremalnych botów · 15 ofert.', botCount: 5, listingCount: 15, startCash: 4_000_000, mysteryQuota: 3, divisibleQuota: 3, impulsiveChance: .82, aggressionBoost: 1.92 }
+      ];
+      const TIER_STORAGE_KEY = 'klitka-tier-progress';
+      const CAMPAIGN_SEEN_KEY = 'klitka-campaign-seen';
+      const CITY_RESULTS_KEY = 'klitka-city-results';
+      const CUSTOM_UNLOCK_KEY = 'klitka-custom-unlocked';
+      const getUnlockedTier = () => {
+        try { return Math.min(DIFFICULTY_TIERS.length - 1, Math.max(0, parseInt(localStorage.getItem(TIER_STORAGE_KEY), 10) || 0)); }
+        catch { return 0; }
+      };
+      const unlockTier = index => {
+        try {
+          const current = getUnlockedTier();
+          if (index > current) localStorage.setItem(TIER_STORAGE_KEY, String(Math.min(DIFFICULTY_TIERS.length - 1, index)));
+        } catch {}
+      };
+      const loadCampaignSeen = () => {
+        try {
+          const stored = JSON.parse(localStorage.getItem(CAMPAIGN_SEEN_KEY) || '[]');
+          return Array.isArray(stored) ? stored.filter(Number.isInteger) : [];
+        } catch { return []; }
+      };
+      const saveCampaignSeen = indexes => {
+        try { localStorage.setItem(CAMPAIGN_SEEN_KEY, JSON.stringify(indexes)); } catch {}
+      };
+      const loadCityResults = () => { try { return JSON.parse(localStorage.getItem(CITY_RESULTS_KEY) || '{}') || {}; } catch { return {}; } };
+      const saveCityResult = (cityId, income) => {
+        const results = loadCityResults();
+        results[cityId] = Math.max(Number(results[cityId]) || 0, income);
+        try { localStorage.setItem(CITY_RESULTS_KEY, JSON.stringify(results)); } catch {}
+        return results[cityId];
+      };
+      const isCustomUnlocked = () => { try { return localStorage.getItem(CUSTOM_UNLOCK_KEY) === '1'; } catch { return false; } };
+      const unlockCustom = () => { try { localStorage.setItem(CUSTOM_UNLOCK_KEY, '1'); } catch {} };
       const syntheticPhoto = number => [
         `assets/listings/synthetic/${String(number).padStart(2, '0')}.jpg`
       ];
@@ -749,30 +1227,109 @@
       // Każda oferta ma jedno czytelne zdjęcie zoptymalizowane pod telefon.
       const LISTINGS = [
         { city: 'Centrum · inwestycyjna okazja', area: 7, rent: 850, photos: syntheticPhoto(1) },
-        { city: 'Śródmieście · standard premium', area: 10, rent: 2350, photos: syntheticPhoto(2) },
-        { city: 'Poddasze · naturalny charakter', area: 18, rent: 1450, photos: syntheticPhoto(3) },
-        { city: 'Centrum · kompaktowy układ', area: 11, rent: 2100, photos: syntheticPhoto(4) },
-        { city: 'Blisko komunikacji · gotowiec', area: 9, rent: 1400, photos: syntheticPhoto(5) },
-        { city: 'Centrum · pełne wyposażenie', area: 12, rent: 1400, photos: syntheticPhoto(6) },
-        { city: 'Top lokalizacja · po remoncie', area: 9, rent: 2200, photos: syntheticPhoto(7) },
-        { city: 'Śródmieście · funkcjonalne 12 m²', area: 12, rent: 1200, photos: syntheticPhoto(8) },
-        { city: 'Centrum · antresola', area: 10, rent: 1500, photos: syntheticPhoto(9) },
-        { city: 'Apartament premium · 11 m²', area: 11, rent: 2350, photos: syntheticPhoto(10) },
-        { city: 'Centrum · gotowe do wejścia', area: 10, rent: 2350, photos: syntheticPhoto(11) },
-        { city: 'Kamienica · loftowy klimat', area: 12, rent: 1750, photos: syntheticPhoto(12) },
+        { city: 'Śródmieście · standard premium', area: 10, rent: 2700, photos: syntheticPhoto(2) },
+        { city: 'Poddasze · naturalny charakter', area: 18, rent: 1650, photos: syntheticPhoto(3) },
+        { city: 'Centrum · kompaktowy układ', area: 11, rent: 2050, photos: syntheticPhoto(4) },
+        { city: 'Blisko komunikacji · gotowiec', area: 9, rent: 1200, photos: syntheticPhoto(5) },
+        { city: 'Centrum · pełne wyposażenie', area: 12, rent: 1500, photos: syntheticPhoto(6) },
+        { city: 'Top lokalizacja · po remoncie', area: 9, rent: 2450, photos: syntheticPhoto(7) },
+        { city: 'Śródmieście · funkcjonalne 12 m²', area: 12, rent: 1350, photos: syntheticPhoto(8) },
+        { city: 'Centrum · antresola', area: 10, rent: 1800, photos: syntheticPhoto(9) },
+        { city: 'Apartament premium · 11 m²', area: 11, rent: 2800, photos: syntheticPhoto(10) },
+        { city: 'Centrum · gotowe do wejścia', area: 10, rent: 2650, photos: syntheticPhoto(11) },
+        { city: 'Kamienica · loftowy klimat', area: 12, rent: 1950, photos: syntheticPhoto(12) },
         { city: 'Centrum · niezależne wejście', area: 9, rent: 1600, photos: syntheticPhoto(13) },
-        { city: 'Spokojna okolica · umeblowane', area: 12, rent: 1500, photos: syntheticPhoto(14) },
-        { city: 'Blisko uczelni · duży stół', area: 12, rent: 1200, photos: syntheticPhoto(15) },
-        { city: 'Przyziemie · mikroloft', area: 8, rent: 950, photos: syntheticPhoto(16) },
-        { city: 'Poddasze · wyjątkowy układ', area: 13, rent: 1850, photos: syntheticPhoto(17) },
-        { city: 'Centrum · 6,5 m² możliwości', area: 6.5, rent: 850, photos: syntheticPhoto(18) },
-        { city: 'Projekt architekta · antresola', area: 14, rent: 2400, photos: syntheticPhoto(19) },
-        { city: 'Industrial premium · ostatnie piętro', area: 11, rent: 2500, photos: syntheticPhoto(20) }
+        { city: 'Spokojna okolica · umeblowane', area: 12, rent: 1100, photos: syntheticPhoto(14) },
+        { city: 'Blisko uczelni · duży stół', area: 12, rent: 1000, photos: syntheticPhoto(15) },
+        { city: 'Przyziemie · mikroloft', area: 8, rent: 900, photos: syntheticPhoto(16) },
+        { city: 'Poddasze · wyjątkowy układ', area: 13, rent: 1750, photos: syntheticPhoto(17) },
+        { city: 'Centrum · 6,5 m² możliwości', area: 6.5, rent: 950, photos: syntheticPhoto(18) },
+        { city: 'Projekt architekta · antresola', area: 14, rent: 2550, photos: syntheticPhoto(19) },
+        { city: 'Industrial premium · ostatnie piętro', area: 11, rent: 2950, photos: syntheticPhoto(20) },
+        { city: 'Dawna pralnia · stół wielofunkcyjny', area: 10, rent: 1250, photos: syntheticPhoto(21) },
+        { city: 'Kamienica · prywatny komin', area: 9, rent: 2100, photos: syntheticPhoto(22) },
+        { city: 'Kotłownia · instalacje w cenie', area: 9, rent: 1050, photos: syntheticPhoto(23) },
+        { city: 'Pod zjazdem · malejąca wysokość', area: 11, rent: 1450, photos: syntheticPhoto(24) },
+        { city: 'Balkon · panoramiczny standard', area: 7, rent: 2350, photos: syntheticPhoto(25) },
+        { city: 'Poddasze · strefa schylania', area: 6, rent: 1400, photos: syntheticPhoto(26) },
+        { city: 'Dawna chłodnia · stała temperatura', area: 9, rent: 1150, photos: syntheticPhoto(27) },
+        { city: 'Suterena · poziom chodnika', area: 12, rent: 1300, photos: syntheticPhoto(28) },
+        { city: 'Dawny kiosk · witryna miejska', area: 8, rent: 2600, photos: syntheticPhoto(29) },
+        { city: 'Kontener · moduł miejski', area: 13, rent: 1700, photos: syntheticPhoto(30) },
+        { city: 'Boazeria · klasyka premium', area: 12, rent: 1550, photos: syntheticPhoto(31) },
+        { city: 'Korytarz · studio w przejściu', area: 8, rent: 800, photos: syntheticPhoto(41) },
+        { city: 'Schowek · pełny standard', area: 6, rent: 825, photos: syntheticPhoto(42) },
+        { city: 'Przy windzie · oszczędny metraż', area: 7, rent: 975, photos: syntheticPhoto(43) },
+        { city: 'Półpiętro · własny licznik', area: 9, rent: 1025, photos: syntheticPhoto(44) },
+        { city: 'Suterenka · światło pośrednie', area: 10, rent: 1075, photos: syntheticPhoto(45) },
+        { city: 'Pokój z aneksem · wszystko pod ręką', area: 8, rent: 1125, photos: syntheticPhoto(46) },
+        { city: 'Adaptacja biurowa · centrum', area: 11, rent: 1225, photos: syntheticPhoto(47) },
+        { city: 'Dawna portiernia · wejście z ulicy', area: 9, rent: 1275, photos: syntheticPhoto(48) },
+        { city: 'Łazienka z funkcją spania', area: 7, rent: 1375, photos: syntheticPhoto(49) },
+        { city: 'Kuchnia przechodnia · prywatny kąt', area: 10, rent: 1425, photos: syntheticPhoto(50) },
+        { city: 'Tapeta total look · vintage premium', area: 8, rent: 1475, photos: syntheticPhoto(51) },
+        { city: 'Dywan pałacowy · miękki standard', area: 9, rent: 1525, photos: syntheticPhoto(52) },
+        { city: 'Balkon zabudowany · całoroczny', area: 6, rent: 1575, photos: syntheticPhoto(53) },
+        { city: 'Garażowa antresola · miejski loft', area: 12, rent: 1675, photos: syntheticPhoto(54) },
+        { city: 'Dawny magazynek · po liftingu', area: 10, rent: 1725, photos: syntheticPhoto(55) },
+        { city: 'Nad piekarnią · ciepło w cenie', area: 9, rent: 1775, photos: syntheticPhoto(56) },
+        { city: 'Wnęka w kamienicy · wysokie 7 m²', area: 7, rent: 1825, photos: syntheticPhoto(57) },
+        { city: 'Lokal po usługach · gotowy na najem', area: 11, rent: 1850, photos: syntheticPhoto(58) },
+        { city: 'Podwórko studnia · klimat premium', area: 10, rent: 1900, photos: syntheticPhoto(59) },
+        { city: 'Wejście przez kuchnię · układ rodzinny', area: 12, rent: 1925, photos: syntheticPhoto(60) },
+        { city: 'Za kotarą · osobna sypialnia', area: 9, rent: 1975, photos: syntheticPhoto(61) },
+        { city: 'Przy zsypie · świetna komunikacja', area: 8, rent: 2000, photos: syntheticPhoto(62) },
+        { city: 'Dawna suszarnia · panoramiczny skos', area: 13, rent: 2025, photos: syntheticPhoto(63) },
+        { city: 'Parter witrynowy · miejski apartament', area: 10, rent: 2075, photos: syntheticPhoto(64) },
+        { city: 'Łóżko piętrowe · dwa poziomy życia', area: 8, rent: 2125, photos: syntheticPhoto(65) },
+        { city: 'Łazienka na podeście · designerskie', area: 9, rent: 2150, photos: syntheticPhoto(66) },
+        { city: 'Studio narożne · trzy funkcje', area: 11, rent: 2250, photos: syntheticPhoto(67) },
+        { city: 'Mikroapartament z patio technicznym', area: 12, rent: 2300, photos: syntheticPhoto(68) },
+        { city: 'Bez zdjęć · właściciel się śpieszy', area: 8, rent: 875, photos: [] },
+        { city: 'Bez zdjęć · fotograf zachorował', area: 7, rent: 925, photos: [] },
+        { city: 'Bez zdjęć · zaufaj opisowi', area: 10, rent: 1175, photos: [] },
+        { city: 'Bez zdjęć · liczy się metraż', area: 9, rent: 1325, photos: [] },
+        { city: 'Bez zdjęć · zdjęcia wkrótce', area: 11, rent: 1625, photos: [] },
+        { city: 'Bez zdjęć · niespodzianka gwarantowana', area: 12, rent: 1875, photos: [] },
+        { city: 'Bez zdjęć · kupujesz w ciemno', area: 9, rent: 2200, photos: [] },
+        { city: 'Bez zdjęć · szczery opis wystarczy', area: 13, rent: 2500, photos: [] },
+        { city: 'Bez zdjęć · aparat nie mieści się w środku', area: 7, rent: 2275, photos: [] },
+        { city: 'Bez zdjęć · klucze są u sąsiada', area: 10, rent: 2400, photos: [] },
+        { city: 'Bez zdjęć · oglądanie po zakupie', area: 12, rent: 2750, photos: [] },
+        { city: 'Kawalerka z oddzielną sypialnią', area: 24, rent: 3100, photos: syntheticPhoto(32), divisible: true },
+        { city: 'Mieszkanie z balkonem', area: 24, rent: 3200, photos: syntheticPhoto(33), divisible: true },
+        { city: 'Przestronne przed remontem', area: 24, rent: 3300, photos: syntheticPhoto(34), divisible: true },
+        { city: 'Jasne mieszkanie z osobną kuchnią', area: 24, rent: 3400, photos: syntheticPhoto(35), divisible: true },
+        { city: 'Klasyczna kawalerka w kamienicy', area: 24, rent: 3500, photos: syntheticPhoto(36), divisible: true },
+        { city: 'Nowoczesne, deweloperskie', area: 24, rent: 3600, photos: syntheticPhoto(37), divisible: true },
+        { city: 'Z antresolą do zaadaptowania', area: 24, rent: 3700, photos: syntheticPhoto(38), divisible: true },
+        { city: 'Przytulne, dwupokojowe', area: 24, rent: 3800, photos: syntheticPhoto(39), divisible: true },
+        { city: 'Reprezentacyjne, gotowe do wejścia', area: 24, rent: 3900, photos: syntheticPhoto(40), divisible: true }
       ];
+
+      // Oferty bez zdjęć (photos: []) to "mystery listingi": zamiast dokładnej
+      // ceny najmu pokazują tylko przedział, prawdziwa kwota ujawnia się dopiero
+      // po rozstrzygnięciu licytacji. Boty zawsze znają prawdziwą wartość.
+      const mysteryHint = rent => {
+        if (rent < 1000) return 'mniej niż 1000 zł';
+        if (rent < 1500) return 'więcej niż 1000 zł';
+        if (rent <= 2000) return 'mniej niż 2000 zł';
+        return 'więcej niż 2000 zł';
+      };
+
+      // Duże mieszkania (divisible: true) można po zakupie podzielić na
+      // DIVIDE_UNITS klitek za stałą kwotę DIVIDE_COST. Czynsz na klitkę to
+      // (oryginalny czynsz + 500) / DIVIDE_UNITS — mniejsze klitki mają wyższą
+      // stawkę za m², co jest samą esencją satyry tej gry.
+      const DIVIDE_COST = 500_000;
+      const DIVIDE_UNITS = 2;
+      const dividedRentPerUnit = rent => Math.round((rent + 500) / DIVIDE_UNITS);
 
       const $ = (selector) => document.querySelector(selector);
       const screens = {
         intro: $('#intro-screen'),
+        tiers: $('#tiers-screen'),
+        custom: $('#custom-screen'),
         lobby: $('#lobby-screen'),
         game: $('#game-screen'),
         final: $('#final-screen')
@@ -793,7 +1350,16 @@
         settled: false,
         demo: true,
         networkListing: null,
-        totalListings: 0
+        totalListings: 0,
+        previousListingIndexes: [],
+        campaignSeenIndexes: loadCampaignSeen(),
+        halfwayShown: false,
+        halfwayContinue: null,
+        tierIndex: null,
+        customGame: false,
+        customSettings: null,
+        startCash: START_CASH,
+        divideResolve: null
       };
 
       const network = {
@@ -801,16 +1367,186 @@
         roomCode: '',
         playerId: '',
         token: '',
+        hostId: '',
         eventSource: null,
         serverOffset: 0,
         lastRevision: -1,
         lastPhase: '',
         lastResultKey: '',
         purchasePending: false,
-        countdownFrame: 0
+        countdownFrame: 0,
+        finalFallbackTimer: 0
       };
 
       const money = value => Math.max(0, Math.round(value)).toLocaleString('pl-PL') + ' zł';
+
+      function createSoundController() {
+        let context = null;
+        let unlocked = false;
+        let menuTimer = 0;
+        let scene = 'intro';
+        let lastAuctionPulse = -Infinity;
+
+        const audioConstructor = () => globalThis.AudioContext || globalThis.webkitAudioContext;
+        const canPlay = () => context && context.state !== 'closed';
+
+        function tone(frequency, duration = .08, options = {}) {
+          if (!canPlay()) return;
+          const start = context.currentTime + (options.delay || 0);
+          const oscillator = context.createOscillator();
+          const gain = context.createGain();
+          oscillator.type = options.type || 'sine';
+          oscillator.frequency.setValueAtTime(frequency, start);
+          if (options.to) oscillator.frequency.exponentialRampToValueAtTime(options.to, start + duration);
+          const volume = Math.max(.0001, options.volume || .035);
+          gain.gain.setValueAtTime(.0001, start);
+          gain.gain.exponentialRampToValueAtTime(volume, start + .012);
+          gain.gain.exponentialRampToValueAtTime(.0001, start + duration);
+          oscillator.connect(gain).connect(context.destination);
+          oscillator.start(start);
+          oscillator.stop(start + duration + .025);
+        }
+
+        function noise(duration = .08, volume = .025, delay = 0) {
+          if (!canPlay()) return;
+          const frames = Math.max(1, Math.floor(context.sampleRate * duration));
+          const buffer = context.createBuffer(1, frames, context.sampleRate);
+          const channel = buffer.getChannelData(0);
+          for (let index = 0; index < frames; index += 1) channel[index] = Math.random() * 2 - 1;
+          const source = context.createBufferSource();
+          const filter = context.createBiquadFilter();
+          const gain = context.createGain();
+          const start = context.currentTime + delay;
+          filter.type = 'lowpass';
+          filter.frequency.value = 1_100;
+          gain.gain.setValueAtTime(volume, start);
+          gain.gain.exponentialRampToValueAtTime(.0001, start + duration);
+          source.buffer = buffer;
+          source.connect(filter).connect(gain).connect(context.destination);
+          source.start(start);
+        }
+
+        // Lekko tandetna muzyka windowa: cztery akordy (Cmaj7-Am7-Dm7-G7),
+        // spacerujący bas i miękki hi-hat na offbeatach. Cała fraza trwa
+        // 4 takty i zapętla się płynnie, zamiast powtarzać ten sam krótki motyw.
+        const MENU_BEAT = 60 / 96;
+        const MENU_BARS = [
+          { pad: [261.63, 329.63, 392.00, 493.88], bass: [130.81, 196.00, 130.81, 164.81], melody: [523.25, null, 587.33, 659.25] },
+          { pad: [220.00, 261.63, 329.63, 392.00], bass: [110.00, 164.81, 110.00, 130.81], melody: [440.00, null, 493.88, 523.25] },
+          { pad: [293.66, 349.23, 440.00, 523.25], bass: [146.83, 220.00, 146.83, 174.61], melody: [587.33, null, 523.25, 440.00] },
+          { pad: [196.00, 246.94, 293.66, 349.23], bass: [98.00, 146.83, 98.00, 123.47], melody: [392.00, null, 349.23, 293.66] }
+        ];
+
+        function menuLoop() {
+          if (!canPlay() || scene !== 'intro') return;
+          const barDuration = MENU_BEAT * 4;
+          MENU_BARS.forEach((bar, barIndex) => {
+            const barStart = barIndex * barDuration;
+            bar.pad.forEach((freq, voiceIndex) => tone(freq, barDuration * .92, {
+              delay: barStart,
+              type: voiceIndex === 0 ? 'triangle' : 'sine',
+              volume: .011
+            }));
+            bar.bass.forEach((freq, beatIndex) => tone(freq, MENU_BEAT * .82, {
+              delay: barStart + beatIndex * MENU_BEAT,
+              type: 'sine',
+              volume: .026
+            }));
+            bar.melody.forEach((freq, beatIndex) => {
+              if (!freq) return;
+              tone(freq, MENU_BEAT * .78, {
+                delay: barStart + beatIndex * MENU_BEAT + MENU_BEAT * .04,
+                type: 'triangle',
+                volume: .02
+              });
+            });
+            for (let eighth = 1; eighth < 8; eighth += 2) {
+              noise(.03, .006, barStart + eighth * (MENU_BEAT / 2));
+            }
+          });
+          menuTimer = setTimeout(menuLoop, MENU_BARS.length * barDuration * 1_000);
+        }
+
+        function stopMenu() {
+          clearTimeout(menuTimer);
+          menuTimer = 0;
+        }
+
+        function startMenu() {
+          if (!canPlay() || scene !== 'intro' || menuTimer) return;
+          menuLoop();
+        }
+
+        function sync() {
+          if (scene === 'intro') startMenu();
+          else stopMenu();
+        }
+
+        async function unlock() {
+          if (unlocked && context) {
+            if (context.state === 'suspended') await context.resume().catch(() => {});
+            sync();
+            return;
+          }
+          const Constructor = audioConstructor();
+          if (!Constructor) return;
+          try {
+            context = new Constructor();
+            unlocked = true;
+            if (context.state === 'suspended') await context.resume();
+            sync();
+          } catch {}
+        }
+
+        return {
+          unlock,
+          setScene(nextScene) { scene = nextScene; sync(); },
+          button(strong = false) {
+            noise(strong ? .075 : .045, strong ? .055 : .025);
+            tone(strong ? 118 : 310, strong ? .11 : .045, { type: 'square', volume: strong ? .045 : .018, to: strong ? 76 : 260 });
+          },
+          countdown(value) {
+            if (value === 'START') {
+              tone(659.25, .22, { type: 'square', volume: .045, to: 987.77 });
+              tone(329.63, .28, { type: 'triangle', volume: .03 });
+            } else {
+              const step = Number(value) || 1;
+              tone(330 + (3 - step) * 45, .1, { type: 'square', volume: .035, to: 285 + (3 - step) * 45 });
+            }
+          },
+          beginAuction() { lastAuctionPulse = -Infinity; stopMenu(); },
+          auction(progress) {
+            if (!canPlay()) return;
+            const now = typeof performance !== 'undefined' ? performance.now() : Date.now();
+            const interval = progress > .7 ? 260 : 690 - progress * 420;
+            if (now - lastAuctionPulse < interval) return;
+            lastAuctionPulse = now;
+            tone(92 + progress * 95, .09, { type: 'sine', volume: .032, to: 74 + progress * 70 });
+            if (progress > .7) tone(730 + progress * 220, .035, { type: 'square', volume: .022 });
+          },
+          debit() {
+            noise(.05, .016);
+            // cha-ching: metaliczny dzwonek kasy fiskalnej.
+            tone(1760.00, .11, { type: 'square', volume: .026, to: 1975.53 });
+            tone(2093.00, .16, { delay: .09, type: 'square', volume: .024, to: 2349.32 });
+            tone(392.00, .09, { type: 'sine', volume: .03, to: 523.25 });
+            tone(523.25, .16, { delay: .07, type: 'triangle', volume: .032, to: 659.25 });
+            tone(659.25, .2, { delay: .16, type: 'sine', volume: .022 });
+          },
+          sold(otherPlayer = false) {
+            tone(otherPlayer ? 145 : 196, .12, { type: 'triangle', volume: .025, to: otherPlayer ? 105 : 130 });
+          },
+          cut() {
+            noise(.09, .05);
+            tone(1200, .07, { type: 'sawtooth', volume: .03, to: 300 });
+          },
+          unsold() {
+            tone(132, .38, { type: 'sine', volume: .03, to: 55 });
+          }
+        };
+      }
+
+      const sound = createSoundController();
       const shuffle = input => {
         const a = input.slice();
         for (let i = a.length - 1; i > 0; i--) {
@@ -820,8 +1556,57 @@
         return a;
       };
 
+      // W kampanii oferta nie wraca w innym mieście. Każde miasto dostaje
+      // własną liczbę ofert w ciemno i mieszkań do podziału.
+      const chooseVariedListings = (count, tier = DIFFICULTY_TIERS[0]) => {
+        const previous = new Set(state.previousListingIndexes);
+        const campaignSeen = new Set(state.campaignSeenIndexes);
+        const indexed = LISTINGS.map((listing, index) => ({ listing, index }));
+        const mysteryPool = indexed.filter(item => item.listing.photos.length === 0 && !item.listing.divisible);
+        const divisiblePool = indexed.filter(item => item.listing.divisible);
+        const normalPool = indexed.filter(item => item.listing.photos.length > 0 && !item.listing.divisible);
+
+        const pickVaried = (pool, take) => {
+          const campaignFresh = pool.filter(item => !campaignSeen.has(item.index));
+          const fresh = shuffle(campaignFresh.filter(item => !previous.has(item.index)));
+          const previousButNotCampaign = shuffle(campaignFresh.filter(item => previous.has(item.index)));
+          const fallback = shuffle(pool.filter(item => campaignSeen.has(item.index)));
+          return [...fresh, ...previousButNotCampaign, ...fallback].slice(0, take);
+        };
+
+        const mysteryQuota = Math.min(tier.mysteryQuota || 0, mysteryPool.length, count);
+        const divisibleQuota = Math.min(tier.divisibleQuota || 0, divisiblePool.length, count - mysteryQuota);
+        const mysterySelected = pickVaried(mysteryPool, mysteryQuota);
+        const divisibleSelected = pickVaried(divisiblePool, divisibleQuota);
+        const normalSelected = pickVaried(normalPool, count - mysterySelected.length - divisibleSelected.length);
+        const selected = shuffle([...mysterySelected, ...divisibleSelected, ...normalSelected]);
+
+        state.previousListingIndexes = selected.map(item => item.index);
+        state.campaignSeenIndexes = [...new Set([...state.campaignSeenIndexes, ...state.previousListingIndexes])];
+        saveCampaignSeen(state.campaignSeenIndexes);
+        return selected.map(item => item.listing);
+      };
+
+      const chooseCustomListings = settings => {
+        const enabled = LISTINGS.filter(listing =>
+          (settings.includeStandard && listing.photos.length > 0 && !listing.divisible) ||
+          (settings.includeMystery && listing.photos.length === 0 && !listing.divisible) ||
+          (settings.includeDivisible && listing.divisible)
+        );
+        if (!enabled.length) return [];
+        const selected = [];
+        while (selected.length < settings.listingCount) selected.push(...shuffle(enabled).slice(0, settings.listingCount - selected.length));
+        return selected;
+      };
+
       function entryError(message = '') {
         $('#entry-error').textContent = message;
+      }
+
+      function maybeShowRules() {
+        try {
+          if (!localStorage.getItem('klitka-rules-seen')) $('#rules-overlay').hidden = false;
+        } catch {}
       }
 
       async function api(path, body) {
@@ -844,6 +1629,8 @@
         network.lastResultKey = '';
         network.purchasePending = false;
         cancelAnimationFrame(network.countdownFrame);
+        clearTimeout(network.finalFallbackTimer);
+        network.finalFallbackTimer = 0;
         if (typeof sessionStorage !== 'undefined') sessionStorage.removeItem('klitka-session');
       }
 
@@ -858,6 +1645,7 @@
 
       function connectNetwork(session) {
         closeNetwork();
+        state.tierIndex = null;
         network.active = true;
         network.roomCode = session.roomCode;
         network.playerId = session.playerId;
@@ -892,6 +1680,7 @@
           const session = await api('/api/rooms', { name: cleanName() });
           connectNetwork(session);
           showScreen('lobby');
+          maybeShowRules();
         } catch (error) {
           entryError(location.protocol === 'file:'
             ? 'Tryb online działa po uruchomieniu wersji serwerowej, nie z pliku na dysku.'
@@ -909,6 +1698,7 @@
           const session = await api(`/api/rooms/${code}/join`, { name: cleanName() });
           connectNetwork(session);
           showScreen('lobby');
+          maybeShowRules();
         } catch (error) {
           entryError(location.protocol === 'file:'
             ? 'Tryb online działa po uruchomieniu wersji serwerowej, nie z pliku na dysku.'
@@ -917,8 +1707,9 @@
         }
       }
 
-      async function networkAction(action) {
+      async function networkAction(action, extra = {}) {
         return api(`/api/rooms/${network.roomCode}/${action}`, {
+          ...extra,
           playerId: network.playerId,
           token: network.token
         });
@@ -927,6 +1718,7 @@
       function showScreen(name) {
         Object.entries(screens).forEach(([key, el]) => { el.hidden = key !== name; });
         state.phase = name;
+        sound.setScene(name);
         window.scrollTo(0, 0);
       }
 
@@ -948,35 +1740,65 @@
         return Array.from({ length: 5 }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
       }
 
-      function buildPlayers(count) {
+      function buildPlayers(count, cash = state.startCash || START_CASH) {
         const names = [cleanName(), ...BOT_NAMES];
         return Array.from({ length: count }, (_, index) => ({
           id: 'p' + index,
           name: names[index],
           isHuman: index === 0,
-          cash: START_CASH,
-          properties: [],
-          avatar: AVATAR_ICONS[index],
-          color: AVATAR_COLORS[index]
+          cash,
+          properties: []
         }));
       }
 
-      function avatarHtml(player) {
-        return `<span class="avatar" style="--avatar:${player.color}">${player.avatar}</span>`;
+      function renderTiers() {
+        const unlocked = getUnlockedTier();
+        const results = loadCityResults();
+        const cityCards = DIFFICULTY_TIERS.map((tier, index) => {
+          const isLocked = index > unlocked;
+          const record = Number(results[tier.id]) || 0;
+          const isCleared = record > 0;
+          const status = isLocked
+            ? `Wygraj ${DIFFICULTY_TIERS[index - 1].city}, żeby odblokować`
+            : isCleared ? 'Ukończone · zagraj ponownie' : 'Zagraj →';
+          return `
+            <button class="tier-card ${isLocked ? 'is-locked' : ''} ${isCleared ? 'is-cleared' : ''}" data-tier="${index}" ${isLocked ? 'disabled' : ''}>
+              <div class="tier-card-city-row"><div class="tier-card-city">${tier.city}</div>${isCleared ? '<span class="tier-crown" aria-label="Wygrane">👑</span>' : ''}</div>
+              <div class="tier-card-desc">${tier.desc}</div>
+              ${record ? `<div class="tier-card-record">Rekord: ${money(record)}/mies.</div>` : ''}
+              <div class="tier-card-status">${status}</div>
+            </button>`;
+        });
+        const customUnlocked = isCustomUnlocked();
+        const customRecord = Number(results.custom) || 0;
+        cityCards.push(`<button class="tier-card ${customUnlocked ? 'is-cleared' : 'is-locked'}" data-custom="true" ${customUnlocked ? '' : 'disabled'}><div class="tier-card-city-row"><div class="tier-card-city">Własna gra</div>${customUnlocked ? '<span class="tier-crown">🏆</span>' : ''}</div><div class="tier-card-desc">Sam ustaw liczbę ofert, botów i mechaniki. Graj na rekord.</div>${customRecord ? `<div class="tier-card-record">Rekord: ${money(customRecord)}/mies.</div>` : ''}<div class="tier-card-status">${customUnlocked ? 'Ustaw grę →' : 'Wygraj Warszawę, żeby odblokować'}</div></button>`);
+        $('#tier-list').innerHTML = cityCards.join('');
+      }
+
+      function readCustomSettings() {
+        return { listingCount: Number($('#custom-listings').value) || 15, botCount: Number($('#custom-bots').value) || 5, includeStandard: $('#custom-standard').checked, includeMystery: $('#custom-mystery').checked, includeDivisible: $('#custom-divisible').checked, impulsiveChance: .86, aggressionBoost: 2.0 };
+      }
+      function updateCustomSummary() {
+        const settings = readCustomSettings();
+        const selectedTypes = [settings.includeStandard, settings.includeMystery, settings.includeDivisible].filter(Boolean).length;
+        const record = Number(loadCityResults().custom) || 0;
+        $('#custom-start').disabled = selectedTypes === 0;
+        $('#custom-summary').textContent = selectedTypes === 0 ? 'Wybierz co najmniej jeden rodzaj ofert.' : `${settings.listingCount} ofert · ${settings.botCount} botów · budżet 4 000 000 zł${record ? ` · rekord ${money(record)}/mies.` : ''}`;
       }
 
       function renderLobby() {
         $('#room-code').textContent = state.roomCode;
         $('#player-count').textContent = state.playerCount;
-        $('#listing-count-label').textContent = `${state.playerCount + 8} mieszkań`;
+        const tier = DIFFICULTY_TIERS[state.tierIndex ?? 0];
+        $('#listing-count-label').textContent = `${tier?.listingCount || state.playerCount + 8} mieszkań`;
         $('#players-minus').disabled = state.playerCount <= 2;
         $('#players-plus').disabled = state.playerCount >= 6;
         state.players = buildPlayers(state.playerCount);
-        $('#lobby-player-list').innerHTML = state.players.map((player, index) => `
+        const alphabetical = state.players.slice().sort((a, b) => a.name.localeCompare(b.name, 'pl'));
+        $('#lobby-player-list').innerHTML = alphabetical.map(player => `
           <div class="lobby-player">
-            ${avatarHtml(player)}
             <span>${player.name}</span>
-            <span class="host-tag">${index === 0 ? 'HOST' : 'GRACZ TESTOWY'}</span>
+            <span class="host-tag">${player === state.players[0] ? 'HOST' : 'GRACZ TESTOWY'}</span>
           </div>`).join('');
       }
 
@@ -984,6 +1806,7 @@
         state.demo = isDemo;
         state.roomCode = roomCode();
         state.playerCount = isDemo ? 4 : 2;
+        $('#network-options-panel').hidden = true;
         renderLobby();
         showScreen('lobby');
       }
@@ -992,8 +1815,10 @@
         clearAsync();
         state.networkListing = null;
         state.totalListings = 0;
-        state.players = buildPlayers(state.playerCount);
-        state.listings = shuffle(LISTINGS).slice(0, state.playerCount + 8);
+        const tier = state.customGame ? state.customSettings : (DIFFICULTY_TIERS[state.tierIndex ?? 0] || DIFFICULTY_TIERS[0]);
+        state.startCash = state.customGame ? START_CASH : tier.startCash;
+        state.players = buildPlayers(state.playerCount, state.startCash);
+        state.listings = state.customGame ? chooseCustomListings(state.customSettings) : chooseVariedListings(tier.listingCount, tier);
         state.listingIndex = 0;
         state.settled = false;
         showScreen('game');
@@ -1005,38 +1830,116 @@
         return network.active ? state.networkListing : state.listings[state.listingIndex];
       }
 
+      function renderRoundProgress(currentIndex, total) {
+        const container = $('#round-progress');
+        if (!container || !total) return;
+        container.innerHTML = Array.from({ length: total }, (_, index) => {
+          const state = index < currentIndex ? 'is-done' : index === currentIndex ? 'is-current' : '';
+          return `<span class="round-progress-seg ${state}"></span>`;
+        }).join('');
+      }
+
       function renderListing() {
         const listing = currentListing();
         const totalListings = network.active ? state.totalListings : state.listings.length;
-        $('#round-label').textContent = `MIESZKANIE ${state.listingIndex + 1} / ${totalListings}`;
-        $('#area-value').textContent = listing.area.toLocaleString('pl-PL') + ' m²';
-        $('#rent-value').textContent = money(listing.rent);
-        $('#location-strip').textContent = listing.city;
+        renderRoundProgress(state.listingIndex, totalListings);
         const photos = listing.photos;
+        const isDivisible = !!listing.divisible;
+        const isMystery = photos.length === 0 && !isDivisible;
+        $('#rent-value').textContent = isMystery ? mysteryHint(listing.rent) : money(listing.rent);
+        $('#rent-value').classList.toggle('is-hint', isMystery);
+        $('#location-strip').textContent = `${listing.city} · ${listing.area.toLocaleString('pl-PL')} m²`;
+        $('#divisible-badge').hidden = !isDivisible;
         const photoGrid = $('#photo-grid');
-        photoGrid.className = `photo-grid count-${Math.min(photos.length, 3)}`;
-        photoGrid.innerHTML = photos.map((url, index) => `
-          <div class="photo"><img src="${url}" alt="Zdjęcie ${index + 1} oferty" loading="eager" onerror="this.parentElement.classList.add('is-broken');this.remove()"></div>
-        `).join('');
+        if (isMystery) {
+          photoGrid.className = 'photo-grid count-1';
+          photoGrid.innerHTML = '<div class="photo is-mystery"></div>';
+        } else if (isDivisible && photos.length === 0) {
+          photoGrid.className = 'photo-grid count-1';
+          photoGrid.innerHTML = '<div class="photo is-divisible-placeholder"></div>';
+        } else {
+          photoGrid.className = `photo-grid count-${Math.min(photos.length, 3)}`;
+          photoGrid.innerHTML = photos.map((url, index) => `
+            <div class="photo"><img src="${url}" alt="Zdjęcie ${index + 1} oferty" loading="eager" onerror="this.parentElement.classList.add('is-broken');this.remove()"></div>
+          `).join('');
+        }
       }
 
       function renderPlayerRail() {
         const human = state.players.find(player => player.isHuman) || state.players[0];
         $('#my-wallet').textContent = money(human.cash);
-        $('#player-rail').innerHTML = state.players.map(player => `
+        const byWealth = state.players.slice().sort((a, b) => b.cash - a.cash || a.name.localeCompare(b.name, 'pl'));
+        $('#player-rail').innerHTML = byWealth.map(player => {
+          const rentSum = player.properties.reduce((sum, property) => sum + property.rent, 0);
+          return `
             <div class="player-card ${player.isHuman ? 'me' : ''}">
-              <div class="player-card-top">${avatarHtml(player)}<span class="player-card-name">${player.name}</span></div>
-              <div class="houses">${player.properties.map(() => '<i class="mini-house"></i>').join('')}</div>
-              <div class="player-balance-label">Saldo</div>
-              <div class="player-balance">${money(player.cash)}</div>
+              <div class="player-card-main">
+                <span class="player-card-name">${player.name}</span>
+                <div class="houses">${player.properties.map(() => '<i class="mini-house"></i>').join('')}</div>
+              </div>
+              <div class="player-balance-wrap">
+                <div class="player-balance">${money(player.cash)}</div>
+                ${player.isHuman ? `<div class="player-rent">czynsz: ${money(rentSum)}/mies.</div>` : ''}
+              </div>
           </div>
-        `).join('');
+        `;
+        }).join('');
+        updateSkipButton();
+      }
+
+      function updateSkipButton() {
+        const button = $('#skip-end-button');
+        if (!button) return;
+        const human = state.players.find(player => player.isHuman);
+        const eligiblePhase = ['ready', 'countdown', 'auction'].includes(state.phase);
+        button.hidden = network.active || !human || human.cash >= 500_000 || !eligiblePhase;
+      }
+
+      function simulateRemainingRound(index) {
+        state.listingIndex = index;
+        const listing = state.listings[index];
+        const botTargets = makeBotTargets();
+        for (let elapsed = 0; elapsed <= AUCTION_MS; elapsed += 16) {
+          const price = Math.max(0, Math.floor(START_PRICE * (1 - elapsed / AUCTION_MS)));
+          const willingBots = botTargets
+            .filter(bot => {
+              const player = state.players.find(item => item.id === bot.playerId);
+              if (!player || bot.target <= 0 || price > bot.target || price > player.cash) return false;
+              if (bot.triggeredAt === null) bot.triggeredAt = elapsed;
+              return elapsed >= bot.triggeredAt + bot.reactionMs;
+            })
+            .sort((a, b) => (a.triggeredAt + a.reactionMs) - (b.triggeredAt + b.reactionMs) || b.target - a.target);
+          if (willingBots.length) {
+            const player = state.players.find(item => item.id === willingBots[0].playerId);
+            const paid = Math.min(player.cash, Math.max(1, Math.floor(price)));
+            player.cash -= paid;
+            player.properties.push({ ...listing, paid });
+            if (listing.divisible) applyBotDivideDecision(player, listing);
+            return;
+          }
+          if (price <= 0) return;
+        }
+      }
+
+      function skipToEnd() {
+        if (network.active || !['ready', 'countdown', 'auction'].includes(state.phase)) return;
+        clearAsync();
+        $('#ready-panel').hidden = true;
+        $('#auction-panel').hidden = true;
+        $('#buy-button').hidden = true;
+        $('#buy-help').textContent = '';
+        for (let index = state.listingIndex; index < state.listings.length; index += 1) {
+          simulateRemainingRound(index);
+        }
+        state.listingIndex = state.listings.length;
+        renderPlayerRail();
+        showFinal();
       }
 
       function renderReady() {
         $('#ready-counter').textContent = `${state.ready.size} / ${state.players.length}`;
         $('#ready-players').innerHTML = state.players.map(player => `
-          <span class="ready-chip ${state.ready.has(player.id) ? 'ready' : ''}">${avatarHtml(player)}<span>${player.name}</span></span>
+          <span class="ready-chip ${state.ready.has(player.id) ? 'ready' : ''}"><span>${player.name}</span></span>
         `).join('');
         const human = state.players.find(player => player.isHuman) || state.players[0];
         const humanReady = state.ready.has(human.id);
@@ -1046,11 +1949,9 @@
       }
 
       function networkPlayers(snapshot) {
-        return snapshot.players.map((player, index) => ({
+        return snapshot.players.map(player => ({
           ...player,
           isHuman: player.id === snapshot.selfId,
-          avatar: AVATAR_ICONS[player.avatarIndex ?? index],
-          color: AVATAR_COLORS[player.avatarIndex ?? index],
           properties: player.properties.map(property => ({
             ...LISTINGS[property.listingId],
             ...property
@@ -1062,15 +1963,24 @@
         state.players = networkPlayers(snapshot);
         state.playerCount = state.players.length;
         state.roomCode = snapshot.roomCode;
+        state.halfwayShown = false;
         $('#room-code').textContent = snapshot.roomCode;
         $('#test-player-panel').hidden = true;
-        $('#lobby-player-list').innerHTML = state.players.map(player => `
+        const alphabetical = state.players.slice().sort((a, b) => a.name.localeCompare(b.name, 'pl'));
+        $('#lobby-player-list').innerHTML = alphabetical.map(player => `
           <div class="lobby-player">
-            ${avatarHtml(player)}
             <span>${player.name}</span>
             <span class="host-tag">${player.id === snapshot.hostId ? 'HOST' : (player.isHuman ? 'TY' : 'GRACZ')}</span>
           </div>`).join('');
         const isHost = snapshot.selfId === snapshot.hostId;
+        $('#network-options-panel').hidden = false;
+        $('#network-mystery-option').checked = Boolean(snapshot.options?.includeMystery);
+        $('#network-divisible-option').checked = Boolean(snapshot.options?.includeDivisible);
+        $('#network-mystery-option').disabled = !isHost;
+        $('#network-divisible-option').disabled = !isHost;
+        $('#network-options-note').textContent = isHost
+          ? 'Możesz zmienić opcje do chwili rozpoczęcia gry.'
+          : 'Opcje ustawia host. Tutaj widzisz jego wybór.';
         $('#start-button').disabled = !isHost || state.players.length < 2;
         $('#start-button').textContent = !isHost
           ? 'Czekamy, aż host zacznie'
@@ -1096,6 +2006,10 @@
       }
 
       function showNetworkReady(snapshot) {
+        if (snapshot.round === 0) {
+          state.halfwayShown = false;
+          network.lastResultKey = '';
+        }
         prepareNetworkGame(snapshot);
         state.phase = 'ready';
         cancelAnimationFrame(state.auctionFrame);
@@ -1105,8 +2019,9 @@
         $('#ready-panel').hidden = false;
         $('#auction-panel').hidden = true;
         $('#buy-button').hidden = true;
-        $('#buy-help').textContent = 'Obejrzyj klitkę. Aukcja ruszy dopiero, gdy wszyscy będą gotowi.';
+        $('#buy-help').textContent = '';
         renderReady();
+        maybeShowHalfwayStandings();
       }
 
       function showNetworkCountdown(snapshot) {
@@ -1123,6 +2038,7 @@
           const number = $('#countdown-number');
           if (value !== previousValue) {
             previousValue = value;
+            sound.countdown(value);
             number.textContent = value;
             number.style.fontSize = value === 'START' ? 'min(25vw,120px)' : '';
             number.style.animation = 'none';
@@ -1140,8 +2056,10 @@
         const elapsed = Math.max(0, now - network.auctionStartsAt);
         const progress = Math.min(1, elapsed / AUCTION_MS);
         const price = Math.max(0, Math.floor(START_PRICE * (1 - progress)));
+        sound.auction(progress);
         renderTicker(price);
         $('#auction-progress').style.transform = `scaleX(${1 - progress})`;
+        $('#auction-panel').classList.toggle('is-critical', progress > .7);
         const human = state.players.find(player => player.isHuman);
         const affordable = price > 0 && price <= human.cash && !network.purchasePending;
         $('#buy-button').disabled = !affordable;
@@ -1164,13 +2082,54 @@
         $('#auction-panel').hidden = false;
         $('#buy-button').hidden = false;
         $('#buy-button').disabled = false;
+        sound.beginAuction();
         renderTicker(START_PRICE);
         $('#auction-progress').style.transform = 'scaleX(1)';
+        $('#auction-panel').classList.remove('is-critical');
         cancelAnimationFrame(state.auctionFrame);
         state.auctionFrame = requestAnimationFrame(networkAuctionLoop);
       }
 
+      function renderNetworkDivide(snapshot, listing) {
+        const isBuyer = snapshot.result.playerId === network.playerId;
+        const decided = snapshot.result.divideDecision != null;
+        $('#result-overlay').hidden = true;
+        $('#divide-kicker').textContent = 'Duże mieszkanie';
+        const keepRent = listing.rent;
+        const splitRent = dividedRentPerUnit(listing.rent);
+        $('#divide-keep-value').textContent = `${money(keepRent)}/mies.`;
+        $('#divide-split-value').textContent = `2 × ${money(splitRent)} (razem ${money(splitRent * 2)})`;
+        renderDividePhoto(listing);
+        $('#divide-photo').classList.toggle('is-cut', snapshot.result.divideDecision === 'split');
+
+        if (decided) {
+          $('#divide-title').textContent = snapshot.result.divideDecision === 'split' ? 'Podzielone na klitki!' : 'Zostało w całości.';
+          $('#divide-actions').hidden = true;
+          $('#divide-waiting-note').hidden = false;
+          $('#divide-waiting-note').textContent = snapshot.result.divideDecision === 'split'
+            ? `Podzielone za ${money(DIVIDE_COST)}.`
+            : 'Bez podziału — pełny czynsz zostaje jak był.';
+        } else if (isBuyer) {
+          const buyer = state.players.find(item => item.id === network.playerId);
+          const canAfford = buyer ? buyer.cash >= DIVIDE_COST : false;
+          $('#divide-title').textContent = 'Podzielić na klitki?';
+          $('#divide-actions').hidden = false;
+          $('#divide-waiting-note').hidden = true;
+          $('#divide-split-button').disabled = !canAfford;
+          $('#divide-split-button').textContent = canAfford
+            ? `Podziel za ${money(DIVIDE_COST)}`
+            : `Podziel za ${money(DIVIDE_COST)} (brak środków)`;
+        } else {
+          $('#divide-title').textContent = 'Podzielić na klitki?';
+          $('#divide-actions').hidden = true;
+          $('#divide-waiting-note').hidden = false;
+          $('#divide-waiting-note').textContent = 'Czeka na decyzję kupującego…';
+        }
+        $('#divide-overlay').hidden = false;
+      }
+
       function showNetworkResult(snapshot) {
+        const previousHumanCash = state.players.find(player => player.isHuman)?.cash;
         prepareNetworkGame(snapshot);
         state.phase = 'result';
         cancelAnimationFrame(state.auctionFrame);
@@ -1178,29 +2137,63 @@
         $('#countdown-overlay').hidden = true;
         $('#ready-panel').hidden = true;
         $('#auction-panel').hidden = false;
+        $('#auction-panel').classList.remove('is-critical');
         $('#buy-button').hidden = true;
         renderTicker(snapshot.result?.price || 0);
+        const resultListing = LISTINGS[snapshot.result?.listingId];
         const key = `${snapshot.round}:${snapshot.result?.type}:${snapshot.result?.playerId || ''}`;
-        if (network.lastResultKey === key) return;
-        network.lastResultKey = key;
-        if (snapshot.result?.type === 'sold') {
-          const winner = state.players.find(player => player.id === snapshot.result.playerId);
-          $('#result-icon').textContent = '🏠';
-          $('#result-kicker').textContent = 'Sprzedane';
-          $('#result-title').textContent = `${winner.name} bierze klitkę`;
-          $('#result-copy').textContent = `za ${money(snapshot.result.price)}`;
-        } else {
-          $('#result-icon').textContent = '🕳️';
-          $('#result-kicker').textContent = 'Cena spadła do zera';
-          $('#result-title').textContent = 'Klitka przepada';
-          $('#result-copy').textContent = 'Nikt nie odważył się jej kupić.';
+        if (network.lastResultKey !== key) {
+          network.lastResultKey = key;
+          const reveal = resultListing && resultListing.photos.length === 0 && !resultListing.divisible
+            ? ` · czynsz: ${money(resultListing.rent)}/mies.`
+            : '';
+          if (snapshot.result?.type === 'sold') {
+            const winner = state.players.find(player => player.id === snapshot.result.playerId);
+            $('#result-icon').textContent = '🏠';
+            $('#result-kicker').textContent = 'Sprzedane';
+            $('#result-title').textContent = `${winner.name} bierze klitkę`;
+            $('#result-copy').textContent = `za ${money(snapshot.result.price)}${reveal}`;
+            sound.sold(!winner.isHuman);
+            $('#result-overlay').hidden = false;
+            if (winner.isHuman && Number.isFinite(previousHumanCash) && previousHumanCash > winner.cash) {
+              animateDebit(previousHumanCash, winner.cash, snapshot.result.price);
+            } else {
+              hideDebit();
+            }
+          } else {
+            $('#result-icon').textContent = '🕳️';
+            $('#result-kicker').textContent = 'Cena spadła do zera';
+            $('#result-title').textContent = 'Klitka przepada';
+            $('#result-copy').textContent = `Nikt nie odważył się jej kupić.${reveal}`;
+            hideDebit();
+            sound.unsold();
+            $('#result-overlay').hidden = false;
+          }
         }
-        $('#result-overlay').hidden = false;
+
+        if (snapshot.result?.divisible) {
+          renderNetworkDivide(snapshot, resultListing);
+        } else {
+          $('#divide-overlay').hidden = true;
+        }
+
+        // Mobilna przeglądarka może chwilowo zgubić ostatnie zdarzenie SSE.
+        // Na ostatniej aukcji każdy klient ma już komplet wyników, więc po
+        // krótkiej chwili może bezpiecznie pokazać tabelę końcową samodzielnie.
+        clearTimeout(network.finalFallbackTimer);
+        if (snapshot.round + 1 >= snapshot.totalListings) {
+          network.finalFallbackTimer = setTimeout(() => {
+            if (!network.active || state.phase !== 'result') return;
+            $('#result-overlay').hidden = true;
+            showFinal();
+          }, 1_800);
+        }
       }
 
       function applyNetworkSnapshot(snapshot) {
         const phaseChanged = snapshot.phase !== network.lastPhase;
         network.lastPhase = snapshot.phase;
+        network.hostId = snapshot.hostId;
         if (snapshot.phase === 'lobby') return renderNetworkLobby(snapshot);
         if (snapshot.phase === 'ready') return showNetworkReady(snapshot);
         if (snapshot.phase === 'countdown') {
@@ -1222,9 +2215,12 @@
         }
         if (snapshot.phase === 'result') return showNetworkResult(snapshot);
         if (snapshot.phase === 'final') {
+          clearTimeout(network.finalFallbackTimer);
+          network.finalFallbackTimer = 0;
           state.players = networkPlayers(snapshot);
           $('#countdown-overlay').hidden = true;
           $('#result-overlay').hidden = true;
+          $('#divide-overlay').hidden = true;
           showFinal();
         }
       }
@@ -1239,7 +2235,7 @@
         $('#ready-panel').hidden = false;
         $('#auction-panel').hidden = true;
         $('#buy-button').hidden = true;
-        $('#buy-help').textContent = 'Obejrzyj klitkę. Aukcja ruszy dopiero, gdy wszyscy będą gotowi.';
+        $('#buy-help').textContent = '';
         renderListing();
         renderPlayerRail();
         renderReady();
@@ -1266,7 +2262,9 @@
         const values = ['3', '2', '1', 'START'];
         let index = 0;
         const tick = () => {
+          if (state.phase !== 'countdown') return;
           number.textContent = values[index];
+          sound.countdown(values[index]);
           number.style.fontSize = values[index] === 'START' ? 'min(25vw,120px)' : '';
           number.style.animation = 'none';
           void number.offsetHeight;
@@ -1276,6 +2274,7 @@
             setTimeout(tick, 620);
           } else {
             setTimeout(() => {
+              if (state.phase !== 'countdown') return;
               overlay.hidden = true;
               number.style.fontSize = '';
               beginAuction();
@@ -1288,6 +2287,7 @@
       function buildTicker() {
         const ticker = $('#ticker');
         ticker.innerHTML = '';
+        const reelDurations = ['0s', '0s', '0s', '1.1s', '.82s', '.62s', '.46s'];
         for (let i = 0; i < 7; i++) {
           if (i === 1 || i === 4) {
             const sep = document.createElement('span');
@@ -1298,7 +2298,23 @@
           const cell = document.createElement('span');
           cell.className = 'ticker-digit';
           cell.dataset.value = '-';
-          cell.innerHTML = '<span>0</span>';
+          cell.dataset.spin = i >= 3 ? 'true' : 'false';
+          cell.style.setProperty('--reel-duration', reelDurations[i]);
+          cell.style.setProperty('--reel-delay', `${i * -.073}s`);
+
+          const value = document.createElement('span');
+          value.className = 'ticker-value';
+          value.textContent = '0';
+          cell.appendChild(value);
+
+          if (i >= 3) {
+            const reel = document.createElement('span');
+            reel.className = 'ticker-reel';
+            reel.innerHTML = [...'9876543210', ...'9876543210']
+              .map(digit => `<b>${digit}</b>`)
+              .join('');
+            cell.appendChild(reel);
+          }
           ticker.appendChild(cell);
         }
         renderTicker(START_PRICE);
@@ -1309,9 +2325,12 @@
         const cells = [...document.querySelectorAll('.ticker-digit')];
         cells.forEach((cell, index) => {
           const next = digits[index];
+          const shouldSpin = state.phase === 'auction' && index >= 3 && price > 0;
+          cell.classList.toggle('is-spinning', shouldSpin);
+          if (shouldSpin) return;
           if (cell.dataset.value === next) return;
           cell.dataset.value = next;
-          cell.querySelector('span').textContent = next;
+          cell.querySelector('.ticker-value').textContent = next;
           cell.classList.remove('snap');
           void cell.offsetHeight;
           cell.classList.add('snap');
@@ -1327,14 +2346,62 @@
       function makeBotTargets() {
         const listing = currentListing();
         const remaining = state.listings.length - state.listingIndex;
-        return state.players.filter(player => !player.isHuman).map((player, index) => {
-          const marketValue = listing.rent * 12 * (15.5 + Math.random() * 10.5);
-          const scarcity = remaining <= 4 ? 1.22 : remaining <= 7 ? 1.09 : .94;
-          const portfolioDrag = Math.max(.72, 1 - player.properties.length * .055);
-          const personality = [.92, 1.08, .8, 1.17, .98][index] || 1;
-          const imperfectRead = .84 + Math.random() * .34;
-          const target = Math.round(marketValue * scarcity * portfolioDrag * personality * imperfectRead);
-          return { playerId: player.id, target: Math.min(player.cash, Math.max(115_000, target)) };
+        const isFinalListing = remaining <= 1;
+        const tier = DIFFICULTY_TIERS[state.tierIndex ?? 0] || DIFFICULTY_TIERS[0];
+        const bots = state.players.filter(player => !player.isHuman);
+        const propertyCounts = bots.map(player => player.properties.length);
+        const leastProperties = Math.min(...propertyCounts);
+        const mostProperties = Math.max(...propertyCounts);
+        const listingId = Math.max(0, LISTINGS.indexOf(listing));
+
+        return bots.map((player, index) => {
+          const profile = BOT_PROFILES[index % BOT_PROFILES.length];
+
+          // Każda oferta ma innego naturalnego faworyta. Zainteresowanie rotuje
+          // pomiędzy botami, więc jedna stała „osobowość” nie wygrywa całej gry.
+          const interestRank = (listingId + index) % bots.length;
+          const interestRange = Math.max(1, bots.length - 1);
+          const taste = 1.18 - (interestRank / interestRange) * .32;
+
+          // Boty z mniejszym portfelem stają się odważniejsze, a liderzy bardziej
+          // wybredni. Pozwala to nadrabiać bez sztucznego rozdawania mieszkań.
+          const catchUp = 1 + Math.max(0, mostProperties - player.properties.length) * .10;
+          const leaderDrag = 1 - Math.max(0, player.properties.length - leastProperties) * .08;
+          const balance = Math.max(.78, Math.min(1.30, catchUp * leaderDrag));
+
+          const urgency = remaining <= 4 ? 1.16 : remaining <= 7 ? 1.06 : .97;
+          const imperfectRead = .92 + Math.random() * .16;
+          const fairPrice = listing.rent * 12 / profile.yield;
+
+          // Bot nie może wydać całego salda na pierwszą okazję. Rezerwuje środki
+          // na rozsądną liczbę pozostałych zakupów.
+          const plannedWins = Math.max(1, Math.ceil(remaining / state.players.length));
+          const budgetCap = player.cash / plannedWins * (1.10 + Math.random() * .40);
+          const rawTarget = fairPrice * profile.valuation * taste * balance * urgency * imperfectRead * tier.aggressionBoost;
+          const normalTarget = Math.min(budgetCap, Math.max(90_000, rawTarget));
+
+          // Impulsywny zryw: bot czasem ignoruje próg opłacalności i jest
+          // gotów zapłacić znacznie więcej, żeby nie odpuścić okazji. Wtedy
+          // może sięgnąć nawet do własnej gotówki ponad zwykły budgetCap.
+          const isImpulsive = Math.random() < tier.impulsiveChance;
+          const impulsiveTarget = isImpulsive ? START_PRICE * (.58 + Math.random() * .40) : 0;
+
+          // Ostatnia oferta w talii: niewydana gotówka jest bezwartościowa na
+          // koniec gry, więc bot licytuje do granicy tego, na co go stać.
+          const target = isFinalListing
+            ? player.cash
+            : Math.round(Math.min(player.cash, Math.max(normalTarget, impulsiveTarget)));
+          const reactionMs = (profile.reactionMin + Math.random() * (profile.reactionMax - profile.reactionMin)) / Math.max(1, tier.aggressionBoost * .78);
+
+          return {
+            playerId: player.id,
+            target,
+            reactionMs,
+            triggeredAt: null,
+            interestRank,
+            taste,
+            balance
+          };
         });
       }
 
@@ -1348,8 +2415,10 @@
         $('#buy-button').hidden = false;
         $('#buy-button').disabled = false;
         $('#buy-help').textContent = 'Jedno dotknięcie kupuje po cenie z tej milisekundy.';
+        sound.beginAuction();
         renderTicker(START_PRICE);
         $('#auction-progress').style.transform = 'scaleX(1)';
+        $('#auction-panel').classList.remove('is-critical');
         state.auctionFrame = requestAnimationFrame(auctionLoop);
       }
 
@@ -1358,8 +2427,10 @@
         const elapsed = now - state.auctionStart;
         const progress = Math.min(1, elapsed / AUCTION_MS);
         const price = priceAt(now);
+        sound.auction(progress);
         renderTicker(price);
         $('#auction-progress').style.transform = `scaleX(${1 - progress})`;
+        $('#auction-panel').classList.toggle('is-critical', progress > .7);
 
         const human = state.players[0];
         const affordable = price <= human.cash;
@@ -1370,9 +2441,13 @@
         const willingBots = state.botTargets
           .filter(bot => {
             const player = state.players.find(item => item.id === bot.playerId);
-            return player && price <= bot.target && price <= player.cash;
+            if (!player || bot.target <= 0 || price > bot.target || price > player.cash) return false;
+            if (bot.triggeredAt === null) bot.triggeredAt = elapsed;
+            return elapsed >= bot.triggeredAt + bot.reactionMs;
           })
-          .sort((a, b) => b.target - a.target);
+          .sort((a, b) =>
+            (a.triggeredAt + a.reactionMs) - (b.triggeredAt + b.reactionMs) || b.target - a.target
+          );
 
         if (willingBots.length) {
           settleSale(willingBots[0].playerId, price);
@@ -1406,24 +2481,145 @@
         settleSale('p0', price);
       }
 
+      function restartAnimation(element, className) {
+        if (!element) return;
+        element.classList.remove(className);
+        void element.offsetHeight;
+        element.classList.add(className);
+      }
+
+      function hideDebit() {
+        $('#purchase-debit').hidden = true;
+        $('#purchase-debit').classList.remove('is-animating');
+        $('#debit-flyer').classList.remove('is-flying');
+      }
+
+      function animateDebit(before, after, paid) {
+        const debit = $('#purchase-debit');
+        const flyer = $('#debit-flyer');
+        const balance = document.querySelector('.player-card.me .player-balance');
+        const card = document.querySelector('.player-card.me');
+        const wallet = $('#my-wallet');
+        $('#debit-before').textContent = money(before);
+        $('#debit-after').textContent = money(after);
+        $('#debit-amount').textContent = `−${money(paid)}`;
+        flyer.textContent = `−${money(paid)}`;
+        debit.hidden = false;
+        if (balance) balance.textContent = money(before);
+        if (wallet) wallet.textContent = money(before);
+        restartAnimation(debit, 'is-animating');
+        restartAnimation(flyer, 'is-flying');
+        restartAnimation(card, 'balance-hit');
+        sound.debit();
+
+        const startedAt = performance.now();
+        const duration = 820;
+        const frame = now => {
+          const progress = Math.min(1, (now - startedAt) / duration);
+          const eased = 1 - Math.pow(1 - progress, 3);
+          const current = before + (after - before) * eased;
+          if (balance) balance.textContent = money(current);
+          if (wallet) wallet.textContent = money(current);
+          if (progress < 1) requestAnimationFrame(frame);
+          else {
+            if (balance) balance.textContent = money(after);
+            if (wallet) wallet.textContent = money(after);
+          }
+        };
+        requestAnimationFrame(frame);
+      }
+
+      function renderDividePhoto(listing) {
+        const left = $('#divide-photo-left');
+        const right = $('#divide-photo-right');
+        if (listing.photos.length > 0) {
+          left.style.backgroundImage = `url(${listing.photos[0]})`;
+          right.style.backgroundImage = `url(${listing.photos[0]})`;
+        } else {
+          left.style.backgroundImage = '';
+          right.style.backgroundImage = '';
+        }
+      }
+
+      function applyBotDivideDecision(player, listing) {
+        if (player.cash < DIVIDE_COST) return ' · zostawia w całości';
+        player.cash -= DIVIDE_COST;
+        const perUnit = dividedRentPerUnit(listing.rent);
+        player.properties.pop();
+        player.properties.push({ ...listing, paid: 0, rent: perUnit, divisible: false });
+        player.properties.push({ ...listing, paid: 0, rent: perUnit, divisible: false });
+        return ` · dzieli na 2 klitki po ${money(perUnit)}`;
+      }
+
+      function showDivideDecision(player, onContinue) {
+        const listing = player.properties[player.properties.length - 1];
+        const keepRent = listing.rent;
+        const splitRent = dividedRentPerUnit(listing.rent);
+        $('#divide-kicker').textContent = 'Duże mieszkanie';
+        $('#divide-title').textContent = 'Podzielić na klitki?';
+        $('#divide-keep-value').textContent = `${money(keepRent)}/mies.`;
+        $('#divide-split-value').textContent = `2 × ${money(splitRent)} (razem ${money(splitRent * 2)})`;
+        renderDividePhoto(listing);
+        const canAfford = player.cash >= DIVIDE_COST;
+        $('#divide-split-button').disabled = !canAfford;
+        $('#divide-split-button').textContent = canAfford
+          ? `Podziel za ${money(DIVIDE_COST)}`
+          : `Podziel za ${money(DIVIDE_COST)} (brak środków)`;
+        $('#divide-actions').hidden = false;
+        $('#divide-waiting-note').hidden = true;
+        $('#divide-photo').classList.remove('is-cut');
+        $('#divide-overlay').hidden = false;
+
+        state.divideResolve = decision => {
+          state.divideResolve = null;
+          if (decision === 'split') {
+            player.cash -= DIVIDE_COST;
+            player.properties.pop();
+            player.properties.push({ ...listing, paid: 0, rent: splitRent, divisible: false });
+            player.properties.push({ ...listing, paid: 0, rent: splitRent, divisible: false });
+            renderPlayerRail();
+          }
+          $('#divide-overlay').hidden = true;
+          onContinue();
+        };
+      }
+
       function settleSale(playerId, price) {
         if (state.settled) return;
         state.settled = true;
         state.phase = 'result';
         cancelAnimationFrame(state.auctionFrame);
         const player = state.players.find(item => item.id === playerId);
+        const cashBefore = player.cash;
         const paid = Math.min(player.cash, Math.max(1, Math.floor(price)));
         player.cash -= paid;
-        player.properties.push({ ...currentListing(), paid });
+        const listing = currentListing();
+        player.properties.push({ ...listing, paid });
         renderTicker(paid);
-        renderPlayerRail();
+        $('#auction-panel').classList.remove('is-critical');
         $('#buy-button').disabled = true;
+
+        const soldReveal = (listing.photos.length === 0 && !listing.divisible)
+          ? ` · czynsz: ${money(listing.rent)}/mies.`
+          : '';
+        let divideReveal = '';
+        let pendingHumanDivide = false;
+        if (listing.divisible) {
+          if (player.isHuman) pendingHumanDivide = true;
+          else divideReveal = applyBotDivideDecision(player, listing);
+        }
+        renderPlayerRail();
 
         $('#result-icon').textContent = '🏠';
         $('#result-kicker').textContent = 'Sprzedane';
         $('#result-title').textContent = `${player.name} bierze klitkę`;
-        $('#result-copy').textContent = `za ${money(paid)}`;
-        showResultAndAdvance(1150);
+        $('#result-copy').textContent = `za ${money(paid)}${soldReveal}${divideReveal}`;
+        sound.sold(!player.isHuman);
+        showResultAndAdvance(
+          player.isHuman ? 1550 : 1150,
+          player.isHuman ? { before: cashBefore, after: player.cash, paid } : null,
+          pendingHumanDivide ? player : null
+        );
       }
 
       function settleUnsold() {
@@ -1432,43 +2628,117 @@
         state.phase = 'result';
         cancelAnimationFrame(state.auctionFrame);
         renderTicker(0);
+        $('#auction-panel').classList.remove('is-critical');
         $('#buy-button').disabled = true;
+        const unsoldListing = currentListing();
+        const unsoldReveal = (unsoldListing.photos.length === 0 && !unsoldListing.divisible)
+          ? ` · czynsz: ${money(unsoldListing.rent)}/mies.`
+          : '';
         $('#result-icon').textContent = '🕳️';
         $('#result-kicker').textContent = 'Cena spadła do zera';
         $('#result-title').textContent = 'Klitka przepada';
-        $('#result-copy').textContent = 'Nikt nie odważył się jej kupić.';
+        $('#result-copy').textContent = `Nikt nie odważył się jej kupić.${unsoldReveal}`;
+        hideDebit();
+        sound.unsold();
         showResultAndAdvance(1150);
       }
 
-      function showResultAndAdvance(delay) {
+      function showResultAndAdvance(delay, debit = null, pendingDivideFor = null) {
         $('#result-overlay').hidden = false;
+        if (debit) animateDebit(debit.before, debit.after, debit.paid);
+        else hideDebit();
         setTimeout(() => {
           $('#result-overlay').hidden = true;
-          state.listingIndex += 1;
-          if (state.listingIndex >= state.listings.length) showFinal();
-          else showReadyStage();
+          const advance = () => {
+            state.listingIndex += 1;
+            if (state.listingIndex >= state.listings.length) showFinal();
+            else maybeShowHalfwayStandings(showReadyStage);
+          };
+          if (pendingDivideFor) showDivideDecision(pendingDivideFor, advance);
+          else advance();
         }, delay);
       }
 
-      function showFinal() {
-        state.phase = 'final';
-        const ranked = state.players.slice().sort((a, b) => {
+      function rankPlayers() {
+        return state.players.slice().sort((a, b) => {
           const incomeA = a.properties.reduce((sum, property) => sum + property.rent, 0);
           const incomeB = b.properties.reduce((sum, property) => sum + property.rent, 0);
           return incomeB - incomeA || b.properties.length - a.properties.length;
         });
+      }
+
+      function totalListingsCount() {
+        return network.active ? state.totalListings : state.listings.length;
+      }
+
+      function showHalfwayStandings(onContinue) {
+        const ranked = rankPlayers();
+        $('#halfway-standings').innerHTML = ranked.map((player, index) => `
+          <div class="standing">
+            <div class="standing-rank">${index + 1}</div>
+            <div>
+              <div class="standing-name">${player.name}${player.isHuman ? ' (Ty)' : ''}</div>
+              <div class="standing-meta">Zostały ${money(player.cash)} do wydania</div>
+            </div>
+            <div class="standing-count">${player.properties.length} ${player.properties.length === 1 ? 'klitka' : 'klitek'}</div>
+          </div>`).join('');
+        state.halfwayContinue = typeof onContinue === 'function' ? onContinue : null;
+        $('#halfway-overlay').hidden = false;
+      }
+
+      function maybeShowHalfwayStandings(onContinue) {
+        const total = totalListingsCount();
+        const isTutorial = !network.active && !state.customGame && state.tierIndex === 0;
+        if (isTutorial || !total || state.halfwayShown || state.listingIndex < Math.ceil(total / 2)) {
+          if (typeof onContinue === 'function') onContinue();
+          return;
+        }
+        state.halfwayShown = true;
+        showHalfwayStandings(onContinue);
+      }
+
+      function showFinal() {
+        state.phase = 'final';
+        const ranked = rankPlayers();
         const winner = ranked[0];
-        $('#winner-title').textContent = `Król Fliperów – ${winner.name}`;
+        $('#winner-title').innerHTML = `Król Fliperów<br>${winner.name}`;
         $('#standings').innerHTML = ranked.map((player, index) => {
           const income = player.properties.reduce((sum, property) => sum + property.rent, 0);
           return `
             <div class="standing">
               <div class="standing-rank">${index + 1}</div>
-              ${avatarHtml(player)}
               <div><div class="standing-name">${player.name}</div><div class="standing-meta">${player.properties.length} ${player.properties.length === 1 ? 'klitka' : 'klitek'} · zostało ${money(player.cash)}</div></div>
               <div class="standing-income">${money(income)}<small>co miesiąc</small></div>
             </div>`;
         }).join('');
+        const isNetworkGuest = network.active && network.playerId !== network.hostId;
+        $('#again-button').disabled = isNetworkGuest;
+        $('#again-button').textContent = isNetworkGuest ? 'Czekamy, aż host zacznie nową rundę' : network.active ? 'Jeszcze raz' : 'Wróć do listy miast';
+
+        let unlockMessage = '';
+        if (!network.active && winner.isHuman) {
+          const human = state.players.find(player => player.isHuman) || state.players[0];
+          const humanIncome = human.properties.reduce((sum, property) => sum + property.rent, 0);
+          if (state.customGame) {
+            unlockMessage = `Rekord własnej gry: ${money(saveCityResult('custom', humanIncome))}/mies.`;
+          } else if (state.tierIndex != null) {
+            const tier = DIFFICULTY_TIERS[state.tierIndex];
+            const record = saveCityResult(tier.id, humanIncome);
+            const nextTier = DIFFICULTY_TIERS[state.tierIndex + 1];
+            if (nextTier) {
+              const wasLocked = state.tierIndex + 1 > getUnlockedTier();
+              unlockTier(state.tierIndex + 1);
+              unlockMessage = `${wasLocked ? `Odblokowano: ${nextTier.city} · ` : ''}rekord ${tier.city}: ${money(record)}/mies.`;
+            } else {
+              const wasLocked = !isCustomUnlocked();
+              unlockCustom();
+              unlockMessage = `${wasLocked ? 'Odblokowano własną grę · ' : ''}rekord Warszawa: ${money(record)}/mies.`;
+            }
+          }
+        }
+        $('#final-unlock').textContent = unlockMessage;
+        $('#final-unlock').hidden = !unlockMessage;
+
         showScreen('final');
       }
 
@@ -1478,24 +2748,78 @@
         state.botReadyTimers = [];
         $('#countdown-overlay').hidden = true;
         $('#result-overlay').hidden = true;
+        $('#halfway-overlay').hidden = true;
+        $('#divide-overlay').hidden = true;
+        state.halfwayShown = false;
+        state.halfwayContinue = null;
+        state.divideResolve = null;
       }
 
       $('#demo-button').addEventListener('click', () => {
         closeNetwork();
-        state.playerCount = 4;
+        state.tierIndex = null;
+        renderTiers();
+        showScreen('tiers');
+        maybeShowRules();
+      });
+      $('#tiers-back').addEventListener('click', () => showScreen('intro'));
+      $('#custom-back').addEventListener('click', () => { renderTiers(); showScreen('tiers'); });
+      ['#custom-listings', '#custom-bots', '#custom-standard', '#custom-mystery', '#custom-divisible'].forEach(selector => $(selector).addEventListener('change', updateCustomSummary));
+      $('#custom-start').addEventListener('click', () => {
+        state.customSettings = readCustomSettings();
+        if (!state.customSettings.includeStandard && !state.customSettings.includeMystery && !state.customSettings.includeDivisible) return;
+        state.customGame = true;
+        state.playerCount = state.customSettings.botCount + 1;
         state.roomCode = roomCode();
-        state.players = buildPlayers(4);
+        startGame();
+      });
+      $('#tier-list').addEventListener('pointerdown', event => {
+        if (event.target.closest('.tier-card')) { sound.unlock(); sound.button(false); }
+      });
+      $('#tier-list').addEventListener('click', event => {
+        const card = event.target.closest('.tier-card');
+        if (!card || card.disabled) return;
+        if (card.dataset.custom === 'true') {
+          state.customGame = true;
+          state.tierIndex = DIFFICULTY_TIERS.length - 1;
+          updateCustomSummary();
+          showScreen('custom');
+          return;
+        }
+        state.customGame = false;
+        state.customSettings = null;
+        state.tierIndex = Number(card.dataset.tier);
+        const tier = DIFFICULTY_TIERS[state.tierIndex];
+        if (state.tierIndex === 0) {
+          state.campaignSeenIndexes = [];
+          saveCampaignSeen([]);
+        }
+        state.playerCount = tier.botCount + 1;
+        state.roomCode = roomCode();
+        state.players = buildPlayers(state.playerCount);
         startGame();
       });
       $('#create-button').addEventListener('click', createNetworkRoom);
       $('#join-button').addEventListener('click', joinNetworkRoom);
-      $('#name-input').addEventListener('input', updateEntryState);
+      $('#name-input').addEventListener('input', () => {
+        updateEntryState();
+        try { localStorage.setItem('klitka-name', $('#name-input').value); } catch {}
+      });
       $('#join-code').addEventListener('input', event => {
         event.target.value = event.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
         updateEntryState();
       });
       $('#players-minus').addEventListener('click', () => { state.playerCount = Math.max(2, state.playerCount - 1); renderLobby(); });
       $('#players-plus').addEventListener('click', () => { state.playerCount = Math.min(6, state.playerCount + 1); renderLobby(); });
+      const updateNetworkOptions = () => {
+        if (!network.active || network.playerId !== network.hostId) return;
+        networkAction('options', {
+          includeMystery: $('#network-mystery-option').checked,
+          includeDivisible: $('#network-divisible-option').checked
+        }).catch(error => { $('#network-options-note').textContent = error.message; });
+      };
+      $('#network-mystery-option').addEventListener('change', updateNetworkOptions);
+      $('#network-divisible-option').addEventListener('change', updateNetworkOptions);
       $('#start-button').addEventListener('click', () => {
         if (network.active) networkAction('start').catch(error => { $('#network-status').textContent = error.message; });
         else startGame();
@@ -1506,8 +2830,71 @@
         else setReady('p0');
       });
       $('#buy-button').addEventListener('pointerdown', buyNow, { passive: false });
-      $('#again-button').addEventListener('click', () => { clearAsync(); closeNetwork(); showScreen('intro'); updateEntryState(); });
+      $('#skip-end-button').addEventListener('click', () => {
+        sound.button(false);
+        skipToEnd();
+      });
+      $('#again-button').addEventListener('click', () => {
+        if (network.active) {
+          networkAction('again').catch(error => { $('#again-button').textContent = error.message; });
+        } else {
+          clearAsync();
+          renderTiers();
+          showScreen('tiers');
+        }
+      });
+      $('#halfway-skip').addEventListener('click', () => {
+        $('#halfway-overlay').hidden = true;
+        const resume = state.halfwayContinue;
+        state.halfwayContinue = null;
+        if (typeof resume === 'function') resume();
+      });
+      $('#rules-link').addEventListener('click', () => { $('#rules-overlay').hidden = false; });
+      $('#rules-close').addEventListener('click', () => {
+        $('#rules-overlay').hidden = true;
+        try { localStorage.setItem('klitka-rules-seen', '1'); } catch {}
+      });
+      $('#divide-keep-button').addEventListener('click', () => {
+        if (network.active) {
+          $('#divide-actions').hidden = true;
+          networkAction('divide', { divide: false }).catch(error => {
+            $('#divide-waiting-note').hidden = false;
+            $('#divide-waiting-note').textContent = error.message;
+          });
+        } else if (state.divideResolve) {
+          state.divideResolve('keep');
+        }
+      });
+      $('#divide-split-button').addEventListener('click', () => {
+        if ($('#divide-split-button').disabled) return;
+        if (!network.active && !state.divideResolve) return;
+        sound.cut();
+        $('#divide-photo').classList.add('is-cut');
+        $('#divide-actions').hidden = true;
+        if (network.active) {
+          networkAction('divide', { divide: true }).catch(error => {
+            $('#divide-waiting-note').hidden = false;
+            $('#divide-waiting-note').textContent = error.message;
+          });
+        } else {
+          setTimeout(() => { if (state.divideResolve) state.divideResolve('split'); }, 550);
+        }
+      });
 
+      if (typeof document.addEventListener === 'function') {
+        document.addEventListener('pointerdown', () => sound.unlock(), { once: true, passive: true });
+      }
+      document.querySelectorAll('button').forEach(button => {
+        button.addEventListener('pointerdown', () => {
+          sound.unlock();
+          sound.button(button.id === 'buy-button');
+        }, { passive: true });
+      });
+
+      try {
+        const savedName = localStorage.getItem('klitka-name');
+        if (savedName) $('#name-input').value = savedName;
+      } catch {}
       updateEntryState();
 
       if (typeof sessionStorage !== 'undefined' && typeof EventSource !== 'undefined') {
@@ -1522,17 +2909,28 @@
         state,
         constants: { START_CASH, START_PRICE, AUCTION_MS },
         listings: LISTINGS,
-        startDemo(count = 4) {
+        startDemo(count = 4, tierIndex = 0) {
           state.playerCount = Math.max(2, Math.min(6, count));
+          state.tierIndex = Math.max(0, Math.min(DIFFICULTY_TIERS.length - 1, tierIndex));
+          if (state.tierIndex === 0) {
+            state.campaignSeenIndexes = [];
+            saveCampaignSeen([]);
+          }
           startGame();
         },
         ready() { setReady('p0'); },
         buy() { buyNow({ preventDefault() {} }); },
         beginAuction,
+        makeBotTargets,
         settleSale,
         priceAt,
         settleUnsold,
-        showFinal
+        showFinal,
+        dividedRentPerUnit,
+        DIVIDE_COST,
+        skipToEnd,
+        updateSkipButton,
+        difficultyTiers: DIFFICULTY_TIERS
       };
     })();
   </script>
