@@ -1186,18 +1186,16 @@
         { yield: .056, valuation: 1.01, reactionMin: 110, reactionMax: 330 },
         { yield: .053, valuation: .97, reactionMin: 160, reactionMax: 390 }
       ];
-      // Szansa, że bot olewa wyliczoną wartość opłacalności i chwyta ofertę
-      // pod wpływem impulsu, przy znacznie wyższej cenie. Bez tego boty nigdy
-      // nie reagują, dopóki cena nie spadnie poniżej progu opłacalności z
-      // czynszu — a to jest zwykle mniej niż połowa ceny startowej, więc
-      // człowiek klikający wcześnie i tak wygrywa każdą licytację bez ryzyka.
+      // Trudność nie polega na losowym kupowaniu za każdą cenę. Kolejne miasta
+      // zmniejszają błąd wyceny i czas reakcji konkurentów, ale każda decyzja
+      // nadal uwzględnia czynsz, rezerwę gotówki, etap gry i pozycję w rankingu.
       const DIFFICULTY_TIERS = [
-        { id: 'radom', city: 'Radom', details: ['Tutorial', '1 konkurent', '5 zwykłych ofert'], botCount: 1, listingCount: 5, startCash: START_CASH, mysteryQuota: 0, divisibleQuota: 0, impulsiveChance: .30, aggressionBoost: 1.12 },
-        { id: 'lodz', city: 'Łódź', details: ['2 konkurentów', '7 ofert', 'Zakupy w ciemno'], botCount: 2, listingCount: 7, startCash: START_CASH, mysteryQuota: 1, divisibleQuota: 0, impulsiveChance: .40, aggressionBoost: 1.27 },
-        { id: 'katowice', city: 'Katowice', details: ['3 konkurentów', '9 ofert', 'Trudniejszy rynek'], botCount: 3, listingCount: 9, startCash: START_CASH, mysteryQuota: 2, divisibleQuota: 0, impulsiveChance: .50, aggressionBoost: 1.42 },
-        { id: 'wroclaw', city: 'Wrocław', details: ['4 konkurentów', '11 ofert', 'Dzielenie klitek'], botCount: 4, listingCount: 11, startCash: START_CASH, mysteryQuota: 2, divisibleQuota: 1, impulsiveChance: .60, aggressionBoost: 1.58 },
-        { id: 'krakow', city: 'Kraków', details: ['5 konkurentów', '13 ofert', 'Pełna pula ofert'], botCount: 5, listingCount: 13, startCash: START_CASH, mysteryQuota: 2, divisibleQuota: 2, impulsiveChance: .70, aggressionBoost: 1.74 },
-        { id: 'warszawa', city: 'Warszawa', details: ['5 ekstremalnych konkurentów', '15 ofert', 'Wszystkie mechaniki'], botCount: 5, listingCount: 15, startCash: START_CASH, mysteryQuota: 3, divisibleQuota: 3, impulsiveChance: .82, aggressionBoost: 1.92 }
+        { id: 'radom', city: 'Radom', details: ['Tutorial', '1 konkurent', '5 zwykłych ofert'], botCount: 1, listingCount: 5, startCash: START_CASH, mysteryQuota: 0, divisibleQuota: 0, openingDelay: 5_000, decisionNoise: .16, valuationBoost: .92, reactionScale: 1.35, finalBidFraction: .48 },
+        { id: 'lodz', city: 'Łódź', details: ['2 konkurentów', '7 ofert', 'Zakupy w ciemno'], botCount: 2, listingCount: 7, startCash: START_CASH, mysteryQuota: 1, divisibleQuota: 0, openingDelay: 4_800, decisionNoise: .13, valuationBoost: .96, reactionScale: 1.20, finalBidFraction: .53 },
+        { id: 'katowice', city: 'Katowice', details: ['3 konkurentów', '9 ofert', 'Trudniejszy rynek'], botCount: 3, listingCount: 9, startCash: START_CASH, mysteryQuota: 2, divisibleQuota: 0, openingDelay: 4_400, decisionNoise: .10, valuationBoost: 1.00, reactionScale: 1.05, finalBidFraction: .59 },
+        { id: 'wroclaw', city: 'Wrocław', details: ['4 konkurentów', '11 ofert', 'Dzielenie klitek'], botCount: 4, listingCount: 11, startCash: START_CASH, mysteryQuota: 2, divisibleQuota: 1, openingDelay: 4_000, decisionNoise: .08, valuationBoost: 1.04, reactionScale: .92, finalBidFraction: .65 },
+        { id: 'krakow', city: 'Kraków', details: ['5 konkurentów', '13 ofert', 'Pełna pula ofert'], botCount: 5, listingCount: 13, startCash: START_CASH, mysteryQuota: 2, divisibleQuota: 2, openingDelay: 3_600, decisionNoise: .06, valuationBoost: 1.08, reactionScale: .80, finalBidFraction: .71 },
+        { id: 'warszawa', city: 'Warszawa', details: ['5 ekstremalnych konkurentów', '15 ofert', 'Wszystkie mechaniki'], botCount: 5, listingCount: 15, startCash: START_CASH, mysteryQuota: 3, divisibleQuota: 3, openingDelay: 3_200, decisionNoise: .04, valuationBoost: 1.12, reactionScale: .70, finalBidFraction: .78 }
       ];
       const TIER_STORAGE_KEY = 'klitka-tier-progress';
       const CAMPAIGN_SEEN_KEY = 'klitka-campaign-seen';
@@ -1764,12 +1762,12 @@
       }
 
       const CITY_LANDMARKS = {
-        radom: '<svg viewBox="0 0 220 72" aria-hidden="true"><path d="M18 62h184M43 62V31h43v31M50 31V21h29v10M58 21V10h13v11M134 62V27h42v35M142 27V17h26v10M151 17V8h8v9M91 62V40h34v22M98 40l10-12 10 12M53 42h9v10h-9M68 42h9v10h-9M145 39h9v12h-9M160 39h9v12h-9"/></svg>',
-        lodz: '<svg viewBox="0 0 220 72" aria-hidden="true"><path d="M15 62h190M27 62V35l30 13V35l30 13V30l34 18v14M35 62V51h12v11M61 62V51h12v11M91 62V51h13v11M129 62V17h17v45M132 17V8h11v9M153 62V37h39v25M160 44h10v9h-10M177 44h9v9h-9"/></svg>',
-        katowice: '<svg viewBox="0 0 220 72" aria-hidden="true"><path d="M14 62h192M34 51h152M45 51l17-20h96l17 20M62 31l19-15h58l19 15M76 20h68M53 42h114M82 51v11M105 51v11M128 51v11M151 51v11M31 56h158"/></svg>',
-        wroclaw: '<svg viewBox="0 0 220 72" aria-hidden="true"><path d="M15 62h190M34 62V37h29v25M38 37l10-14 11 14M75 62V27h43v35M80 27l8-12 8 12 8-12 9 12M129 62V34h38v28M135 34l8-11 8 11 9-11 7 11M91 15V6M86 8h10M44 47h9v10h-9M84 39h9v12h-9M101 39h9v12h-9M140 44h9v10h-9M155 44h8v10h-8M177 62V23h12v39M179 23l4-15 4 15"/></svg>',
-        krakow: '<svg viewBox="0 0 220 72" aria-hidden="true"><path d="M16 62h188M55 62V27h35v35M130 62V20h35v42M61 27l6-11 6 11 6-11 6 11M136 20l6-12 6 12 6-12 6 12M72 16V7M68 9h8M148 8V3M144 5h8M97 62V39h26v23M102 39l8-13 9 13M63 40h8v12h-8M76 40h8v12h-8M138 34h8v13h-8M152 34h8v13h-8"/></svg>',
-        warszawa: '<svg viewBox="0 0 220 72" aria-hidden="true"><path d="M15 62h190M78 62V30h64v32M88 30V19h44v11M99 19V9h22v10M106 9V3h8v6M67 62V42h11M142 42h11v20M87 40h12v8H87M105 40h10v8h-10M121 40h12v8h-12M91 53h10v9M110 53h10v9M128 53h7v9M48 62V47h12v15M160 62V37h19v25M166 37V25h7v12"/></svg>'
+        radom: '<svg viewBox="0 0 220 72" aria-hidden="true"><path d="M12 63h196M24 63V42h19V29h17V10h24v53M60 10h24M64 6h16M67 20h10v10H67M69 35a4 4 0 1 0 8 0 4 4 0 1 0-8 0M43 42v21M84 31h91v32M175 25h22v38M179 21h14v4M91 43h10v13H91M110 43h10v13h-10M130 43h10v13h-10M150 43h10v13h-10M181 37h10v13h-10M24 51h12v12"/></svg>',
+        lodz: '<svg viewBox="0 0 220 72" aria-hidden="true"><path d="M11 63h198M24 63V22h72v41M31 22V15h58v7M38 34c0-7 10-7 10 0v17H38V34M57 34c0-7 10-7 10 0v17H57V34M76 34c0-7 10-7 10 0v17H76V34M34 57h57M105 63V35h89v28M116 35V27h43v8M166 35V23h20v12M119 47c0-6 9-6 9 0v10h-9V47M135 47c0-6 9-6 9 0v10h-9V47M151 47c0-6 9-6 9 0v10h-9V47M173 46h9v11h-9"/></svg>',
+        katowice: '<svg viewBox="0 0 220 72" aria-hidden="true"><path d="M10 63h200M31 51h158M41 48c17-5 34-7 69-7s52 2 69 7M32 31c28-10 128-10 156 0M32 31l9 17M188 31l-9 17M48 32l12-13h100l12 13M76 19c9-8 59-8 68 0M88 19c3-11 41-11 44 0M48 52v11M66 52v11M154 52v11M172 52v11M75 52v7h70v-7"/><path d="M43 35l10 9 10-11 10 9 10-11 10 10 10-11 10 11 10-10 10 11 10-9 10 11 11-9"/></svg>',
+        wroclaw: '<svg viewBox="0 0 220 72" aria-hidden="true"><path d="M11 63h198M25 63V48h170v15M35 48V39h150v9M54 39V29h112v10M67 29V20h86v9M81 20v-7h58v7M98 13V9h24v4M29 55h162M40 48v15M54 48v15M68 48v15M82 48v15M96 48v15M110 48v15M124 48v15M138 48v15M152 48v15M166 48v15M180 48v15M62 34h96M76 25h68M91 17h38"/></svg>',
+        krakow: '<svg viewBox="0 0 220 72" aria-hidden="true"><path d="M8 63h204M14 63V38h192v25M14 38c8 0 8-7 16-7s8 7 16 7 8-7 16-7 8 7 16 7 8-7 16-7 8 7 16 7 8-7 16-7 8 7 16 7 8-7 16-7 8 7 16 7 8-7 16-7 8 7 16 7M82 38V22h56v16M91 22l7-8 6 5 6-12 6 12 6-5 7 8M110 7V3M20 50h180M25 63c0-15 14-15 14 0M48 63c0-15 14-15 14 0M71 63c0-15 14-15 14 0M94 63c0-15 14-15 14 0M117 63c0-15 14-15 14 0M140 63c0-15 14-15 14 0M163 63c0-15 14-15 14 0M186 63c0-15 14-15 14 0M91 28h8v8h-8M106 25h8v11h-8M121 28h8v8h-8"/></svg>',
+        warszawa: '<svg viewBox="0 0 220 72" aria-hidden="true"><path d="M11 63h198M72 63V51h76v12M82 51V39h56v12M91 39V21h38v18M98 21V13h24v8M105 13V7h10v6M110 7V2M64 63V48h8M148 48h8v15M45 63V54h19M156 54h19v9M96 28h7v7h-7M107 28h6v7h-6M118 28h6v7h-6M91 39h38M89 44h42M91 51h38M99 55h8v8M113 55h8v8M83 39l-5-4 5-4M137 39l5-4-5-4M98 13l-4-3M122 13l4-3"/></svg>'
       };
 
       function renderTiers() {
@@ -1798,7 +1796,7 @@
       }
 
       function readCustomSettings() {
-        return { listingCount: Number($('#custom-listings').value) || 15, botCount: Number($('#custom-bots').value) || 5, includeStandard: $('#custom-standard').checked, includeMystery: $('#custom-mystery').checked, includeDivisible: $('#custom-divisible').checked, impulsiveChance: .86, aggressionBoost: 2.0 };
+        return { listingCount: Number($('#custom-listings').value) || 15, botCount: Number($('#custom-bots').value) || 5, includeStandard: $('#custom-standard').checked, includeMystery: $('#custom-mystery').checked, includeDivisible: $('#custom-divisible').checked, openingDelay: 3_000, decisionNoise: .04, valuationBoost: 1.14, reactionScale: .68, finalBidFraction: .80 };
       }
       function updateCustomSummary() {
         const settings = readCustomSettings();
@@ -1926,7 +1924,7 @@
           const willingBots = botTargets
             .filter(bot => {
               const player = state.players.find(item => item.id === bot.playerId);
-              if (!player || bot.target <= 0 || price > bot.target || price > player.cash) return false;
+              if (!player || elapsed < bot.notBeforeMs || bot.target <= 0 || price > bot.target || price > player.cash) return false;
               if (bot.triggeredAt === null) bot.triggeredAt = elapsed;
               return elapsed >= bot.triggeredAt + bot.reactionMs;
             })
@@ -2369,60 +2367,93 @@
         const listing = currentListing();
         const remaining = state.listings.length - state.listingIndex;
         const isFinalListing = remaining <= 1;
-        const tier = DIFFICULTY_TIERS[state.tierIndex ?? 0] || DIFFICULTY_TIERS[0];
+        const tier = state.customGame
+          ? state.customSettings
+          : (DIFFICULTY_TIERS[state.tierIndex ?? 0] || DIFFICULTY_TIERS[0]);
         const bots = state.players.filter(player => !player.isHuman);
-        const propertyCounts = bots.map(player => player.properties.length);
-        const leastProperties = Math.min(...propertyCounts);
-        const mostProperties = Math.max(...propertyCounts);
+        const incomeOf = player => player.properties.reduce((sum, property) => sum + property.rent, 0);
+        const incomes = state.players.map(incomeOf);
+        const leadingIncome = Math.max(0, ...incomes);
+        const lowestIncome = Math.min(...incomes);
         const listingId = Math.max(0, LISTINGS.indexOf(listing));
+        const totalListings = Math.max(1, state.listings.length);
+        const stage = totalListings <= 1 ? 1 : state.listingIndex / (totalListings - 1);
+        const remainingRentAverage = state.listings
+          .slice(state.listingIndex)
+          .reduce((sum, item) => sum + (item.divisible ? item.rent + 500 : item.rent), 0) / Math.max(1, remaining);
 
         return bots.map((player, index) => {
           const profile = BOT_PROFILES[index % BOT_PROFILES.length];
 
-          // Każda oferta ma innego naturalnego faworyta. Zainteresowanie rotuje
-          // pomiędzy botami, więc jedna stała „osobowość” nie wygrywa całej gry.
+          // Różne gusta rozdzielają okazje między konkurentów, ale ich wpływ
+          // jest celowo niewielki: czynsz i budżet są ważniejsze od losowania.
           const interestRank = (listingId + index) % bots.length;
           const interestRange = Math.max(1, bots.length - 1);
-          const taste = 1.18 - (interestRank / interestRange) * .32;
+          const taste = 1.07 - (interestRank / interestRange) * .14;
 
-          // Boty z mniejszym portfelem stają się odważniejsze, a liderzy bardziej
-          // wybredni. Pozwala to nadrabiać bez sztucznego rozdawania mieszkań.
-          const catchUp = 1 + Math.max(0, mostProperties - player.properties.length) * .10;
-          const leaderDrag = 1 - Math.max(0, player.properties.length - leastProperties) * .08;
-          const balance = Math.max(.78, Math.min(1.30, catchUp * leaderDrag));
+          // Pozycję oceniamy według celu gry: miesięcznego czynszu, nie liczby
+          // mieszkań. Gracz z tyłu podejmuje trochę większe ryzyko, lider hamuje.
+          const playerIncome = incomeOf(player);
+          const deficit = leadingIncome > 0 ? (leadingIncome - playerIncome) / leadingIncome : 0;
+          const lead = leadingIncome > lowestIncome ? (playerIncome - lowestIncome) / (leadingIncome - lowestIncome) : 0;
+          const balance = Math.max(.86, Math.min(1.20, 1 + deficit * .20 - lead * .10));
 
-          const urgency = remaining <= 4 ? 1.16 : remaining <= 7 ? 1.06 : .97;
-          const imperfectRead = .92 + Math.random() * .16;
-          const fairPrice = listing.rent * 12 / profile.yield;
+          // Wycena bierze pod uwagę realny przychód po ewentualnym podziale.
+          // Koszt podziału odejmujemy od maksymalnej ceny samego mieszkania.
+          const canDivide = listing.divisible && player.cash > DIVIDE_COST;
+          const effectiveRent = canDivide ? dividedRentPerUnit(listing.rent) * DIVIDE_UNITS : listing.rent;
+          const divisionCost = canDivide ? DIVIDE_COST : 0;
+          const fairPrice = Math.max(90_000, effectiveRent * 12 / profile.yield - divisionCost);
+          const imperfectRead = 1 + (Math.random() * 2 - 1) * tier.decisionNoise;
+          const urgency = .94 + stage * .24;
 
-          // Bot nie może wydać całego salda na pierwszą okazję. Rezerwuje środki
-          // na rozsądną liczbę pozostałych zakupów.
+          // Konkurent planuje portfel: odkłada pieniądze na kolejne spodziewane
+          // zakupy i uwalnia tę rezerwę stopniowo wraz z końcem miasta.
           const plannedWins = Math.max(1, Math.ceil(remaining / state.players.length));
-          const budgetCap = player.cash / plannedWins * (1.10 + Math.random() * .40);
-          const rawTarget = fairPrice * profile.valuation * taste * balance * urgency * imperfectRead * tier.aggressionBoost;
-          const normalTarget = Math.min(budgetCap, Math.max(90_000, rawTarget));
+          const reservePerWin = 360_000 + stage * 90_000;
+          const reserve = Math.max(0, plannedWins - 1) * reservePerWin * (1 - stage * .55);
+          const cashAfterDivision = Math.max(0, player.cash - divisionCost);
+          const portfolioCap = Math.max(90_000, cashAfterDivision - reserve);
+          const roundSpendShare = .34 + stage * .30;
+          const roundCap = Math.max(90_000, cashAfterDivision * roundSpendShare);
+          const budgetCap = Math.min(portfolioCap, roundCap);
+          const spendPerPlannedWin = cashAfterDivision * (.82 + stage * .14) / plannedWins;
+          const rentQuality = Math.max(.45, Math.min(1.75, effectiveRent / Math.max(1, remainingRentAverage)));
+          const portfolioValue = spendPerPlannedWin * Math.pow(rentQuality, .90);
+          const rawTarget = (fairPrice * .34 + portfolioValue * .66)
+            * profile.valuation * taste * balance * urgency * imperfectRead * tier.valuationBoost;
+          const strategicTarget = Math.min(budgetCap, Math.max(90_000, rawTarget));
 
-          // Impulsywny zryw: bot czasem ignoruje próg opłacalności i jest
-          // gotów zapłacić znacznie więcej, żeby nie odpuścić okazji. Wtedy
-          // może sięgnąć nawet do własnej gotówki ponad zwykły budgetCap.
-          const isImpulsive = Math.random() < tier.impulsiveChance;
-          const impulsiveTarget = isImpulsive ? START_PRICE * (.58 + Math.random() * .40) : 0;
-
-          // Ostatnia oferta w talii: niewydana gotówka jest bezwartościowa na
-          // koniec gry, więc bot licytuje do granicy tego, na co go stać.
+          // W ostatniej aukcji gotówka nie punktuje, ale konkurent nadal ma
+          // określoną granicę ryzyka zamiast automatycznie oddawać cały portfel.
           const target = isFinalListing
-            ? player.cash
-            : Math.round(Math.min(player.cash, Math.max(normalTarget, impulsiveTarget)));
-          const reactionMs = (profile.reactionMin + Math.random() * (profile.reactionMax - profile.reactionMin)) / Math.max(1, tier.aggressionBoost * .78);
+            ? Math.round(Math.min(cashAfterDivision, Math.max(strategicTarget, START_PRICE * tier.finalBidFraction)))
+            : Math.round(Math.min(cashAfterDivision, strategicTarget));
+
+          // Nawet wysoka wycena nie może wywołać zakupu tuż po starcie. Dobre
+          // oferty i końcówka skracają namysł, lecz zachowujemy czytelne okno
+          // decyzji dla człowieka. Trudność zwiększa precyzja, nie refleks 0 ms.
+          const opportunityScore = Math.max(0, Math.min(1, (rentQuality - .70) / .80));
+          const stageAcceleration = 1 - stage * .28;
+          const opportunityBonus = opportunityScore * 450;
+          const notBeforeMs = isFinalListing
+            ? Math.max(1_050, tier.openingDelay * .42 - opportunityBonus)
+            : Math.max(2_450, tier.openingDelay * stageAcceleration - opportunityBonus);
+          const reactionMs = (profile.reactionMin + Math.random() * (profile.reactionMax - profile.reactionMin)) * tier.reactionScale;
 
           return {
             playerId: player.id,
             target,
             reactionMs,
+            notBeforeMs,
             triggeredAt: null,
             interestRank,
             taste,
-            balance
+            balance,
+            fairPrice,
+            portfolioValue,
+            budgetCap,
+            playerIncome
           };
         });
       }
@@ -2463,7 +2494,7 @@
         const willingBots = state.botTargets
           .filter(bot => {
             const player = state.players.find(item => item.id === bot.playerId);
-            if (!player || bot.target <= 0 || price > bot.target || price > player.cash) return false;
+            if (!player || elapsed < bot.notBeforeMs || bot.target <= 0 || price > bot.target || price > player.cash) return false;
             if (bot.triggeredAt === null) bot.triggeredAt = elapsed;
             return elapsed >= bot.triggeredAt + bot.reactionMs;
           })
