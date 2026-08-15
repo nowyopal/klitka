@@ -973,6 +973,7 @@
         <div class="button-stack">
           <button class="primary" id="demo-button" disabled>Podbijaj miasta</button>
           <button class="secondary" id="create-button" disabled>Zaproś znajomych</button>
+          <button class="secondary" id="quickplay-button" disabled>Zagraj z obcymi</button>
         </div>
         <div class="join-box">
           <label class="label" for="join-code">Dołącz do gry</label>
@@ -1012,9 +1013,9 @@
     </section>
 
     <section class="screen" id="lobby-screen" hidden>
-      <h2 class="lobby-title">Zbierz fliperów.</h2>
-      <p style="margin:5px 0 0;font-weight:750;color:var(--muted)">Podaj kod osobom, które mają wejść do gry.</p>
-      <div class="code-card">
+      <h2 class="lobby-title" id="lobby-title">Zbierz fliperów.</h2>
+      <p id="lobby-subtitle" style="margin:5px 0 0;font-weight:750;color:var(--muted)">Podaj kod osobom, które mają wejść do gry.</p>
+      <div class="code-card" id="code-card">
         <small>Kod pokoju</small>
         <strong class="room-code" id="room-code">K7M2X</strong>
       </div>
@@ -1454,45 +1455,60 @@
           source.start(start);
         }
 
-        // Lekko tandetna muzyka windowa: cztery akordy (Cmaj7-Am7-Dm7-G7),
-        // spacerujący bas i miękki hi-hat na offbeatach. Cała fraza trwa
-        // 4 takty i zapętla się płynnie, zamiast powtarzać ten sam krótki motyw.
-        const MENU_BEAT = 60 / 96;
+        // "Poczekalnia dewelopera": cztery akordy (Fmaj7-Dm7-Gm7-C7), ciepłe
+        // pady, delikatny pluck melodii — ale fraza celowo nigdy się nie
+        // rozwiązuje (ostatni takt C7 zawiesza się na tercji, nie wraca do
+        // Fmaj7), jak muzyka z infolinii, która nigdy nie przełącza na
+        // konsultanta. Cała fraza trwa 4 takty i zapętla się płynnie.
+        const MENU_BEAT = 60 / 100;
         const MENU_BARS = [
-          { pad: [261.63, 329.63, 392.00, 493.88], bass: [130.81, 196.00, 130.81, 164.81], melody: [523.25, null, 587.33, 659.25] },
-          { pad: [220.00, 261.63, 329.63, 392.00], bass: [110.00, 164.81, 110.00, 130.81], melody: [440.00, null, 493.88, 523.25] },
-          { pad: [293.66, 349.23, 440.00, 523.25], bass: [146.83, 220.00, 146.83, 174.61], melody: [587.33, null, 523.25, 440.00] },
-          { pad: [196.00, 246.94, 293.66, 349.23], bass: [98.00, 146.83, 98.00, 123.47], melody: [392.00, null, 349.23, 293.66] }
+          { pad: [174.61, 220.00, 261.63, 329.63], bass: [87.31, 130.81, 87.31, 110.00], melody: [261.63, null, 329.63, null] },
+          { pad: [146.83, 174.61, 220.00, 261.63], bass: [73.42, 110.00, 73.42, 98.00], melody: [220.00, null, 261.63, null] },
+          { pad: [196.00, 233.08, 293.66, 349.23], bass: [98.00, 146.83, 98.00, 130.81], melody: [293.66, null, 349.23, null] },
+          { pad: [130.81, 164.81, 196.00, 233.08], bass: [65.41, 98.00, 65.41, 82.41], melody: [233.08, null, 329.63, null] }
         ];
+
+        let nextPhraseStart = 0;
 
         function menuLoop() {
           if (!canPlay() || scene !== 'intro') return;
           const barDuration = MENU_BEAT * 4;
+          const phraseDuration = MENU_BARS.length * barDuration;
+          // Zegar audio, nie zegar setTimeout: setTimeout budzi się z
+          // niedokładnością rzędu kilku-kilkunastu ms, co na złączeniu 4. i
+          // 1. taktu słychać jako mikroprzerwę albo zdwojenie ataku. Kolejna
+          // fraza zawsze zaczyna się dokładnie tam, gdzie powinna wypaść
+          // poprzednia (czysta arytmetyka), niezależnie od tego, kiedy
+          // faktycznie wybudzi się callback — więc pętla nie dryfuje.
+          if (nextPhraseStart < context.currentTime) nextPhraseStart = context.currentTime + .05;
+          const phraseOffset = nextPhraseStart - context.currentTime;
           MENU_BARS.forEach((bar, barIndex) => {
-            const barStart = barIndex * barDuration;
-            bar.pad.forEach((freq, voiceIndex) => tone(freq, barDuration * .92, {
+            const barStart = phraseOffset + barIndex * barDuration;
+            bar.pad.forEach((freq, voiceIndex) => tone(freq, barDuration * .94, {
               delay: barStart,
               type: voiceIndex === 0 ? 'triangle' : 'sine',
-              volume: .011
+              volume: .012
             }));
-            bar.bass.forEach((freq, beatIndex) => tone(freq, MENU_BEAT * .82, {
+            bar.bass.forEach((freq, beatIndex) => tone(freq, MENU_BEAT * .85, {
               delay: barStart + beatIndex * MENU_BEAT,
               type: 'sine',
-              volume: .026
+              volume: .03
             }));
             bar.melody.forEach((freq, beatIndex) => {
               if (!freq) return;
-              tone(freq, MENU_BEAT * .78, {
-                delay: barStart + beatIndex * MENU_BEAT + MENU_BEAT * .04,
+              tone(freq, MENU_BEAT * .7, {
+                delay: barStart + beatIndex * MENU_BEAT + MENU_BEAT * .05,
                 type: 'triangle',
-                volume: .02
+                volume: .022
               });
             });
-            for (let eighth = 1; eighth < 8; eighth += 2) {
-              noise(.03, .006, barStart + eighth * (MENU_BEAT / 2));
+            for (let beat = 0; beat < 4; beat += 1) {
+              noise(.05, .008, barStart + beat * MENU_BEAT);
             }
           });
-          menuTimer = setTimeout(menuLoop, MENU_BARS.length * barDuration * 1_000);
+          nextPhraseStart += phraseDuration;
+          const wakeDelayMs = Math.max(0, (nextPhraseStart - context.currentTime) * 1_000 - 60);
+          menuTimer = setTimeout(menuLoop, wakeDelayMs);
         }
 
         function stopMenu() {
@@ -1736,6 +1752,22 @@
         }
       }
 
+      async function quickplayJoinRoom() {
+        entryError();
+        $('#quickplay-button').disabled = true;
+        try {
+          const session = await api('/api/quickplay/join', { name: cleanName() });
+          connectNetwork(session);
+          showScreen('lobby');
+          maybeShowRules();
+        } catch (error) {
+          entryError(location.protocol === 'file:'
+            ? 'Tryb online działa po uruchomieniu wersji serwerowej, nie z pliku na dysku.'
+            : error.message);
+          updateEntryState();
+        }
+      }
+
       async function networkAction(action, extra = {}) {
         return api(`/api/rooms/${network.roomCode}/${action}`, {
           ...extra,
@@ -1761,6 +1793,7 @@
         const hasRoomCode = $('#join-code').value.trim().length === 5;
         $('#demo-button').disabled = !hasName;
         $('#create-button').disabled = !hasName;
+        $('#quickplay-button').disabled = !hasName;
         $('#join-button').disabled = !hasName || !hasRoomCode;
       }
 
@@ -2037,6 +2070,25 @@
             <span class="host-tag">${player.id === snapshot.hostId ? 'HOST' : player.isBot ? 'BOT' : (player.isHuman ? 'TY' : 'GRACZ')}</span>
           </div>`).join('');
         const isHost = snapshot.selfId === snapshot.hostId;
+        const humanCount = state.players.filter(player => !player.isBot).length;
+
+        if (snapshot.isPublic) {
+          // "Zagraj z obcymi": bez kodu, bez ręcznego hosta — dopasowanie i
+          // start są w pełni automatyczne po stronie serwera.
+          $('#lobby-title').textContent = 'Szukamy innych graczy…';
+          $('#lobby-subtitle').textContent = 'Zaraz dołączą kolejni fliperzy — gra zacznie się sama, najdalej za chwilę.';
+          $('#code-card').hidden = true;
+          $('#add-bot-button').hidden = true;
+          $('#network-options-panel').hidden = true;
+          $('#start-button').disabled = true;
+          $('#start-button').textContent = `Czekamy na innych graczy… (${humanCount}/4)`;
+          if (screens.lobby.hidden) showScreen('lobby');
+          return;
+        }
+
+        $('#lobby-title').textContent = 'Zbierz fliperów.';
+        $('#lobby-subtitle').textContent = 'Podaj kod osobom, które mają wejść do gry.';
+        $('#code-card').hidden = false;
         const botCount = state.players.filter(player => player.isBot).length;
         $('#add-bot-button').hidden = !isHost;
         $('#add-bot-button').disabled = state.players.length >= 6 || botCount >= 4;
@@ -2049,7 +2101,6 @@
         $('#network-options-note').textContent = isHost
           ? 'Możesz zmienić opcje do chwili rozpoczęcia gry.'
           : 'Opcje ustawia host. Tutaj widzisz jego wybór.';
-        const humanCount = state.players.filter(player => !player.isBot).length;
         $('#start-button').disabled = !isHost || humanCount < 2;
         $('#start-button').textContent = !isHost
           ? 'Czekamy, aż host zacznie'
@@ -2871,6 +2922,7 @@
         startGame();
       });
       $('#create-button').addEventListener('click', createNetworkRoom);
+      $('#quickplay-button').addEventListener('click', quickplayJoinRoom);
       $('#join-button').addEventListener('click', joinNetworkRoom);
       $('#name-input').addEventListener('input', () => {
         updateEntryState();
@@ -2968,6 +3020,13 @@
           sound.button(button.id === 'buy-button');
         }, { passive: true });
       });
+
+      // Tryb "Zagraj z obcymi" jest w pełni gotowy i przetestowany, ale
+      // celowo wstrzymany — Rafał wdroży go, gdy gra ma dużo jednoczesnych
+      // graczy naraz (przy małym ruchu tryb i tak kończyłby się głównie
+      // dobijaniem botami). Żeby włączyć: zmień na true.
+      const QUICKPLAY_ENABLED = false;
+      if (!QUICKPLAY_ENABLED) $('#quickplay-button').hidden = true;
 
       try {
         const savedName = localStorage.getItem('klitka-name');
