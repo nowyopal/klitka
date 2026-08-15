@@ -164,6 +164,7 @@
     .danger { background: var(--red); color: white; box-shadow: 0 5px 14px rgba(173, 42, 31, .24); }
     .ghost { min-height: 48px; background: transparent; border: 2px solid #9eacb4; box-shadow: none; }
     .skip-end-button { margin-top: 8px; min-height: 42px; font-size: 12px; color: var(--muted); flex: 0 0 auto; }
+    .skip-listing-button { margin-top: 6px; min-height: 38px; font-size: 12px; color: var(--muted); flex: 0 0 auto; }
     button:active:not(:disabled) { transform: translateY(2px); box-shadow: none; }
     button:disabled { cursor: default; opacity: .36; filter: grayscale(.35); }
     .button-stack { display: grid; gap: 10px; margin-top: 15px; }
@@ -288,7 +289,7 @@
     .tier-card.is-locked { opacity: .5; filter: grayscale(.5); box-shadow: none; }
     .tier-card.is-locked .tier-card-status { color: var(--muted); }
     .final-unlock { margin: -8px 0 18px; text-align: center; color: var(--green-dark); font-size: 13px; font-weight: 1000; }
-    .final-market-note { margin: 14px 0 0; padding: 10px 14px; border-radius: 12px; background: #f1f4f5; color: var(--muted); font-size: 12.5px; font-weight: 700; text-align: center; line-height: 1.5; }
+    .final-market-note { margin: 14px 0 0; padding: 13px 15px; border-radius: 13px; background: #fff1ef; border: 2px solid var(--red); color: var(--red-dark); font-size: 13.5px; font-weight: 900; text-align: center; line-height: 1.5; }
     .custom-options { display: grid; gap: 14px; margin: 22px 0; }
     .custom-option { padding: 14px; background: white; border: 1px solid var(--line); border-radius: 12px; }
     .custom-option select { width: 100%; height: 48px; padding: 0 12px; border: 2px solid #9eacb4; border-radius: 9px; background: white; color: var(--ink); font: inherit; font-weight: 850; }
@@ -487,8 +488,6 @@
       border-radius: 14px;
       flex: 0 0 auto;
     }
-    .ready-heading { display: flex; align-items: baseline; justify-content: flex-end; gap: 8px; margin-bottom: 9px; }
-    .ready-heading span { color: var(--muted); font-size: 10px; font-weight: 900; }
     .ready-players { display: flex; flex-wrap: wrap; gap: 7px; }
     .ready-chip {
       min-width: 0;
@@ -603,7 +602,6 @@
       0%, 100% { box-shadow: 0 6px 18px rgba(17,31,39,.18), 0 0 0 0 rgba(237,76,59,.55); }
       50% { box-shadow: 0 6px 18px rgba(17,31,39,.18), 0 0 0 7px rgba(237,76,59,0); }
     }
-    .auction-label { text-align: center; font-size: 10px; font-weight: 1000; letter-spacing: .13em; color: #aaa99f; }
     .ticker {
       display: flex;
       justify-content: center;
@@ -724,8 +722,16 @@
       font-size: min(62vw, 280px);
       line-height: .8;
       font-weight: 1000;
-      -webkit-text-stroke: 6px var(--ink);
-      text-shadow: 9px 10px 0 var(--red);
+      /* -webkit-text-stroke dawał samoprzecinający się artefakt (czarna
+         "gwiazdka") na wklęsłych wierzchołkach niektórych glifów (np. "2",
+         "A") niezależnie od szerokości obrysu — obrys symulowany przez stos
+         text-shadow, który nie ma tej wady. */
+      text-shadow:
+        6px 0 0 var(--ink), -6px 0 0 var(--ink),
+        0 6px 0 var(--ink), 0 -6px 0 var(--ink),
+        4px 4px 0 var(--ink), -4px 4px 0 var(--ink),
+        4px -4px 0 var(--ink), -4px -4px 0 var(--ink),
+        9px 10px 0 var(--red);
       animation: count-pop .64s ease both;
     }
     @keyframes count-pop { from { opacity: 0; transform: scale(1.8) rotate(-7deg); } to { opacity: 1; transform: scale(1) rotate(2deg); } }
@@ -1062,19 +1068,18 @@
         </article>
 
         <section class="ready-panel" id="ready-panel">
-          <div class="ready-heading"><span id="ready-counter">0 / 4</span></div>
           <div class="ready-players" id="ready-players"></div>
           <button class="primary ready-button" id="ready-button">Jestem gotowy</button>
         </section>
 
         <section class="auction-wrap" id="auction-panel" hidden>
-          <div class="auction-label">CENA SPADA · ZATRZYMAJ JĄ</div>
           <div class="ticker" id="ticker" aria-live="off"></div>
           <div class="ticker-currency">ZŁOTYCH</div>
           <div class="auction-progress"><i id="auction-progress"></i></div>
         </section>
         <button class="danger buy-button" id="buy-button" hidden>Kupuję!</button>
         <div class="buy-help" id="buy-help"></div>
+        <button class="ghost skip-listing-button" id="skip-listing-button" hidden>Pomiń tę ofertę</button>
         <button class="ghost skip-end-button" id="skip-end-button" hidden>Przeskocz do końca</button>
 
         <div class="balances-heading">Kto teraz wygrywa</div>
@@ -1087,7 +1092,7 @@
     <section class="screen final-screen" id="final-screen" hidden>
       <div class="final-crown">👑</div>
       <h1 class="final-title" id="winner-title">Król Fliperów</h1>
-      <p class="final-subtitle">Wygrywa najwyższy miesięczny przychód. Niewydane miliony właśnie przepadły.</p>
+      <p class="final-subtitle">Liczy się tylko przychód pasywny. Reszta to zmarnowany potencjał kapitału.</p>
       <p class="final-unlock" id="final-unlock" hidden></p>
       <div class="standings" id="standings"></div>
       <p class="final-market-note" id="final-market-note" hidden></p>
@@ -1099,7 +1104,7 @@
       <div class="result-card">
         <div class="result-icon" id="result-icon">🏠</div>
         <div class="result-kicker" id="result-kicker">Sprzedane</div>
-        <h2 id="result-title">Rafał bierze klitkę</h2>
+        <h2 id="result-title">Rafał zabezpiecza aktywo</h2>
         <p id="result-copy">za 456 250 zł</p>
         <div class="purchase-debit" id="purchase-debit" hidden>
           <small>Z TWOJEGO KONTA</small>
@@ -1117,7 +1122,7 @@
           <li>Cena klitki spada. Kto pierwszy kliknie „Kupuję!”, płaci cenę z tej sekundy.</li>
           <li>Wygrywa gracz z najwyższym łącznym czynszem z kupionych klitek — nie ten z największym saldem.</li>
           <li>Niewydane pieniądze nic nie dają na koniec gry.</li>
-          <li>Kilkanaście rund, każda to inna oferta.</li>
+          <li>Od kilku do prawie trzydziestu rund, zależnie od miasta — każda to inna oferta.</li>
         </ul>
         <button class="primary" id="rules-close">Zrozumiałem, gramy</button>
       </div>
@@ -1154,15 +1159,21 @@
       'use strict';
 
       const START_CASH = 4_000_000;
-      const START_PRICE = 2_000_000;
-      const AUCTION_MS = 10_000;
+      const START_PRICE = 3_000_000;
+      const AUCTION_MS = 13_000;
       const BOT_NAMES = ['Piotr', 'Wojciech', 'Kuba', 'Aneta', 'Marek'];
+      // Każdy bot ma stały charakter, nie tylko losowy szum. aggroMod
+      // przesuwa cały zakres aggroMin/aggroMax z DIFFICULTY_TIERS w górę/dół
+      // (porywisty płaci więcej, ale i tak skończy z mniejszym portfelem);
+      // delayMod mnoży czas oczekiwania (porywisty rusza wcześnie, oszczędny
+      // czeka do końca — i ryzykuje, że oferta wymknie się "prawdziwym
+      // ludziom", zanim w ogóle spróbuje kupić).
       const BOT_PROFILES = [
-        { yield: .054, valuation: 1, reactionMin: 140, reactionMax: 360 },
-        { yield: .058, valuation: .98, reactionMin: 80, reactionMax: 280 },
-        { yield: .051, valuation: 1.02, reactionMin: 190, reactionMax: 430 },
-        { yield: .056, valuation: 1.01, reactionMin: 110, reactionMax: 330 },
-        { yield: .053, valuation: .97, reactionMin: 160, reactionMax: 390 }
+        { label: 'porywisty', aggroMod: .16, delayMod: .55, reactionMin: 90, reactionMax: 240 },
+        { label: 'żwawy', aggroMod: .05, delayMod: .80, reactionMin: 120, reactionMax: 300 },
+        { label: 'zrównoważony', aggroMod: 0, delayMod: 1, reactionMin: 140, reactionMax: 360 },
+        { label: 'wyczekująca', aggroMod: -.05, delayMod: 1.25, reactionMin: 160, reactionMax: 390 },
+        { label: 'oszczędny', aggroMod: -.13, delayMod: 1.55, reactionMin: 190, reactionMax: 430 }
       ];
       // Trudność nie polega na losowym kupowaniu za każdą cenę. Kolejne miasta
       // zmniejszają błąd wyceny i czas reakcji konkurentów, ale każda decyzja
@@ -1174,13 +1185,16 @@
       // zakresy, sprawdzone symulacyjnie (150 gier/miasto, człowiek grający
       // „uczciwą” wyceną wg czynszu): Radom ~94% wygranych człowieka,
       // Warszawa ~0%.
+      // listingCount rośnie z liczbą graczy (co najmniej graczy×4) — chodzi o
+      // to, żeby wygrana wymagała portfela wielu klitek, nie 2-3 najdroższych
+      // z brzegu talii i czekania na koniec rundy.
       const DIFFICULTY_TIERS = [
-        { id: 'radom', city: 'Radom', details: ['Tutorial', '1 konkurent', '5 zwykłych ofert'], botCount: 1, listingCount: 5, startCash: START_CASH, mysteryQuota: 0, divisibleQuota: 0, aggroMin: .10, aggroMax: .24, delayMin: 4_500, delayMax: 8_500 },
-        { id: 'lodz', city: 'Łódź', details: ['2 konkurentów', '7 ofert', 'Zakupy w ciemno'], botCount: 2, listingCount: 7, startCash: START_CASH, mysteryQuota: 1, divisibleQuota: 0, aggroMin: .14, aggroMax: .30, delayMin: 4_000, delayMax: 7_800 },
-        { id: 'katowice', city: 'Katowice', details: ['3 konkurentów', '9 ofert', 'Trudniejszy rynek'], botCount: 3, listingCount: 9, startCash: START_CASH, mysteryQuota: 2, divisibleQuota: 0, aggroMin: .18, aggroMax: .38, delayMin: 3_500, delayMax: 7_000 },
-        { id: 'wroclaw', city: 'Wrocław', details: ['4 konkurentów', '11 ofert', 'Dzielenie klitek'], botCount: 4, listingCount: 11, startCash: START_CASH, mysteryQuota: 2, divisibleQuota: 1, aggroMin: .23, aggroMax: .48, delayMin: 3_000, delayMax: 6_200 },
-        { id: 'krakow', city: 'Kraków', details: ['5 konkurentów', '13 ofert', 'Pełna pula ofert'], botCount: 5, listingCount: 13, startCash: START_CASH, mysteryQuota: 2, divisibleQuota: 2, aggroMin: .29, aggroMax: .60, delayMin: 2_500, delayMax: 5_400 },
-        { id: 'warszawa', city: 'Warszawa', details: ['5 ekstremalnych konkurentów', '15 ofert', 'Wszystkie mechaniki'], botCount: 5, listingCount: 15, startCash: START_CASH, mysteryQuota: 3, divisibleQuota: 3, aggroMin: .36, aggroMax: .75, delayMin: 2_000, delayMax: 4_600 }
+        { id: 'radom', city: 'Radom', details: ['Tutorial', '1 konkurent', '8 zwykłych ofert'], botCount: 1, listingCount: 8, startCash: START_CASH, mysteryQuota: 0, divisibleQuota: 0, aggroMin: .10, aggroMax: .24, delayMin: 4_500, delayMax: 8_500 },
+        { id: 'lodz', city: 'Łódź', details: ['2 konkurentów', '12 ofert', 'Zakupy w ciemno'], botCount: 2, listingCount: 12, startCash: START_CASH, mysteryQuota: 2, divisibleQuota: 0, aggroMin: .14, aggroMax: .30, delayMin: 4_000, delayMax: 7_800 },
+        { id: 'katowice', city: 'Katowice', details: ['3 konkurentów', '16 ofert', 'Trudniejszy rynek'], botCount: 3, listingCount: 16, startCash: START_CASH, mysteryQuota: 3, divisibleQuota: 1, aggroMin: .18, aggroMax: .38, delayMin: 3_500, delayMax: 7_000 },
+        { id: 'wroclaw', city: 'Wrocław', details: ['4 konkurentów', '20 ofert', 'Dzielenie klitek'], botCount: 4, listingCount: 20, startCash: START_CASH, mysteryQuota: 4, divisibleQuota: 2, aggroMin: .23, aggroMax: .48, delayMin: 3_000, delayMax: 6_200 },
+        { id: 'krakow', city: 'Kraków', details: ['5 konkurentów', '24 oferty', 'Pełna pula ofert'], botCount: 5, listingCount: 24, startCash: START_CASH, mysteryQuota: 4, divisibleQuota: 4, aggroMin: .29, aggroMax: .60, delayMin: 2_500, delayMax: 5_400 },
+        { id: 'warszawa', city: 'Warszawa', details: ['5 ekstremalnych konkurentów', '28 ofert', 'Wszystkie mechaniki'], botCount: 5, listingCount: 28, startCash: START_CASH, mysteryQuota: 5, divisibleQuota: 5, aggroMin: .36, aggroMax: .75, delayMin: 2_000, delayMax: 4_600 }
       ];
       const TIER_STORAGE_KEY = 'klitka-tier-progress';
       const CAMPAIGN_SEEN_KEY = 'klitka-campaign-seen';
@@ -1221,85 +1235,85 @@
       // Fikcyjne oferty z całkowicie syntetycznymi wnętrzami.
       // Każda oferta ma jedno czytelne zdjęcie zoptymalizowane pod telefon.
       const LISTINGS = [
-        { city: 'Centrum · inwestycyjna okazja', area: 7, rent: 850, photos: syntheticPhoto(1) },
-        { city: 'Śródmieście · standard premium', area: 10, rent: 2700, photos: syntheticPhoto(2) },
-        { city: 'Poddasze · naturalny charakter', area: 18, rent: 1650, photos: syntheticPhoto(3) },
-        { city: 'Centrum · kompaktowy układ', area: 11, rent: 2050, photos: syntheticPhoto(4) },
-        { city: 'Blisko komunikacji · gotowiec', area: 9, rent: 1200, photos: syntheticPhoto(5) },
-        { city: 'Centrum · pełne wyposażenie', area: 12, rent: 1500, photos: syntheticPhoto(6) },
-        { city: 'Top lokalizacja · po remoncie', area: 9, rent: 2450, photos: syntheticPhoto(7) },
-        { city: 'Śródmieście · funkcjonalne 12 m²', area: 12, rent: 1350, photos: syntheticPhoto(8) },
-        { city: 'Centrum · antresola', area: 10, rent: 1800, photos: syntheticPhoto(9) },
-        { city: 'Apartament premium · 11 m²', area: 11, rent: 2800, photos: syntheticPhoto(10) },
-        { city: 'Centrum · gotowe do wejścia', area: 10, rent: 2650, photos: syntheticPhoto(11) },
-        { city: 'Kamienica · loftowy klimat', area: 12, rent: 1950, photos: syntheticPhoto(12) },
-        { city: 'Centrum · niezależne wejście', area: 9, rent: 1600, photos: syntheticPhoto(13) },
-        { city: 'Spokojna okolica · umeblowane', area: 12, rent: 1100, photos: syntheticPhoto(14) },
-        { city: 'Blisko uczelni · duży stół', area: 12, rent: 1000, photos: syntheticPhoto(15) },
-        { city: 'Przyziemie · mikroloft', area: 8, rent: 900, photos: syntheticPhoto(16) },
-        { city: 'Poddasze · wyjątkowy układ', area: 13, rent: 1750, photos: syntheticPhoto(17) },
-        { city: 'Centrum · 6,5 m² możliwości', area: 6.5, rent: 950, photos: syntheticPhoto(18) },
-        { city: 'Projekt architekta · antresola', area: 14, rent: 2550, photos: syntheticPhoto(19) },
-        { city: 'Industrial premium · ostatnie piętro', area: 11, rent: 2950, photos: syntheticPhoto(20) },
-        { city: 'Dawna pralnia · stół wielofunkcyjny', area: 10, rent: 1250, photos: syntheticPhoto(21) },
-        { city: 'Kamienica · prywatny komin', area: 9, rent: 2100, photos: syntheticPhoto(22) },
-        { city: 'Kotłownia · instalacje w cenie', area: 9, rent: 1050, photos: syntheticPhoto(23) },
-        { city: 'Pod zjazdem · malejąca wysokość', area: 11, rent: 1450, photos: syntheticPhoto(24) },
-        { city: 'Balkon · panoramiczny standard', area: 7, rent: 2350, photos: syntheticPhoto(25) },
-        { city: 'Poddasze · strefa schylania', area: 6, rent: 1400, photos: syntheticPhoto(26) },
-        { city: 'Dawna chłodnia · stała temperatura', area: 9, rent: 1150, photos: syntheticPhoto(27) },
-        { city: 'Suterena · poziom chodnika', area: 12, rent: 1300, photos: syntheticPhoto(28) },
-        { city: 'Dawny kiosk · witryna miejska', area: 8, rent: 2600, photos: syntheticPhoto(29) },
-        { city: 'Kontener · moduł miejski', area: 13, rent: 1700, photos: syntheticPhoto(30) },
-        { city: 'Boazeria · klasyka premium', area: 12, rent: 1550, photos: syntheticPhoto(31) },
-        { city: 'Korytarz · studio w przejściu', area: 8, rent: 800, photos: syntheticPhoto(41) },
-        { city: 'Schowek · pełny standard', area: 6, rent: 825, photos: syntheticPhoto(42) },
-        { city: 'Przy windzie · oszczędny metraż', area: 7, rent: 975, photos: syntheticPhoto(43) },
-        { city: 'Półpiętro · własny licznik', area: 9, rent: 1025, photos: syntheticPhoto(44) },
-        { city: 'Suterenka · światło pośrednie', area: 10, rent: 1075, photos: syntheticPhoto(45) },
-        { city: 'Pokój z aneksem · wszystko pod ręką', area: 8, rent: 1125, photos: syntheticPhoto(46) },
-        { city: 'Adaptacja biurowa · centrum', area: 11, rent: 1225, photos: syntheticPhoto(47) },
-        { city: 'Dawna portiernia · wejście z ulicy', area: 9, rent: 1275, photos: syntheticPhoto(48) },
-        { city: 'Łazienka z funkcją spania', area: 7, rent: 1375, photos: syntheticPhoto(49) },
-        { city: 'Kuchnia przechodnia · prywatny kąt', area: 10, rent: 1425, photos: syntheticPhoto(50) },
-        { city: 'Tapeta total look · vintage premium', area: 8, rent: 1475, photos: syntheticPhoto(51) },
-        { city: 'Dywan pałacowy · miękki standard', area: 9, rent: 1525, photos: syntheticPhoto(52) },
-        { city: 'Balkon zabudowany · całoroczny', area: 6, rent: 1575, photos: syntheticPhoto(53) },
-        { city: 'Garażowa antresola · miejski loft', area: 12, rent: 1675, photos: syntheticPhoto(54) },
-        { city: 'Dawny magazynek · po liftingu', area: 10, rent: 1725, photos: syntheticPhoto(55) },
-        { city: 'Nad piekarnią · ciepło w cenie', area: 9, rent: 1775, photos: syntheticPhoto(56) },
-        { city: 'Wnęka w kamienicy · wysokie 7 m²', area: 7, rent: 1825, photos: syntheticPhoto(57) },
-        { city: 'Lokal po usługach · gotowy na najem', area: 11, rent: 1850, photos: syntheticPhoto(58) },
-        { city: 'Podwórko studnia · klimat premium', area: 10, rent: 1900, photos: syntheticPhoto(59) },
-        { city: 'Wejście przez kuchnię · układ rodzinny', area: 12, rent: 1925, photos: syntheticPhoto(60) },
-        { city: 'Za kotarą · osobna sypialnia', area: 9, rent: 1975, photos: syntheticPhoto(61) },
-        { city: 'Przy zsypie · świetna komunikacja', area: 8, rent: 2000, photos: syntheticPhoto(62) },
-        { city: 'Dawna suszarnia · panoramiczny skos', area: 13, rent: 2025, photos: syntheticPhoto(63) },
-        { city: 'Parter witrynowy · miejski apartament', area: 10, rent: 2075, photos: syntheticPhoto(64) },
-        { city: 'Łóżko piętrowe · dwa poziomy życia', area: 8, rent: 2125, photos: syntheticPhoto(65) },
-        { city: 'Łazienka na podeście · designerskie', area: 9, rent: 2150, photos: syntheticPhoto(66) },
-        { city: 'Studio narożne · trzy funkcje', area: 11, rent: 2250, photos: syntheticPhoto(67) },
-        { city: 'Mikroapartament z patio technicznym', area: 12, rent: 2300, photos: syntheticPhoto(68) },
-        { city: 'Bez zdjęć · właściciel się śpieszy', area: 8, rent: 875, photos: [] },
-        { city: 'Bez zdjęć · fotograf zachorował', area: 7, rent: 925, photos: [] },
-        { city: 'Bez zdjęć · zaufaj opisowi', area: 10, rent: 1175, photos: [] },
-        { city: 'Bez zdjęć · liczy się metraż', area: 9, rent: 1325, photos: [] },
-        { city: 'Bez zdjęć · zdjęcia wkrótce', area: 11, rent: 1625, photos: [] },
-        { city: 'Bez zdjęć · niespodzianka gwarantowana', area: 12, rent: 1875, photos: [] },
-        { city: 'Bez zdjęć · kupujesz w ciemno', area: 9, rent: 2200, photos: [] },
-        { city: 'Bez zdjęć · szczery opis wystarczy', area: 13, rent: 2500, photos: [] },
-        { city: 'Bez zdjęć · aparat nie mieści się w środku', area: 7, rent: 2275, photos: [] },
-        { city: 'Bez zdjęć · klucze są u sąsiada', area: 10, rent: 2400, photos: [] },
-        { city: 'Bez zdjęć · oglądanie po zakupie', area: 12, rent: 2750, photos: [] },
-        { city: 'Kawalerka z oddzielną sypialnią', area: 24, rent: 3200, photos: syntheticPhoto(32), divisible: true },
-        { city: 'Mieszkanie z balkonem', area: 24, rent: 3300, photos: syntheticPhoto(33), divisible: true },
-        { city: 'Przestronne przed remontem', area: 24, rent: 3100, photos: syntheticPhoto(34), divisible: true },
-        { city: 'Jasne mieszkanie z osobną kuchnią', area: 24, rent: 3500, photos: syntheticPhoto(35), divisible: true },
-        { city: 'Klasyczna kawalerka w kamienicy', area: 24, rent: 3800, photos: syntheticPhoto(36), divisible: true },
-        { city: 'Nowoczesne, deweloperskie', area: 24, rent: 3700, photos: syntheticPhoto(37), divisible: true },
-        { city: 'Z antresolą do zaadaptowania', area: 24, rent: 3900, photos: syntheticPhoto(38), divisible: true },
-        { city: 'Przytulne, dwupokojowe', area: 24, rent: 3400, photos: syntheticPhoto(39), divisible: true },
-        { city: 'Reprezentacyjne, gotowe do wejścia', area: 24, rent: 3600, photos: syntheticPhoto(40), divisible: true }
+        { city: 'Centrum · inwestycyjna okazja', area: 7, rent: 1420, photos: syntheticPhoto(1) },
+        { city: 'Śródmieście · standard premium', area: 10, rent: 2105, photos: syntheticPhoto(2) },
+        { city: 'Poddasze · naturalny charakter', area: 18, rent: 1715, photos: syntheticPhoto(3) },
+        { city: 'Centrum · kompaktowy układ', area: 11, rent: 1865, photos: syntheticPhoto(4) },
+        { city: 'Blisko komunikacji · gotowiec', area: 9, rent: 1550, photos: syntheticPhoto(5) },
+        { city: 'Centrum · pełne wyposażenie', area: 12, rent: 1660, photos: syntheticPhoto(6) },
+        { city: 'Top lokalizacja · po remoncie', area: 9, rent: 2015, photos: syntheticPhoto(7) },
+        { city: 'Śródmieście · funkcjonalny układ', area: 12, rent: 1605, photos: syntheticPhoto(8) },
+        { city: 'Centrum · antresola', area: 10, rent: 1770, photos: syntheticPhoto(9) },
+        { city: 'Apartament premium · pełen komfort', area: 11, rent: 2145, photos: syntheticPhoto(10) },
+        { city: 'Centrum · gotowe do wejścia', area: 10, rent: 2090, photos: syntheticPhoto(11) },
+        { city: 'Kamienica · loftowy klimat', area: 12, rent: 1830, photos: syntheticPhoto(12) },
+        { city: 'Centrum · niezależne wejście', area: 9, rent: 1700, photos: syntheticPhoto(13) },
+        { city: 'Spokojna okolica · umeblowane', area: 12, rent: 1510, photos: syntheticPhoto(14) },
+        { city: 'Blisko uczelni · duży stół', area: 12, rent: 1475, photos: syntheticPhoto(15) },
+        { city: 'Przyziemie · mikroloft', area: 8, rent: 1435, photos: syntheticPhoto(16) },
+        { city: 'Poddasze · wyjątkowy układ', area: 13, rent: 1755, photos: syntheticPhoto(17) },
+        { city: 'Centrum · pełne możliwości', area: 6.5, rent: 1455, photos: syntheticPhoto(18) },
+        { city: 'Projekt architekta · antresola', area: 14, rent: 2050, photos: syntheticPhoto(19) },
+        { city: 'Industrial premium · ostatnie piętro', area: 11, rent: 2200, photos: syntheticPhoto(20) },
+        { city: 'Dawna pralnia · stół wielofunkcyjny', area: 10, rent: 1565, photos: syntheticPhoto(21) },
+        { city: 'Kamienica · prywatny komin', area: 9, rent: 1885, photos: syntheticPhoto(22) },
+        { city: 'Kotłownia · instalacje w cenie', area: 9, rent: 1495, photos: syntheticPhoto(23) },
+        { city: 'Pod zjazdem · malejąca wysokość', area: 11, rent: 1640, photos: syntheticPhoto(24) },
+        { city: 'Balkon · panoramiczny standard', area: 7, rent: 1975, photos: syntheticPhoto(25) },
+        { city: 'Poddasze · strefa schylania', area: 6, rent: 1625, photos: syntheticPhoto(26) },
+        { city: 'Dawna chłodnia · stała temperatura', area: 9, rent: 1530, photos: syntheticPhoto(27) },
+        { city: 'Suterena · poziom chodnika', area: 12, rent: 1585, photos: syntheticPhoto(28) },
+        { city: 'Dawny kiosk · witryna miejska', area: 8, rent: 2070, photos: syntheticPhoto(29) },
+        { city: 'Kontener · moduł miejski', area: 13, rent: 1735, photos: syntheticPhoto(30) },
+        { city: 'Boazeria · klasyka premium', area: 12, rent: 1680, photos: syntheticPhoto(31) },
+        { city: 'Korytarz · studio w przejściu', area: 8, rent: 1400, photos: syntheticPhoto(41) },
+        { city: 'Schowek · pełny standard', area: 6, rent: 1410, photos: syntheticPhoto(42) },
+        { city: 'Przy windzie · oszczędny metraż', area: 7, rent: 1465, photos: syntheticPhoto(43) },
+        { city: 'Półpiętro · własny licznik', area: 9, rent: 1485, photos: syntheticPhoto(44) },
+        { city: 'Suterenka · światło pośrednie', area: 10, rent: 1500, photos: syntheticPhoto(45) },
+        { city: 'Pokój z aneksem · wszystko pod ręką', area: 8, rent: 1520, photos: syntheticPhoto(46) },
+        { city: 'Adaptacja biurowa · centrum', area: 11, rent: 1560, photos: syntheticPhoto(47) },
+        { city: 'Dawna portiernia · wejście z ulicy', area: 9, rent: 1575, photos: syntheticPhoto(48) },
+        { city: 'Łazienka z funkcją spania', area: 7, rent: 1615, photos: syntheticPhoto(49) },
+        { city: 'Kuchnia przechodnia · prywatny kąt', area: 10, rent: 1635, photos: syntheticPhoto(50) },
+        { city: 'Tapeta total look · vintage premium', area: 8, rent: 1650, photos: syntheticPhoto(51) },
+        { city: 'Dywan pałacowy · miękki standard', area: 9, rent: 1670, photos: syntheticPhoto(52) },
+        { city: 'Balkon zabudowany · całoroczny', area: 6, rent: 1690, photos: syntheticPhoto(53) },
+        { city: 'Garażowa antresola · miejski loft', area: 12, rent: 1725, photos: syntheticPhoto(54) },
+        { city: 'Dawny magazynek · po liftingu', area: 10, rent: 1745, photos: syntheticPhoto(55) },
+        { city: 'Nad piekarnią · ciepło w cenie', area: 9, rent: 1765, photos: syntheticPhoto(56) },
+        { city: 'Wnęka w kamienicy · wysoki strop', area: 7, rent: 1780, photos: syntheticPhoto(57) },
+        { city: 'Lokal po usługach · gotowy na najem', area: 11, rent: 1790, photos: syntheticPhoto(58) },
+        { city: 'Podwórko studnia · klimat premium', area: 10, rent: 1810, photos: syntheticPhoto(59) },
+        { city: 'Wejście przez kuchnię · układ rodzinny', area: 12, rent: 1820, photos: syntheticPhoto(60) },
+        { city: 'Za kotarą · osobna sypialnia', area: 9, rent: 1835, photos: syntheticPhoto(61) },
+        { city: 'Przy zsypie · świetna komunikacja', area: 8, rent: 1845, photos: syntheticPhoto(62) },
+        { city: 'Dawna suszarnia · panoramiczny skos', area: 13, rent: 1855, photos: syntheticPhoto(63) },
+        { city: 'Parter witrynowy · miejski apartament', area: 10, rent: 1875, photos: syntheticPhoto(64) },
+        { city: 'Łóżko piętrowe · dwa poziomy życia', area: 8, rent: 1895, photos: syntheticPhoto(65) },
+        { city: 'Łazienka na podeście · designerskie', area: 9, rent: 1900, photos: syntheticPhoto(66) },
+        { city: 'Studio narożne · trzy funkcje', area: 11, rent: 1940, photos: syntheticPhoto(67) },
+        { city: 'Mikroapartament z patio technicznym', area: 12, rent: 1960, photos: syntheticPhoto(68) },
+        { city: 'Bez zdjęć · właściciel się śpieszy', area: 8, rent: 1430, photos: [] },
+        { city: 'Bez zdjęć · fotograf zachorował', area: 7, rent: 1445, photos: [] },
+        { city: 'Bez zdjęć · zaufaj opisowi', area: 10, rent: 1540, photos: [] },
+        { city: 'Bez zdjęć · liczy się metraż', area: 9, rent: 1595, photos: [] },
+        { city: 'Bez zdjęć · zdjęcia wkrótce', area: 11, rent: 1705, photos: [] },
+        { city: 'Bez zdjęć · niespodzianka gwarantowana', area: 12, rent: 1800, photos: [] },
+        { city: 'Bez zdjęć · kupujesz w ciemno', area: 9, rent: 1920, photos: [] },
+        { city: 'Bez zdjęć · szczery opis wystarczy', area: 13, rent: 2035, photos: [] },
+        { city: 'Bez zdjęć · aparat nie mieści się w środku', area: 7, rent: 1950, photos: [] },
+        { city: 'Bez zdjęć · klucze są u sąsiada', area: 10, rent: 1995, photos: [] },
+        { city: 'Bez zdjęć · oglądanie po zakupie', area: 12, rent: 2125, photos: [] },
+        { city: 'Kawalerka z oddzielną sypialnią', area: 24, rent: 2700, photos: syntheticPhoto(32), divisible: true },
+        { city: 'Mieszkanie z balkonem', area: 24, rent: 2800, photos: syntheticPhoto(33), divisible: true },
+        { city: 'Przestronne przed remontem', area: 24, rent: 2600, photos: syntheticPhoto(34), divisible: true },
+        { city: 'Jasne mieszkanie z osobną kuchnią', area: 24, rent: 3000, photos: syntheticPhoto(35), divisible: true },
+        { city: 'Klasyczna kawalerka w kamienicy', area: 24, rent: 3300, photos: syntheticPhoto(36), divisible: true },
+        { city: 'Nowoczesne, deweloperskie', area: 24, rent: 3200, photos: syntheticPhoto(37), divisible: true },
+        { city: 'Z antresolą do zaadaptowania', area: 24, rent: 3400, photos: syntheticPhoto(38), divisible: true },
+        { city: 'Przytulne, dwupokojowe', area: 24, rent: 2900, photos: syntheticPhoto(39), divisible: true },
+        { city: 'Reprezentacyjne, gotowe do wejścia', area: 24, rent: 3100, photos: syntheticPhoto(40), divisible: true }
       ];
 
       // Oferty bez zdjęć (photos: []) to "mystery listingi": zamiast dokładnej
@@ -1326,9 +1340,10 @@
       // do tego progu, licytacja kończy się tam — mieszkanie wymyka się z rynku
       // inwestycyjnego, zamiast trafiać do gracza za darmo przy cenie zero.
       // Próg rośnie z czynszem oferty (lepsza oferta = wyższa, ale wciąż realna
-      // dla zwykłego człowieka cena), licząc jako ułamek START_PRICE.
-      const FAMILY_THRESHOLD_MIN_FRAC = .03;
-      const FAMILY_THRESHOLD_MAX_FRAC = .10;
+      // dla zwykłego człowieka cena) — stała kwota w złotówkach, nie ułamek
+      // START_PRICE, żeby próg nie "pływał" razem ze zmianami ceny startowej.
+      const FAMILY_THRESHOLD_MIN = 500_000;
+      const FAMILY_THRESHOLD_MAX = 600_000;
       const LISTING_RENT_RANGE = LISTINGS.reduce((range, listing) => ({
         min: Math.min(range.min, listing.rent),
         max: Math.max(range.max, listing.rent)
@@ -1336,8 +1351,7 @@
       const familyThresholdFor = listing => {
         const span = LISTING_RENT_RANGE.max - LISTING_RENT_RANGE.min;
         const ratio = span > 0 ? (listing.rent - LISTING_RENT_RANGE.min) / span : 0;
-        const frac = FAMILY_THRESHOLD_MIN_FRAC + ratio * (FAMILY_THRESHOLD_MAX_FRAC - FAMILY_THRESHOLD_MIN_FRAC);
-        return Math.round(START_PRICE * frac);
+        return Math.round(FAMILY_THRESHOLD_MIN + ratio * (FAMILY_THRESHOLD_MAX - FAMILY_THRESHOLD_MIN));
       };
 
       const $ = (selector) => document.querySelector(selector);
@@ -1933,30 +1947,44 @@
         button.hidden = network.active || !human || human.cash >= 500_000 || !eligiblePhase;
       }
 
+      // Współdzielone przez auctionLoop (na żywo), simulateRemainingRound
+      // ("Przeskocz do końca") i skipCurrentListing ("Pomiń") — jedna wersja
+      // logiki "który bot jest gotów kupić teraz", żeby nie rozjeżdżały się
+      // przy kolejnych zmianach.
+      function pickWillingBot(botTargets, elapsed, price) {
+        const willing = botTargets
+          .filter(bot => {
+            const player = state.players.find(item => item.id === bot.playerId);
+            if (!player || elapsed < bot.notBeforeMs || bot.target <= 0 || price > bot.target || price > player.cash) return false;
+            if (bot.triggeredAt === null) bot.triggeredAt = elapsed;
+            return elapsed >= bot.triggeredAt + bot.reactionMs;
+          })
+          .sort((a, b) => (a.triggeredAt + a.reactionMs) - (b.triggeredAt + b.reactionMs) || b.target - a.target);
+        return willing[0] || null;
+      }
+
       function simulateRemainingRound(index) {
         state.listingIndex = index;
         const listing = state.listings[index];
         const botTargets = makeBotTargets();
+        const threshold = familyThresholdFor(listing);
         for (let elapsed = 0; elapsed <= AUCTION_MS; elapsed += 16) {
           const price = Math.max(0, Math.floor(START_PRICE * (1 - elapsed / AUCTION_MS)));
-          const willingBots = botTargets
-            .filter(bot => {
-              const player = state.players.find(item => item.id === bot.playerId);
-              if (!player || elapsed < bot.notBeforeMs || bot.target <= 0 || price > bot.target || price > player.cash) return false;
-              if (bot.triggeredAt === null) bot.triggeredAt = elapsed;
-              return elapsed >= bot.triggeredAt + bot.reactionMs;
-            })
-            .sort((a, b) => (a.triggeredAt + a.reactionMs) - (b.triggeredAt + b.reactionMs) || b.target - a.target);
-          if (willingBots.length) {
-            const player = state.players.find(item => item.id === willingBots[0].playerId);
+          const winner = pickWillingBot(botTargets, elapsed, price);
+          if (winner) {
+            const player = state.players.find(item => item.id === winner.playerId);
             const paid = Math.min(player.cash, Math.max(1, Math.floor(price)));
             player.cash -= paid;
             player.properties.push({ ...listing, paid });
             if (listing.divisible) applyBotDivideDecision(player, listing);
             return;
           }
-          if (price <= 0) return;
+          if (price <= threshold) {
+            state.familyBuys.push({ listingIndex: index, price: threshold, rent: listing.rent });
+            return;
+          }
         }
+        state.familyBuys.push({ listingIndex: index, price: threshold, rent: listing.rent });
       }
 
       function skipToEnd() {
@@ -1975,7 +2003,6 @@
       }
 
       function renderReady() {
-        $('#ready-counter').textContent = `${state.ready.size} / ${state.players.length}`;
         $('#ready-players').innerHTML = state.players.map(player => `
           <span class="ready-chip ${state.ready.has(player.id) ? 'ready' : ''}"><span>${player.name}</span></span>
         `).join('');
@@ -2039,6 +2066,10 @@
         state.listingIndex = snapshot.round;
         state.totalListings = snapshot.totalListings;
         state.networkListing = LISTINGS[snapshot.listingId];
+        // "Pomiń tę ofertę" istnieje tylko w trybie solo — jeśli gracz wszedł
+        // tu z poprzedniej gry solo (przycisk mógł zostać widoczny), zawsze
+        // wymuszamy jego ukrycie w trybie sieciowym.
+        $('#skip-listing-button').hidden = true;
         if (screens.game.hidden) {
           showScreen('game');
           buildTicker();
@@ -2191,7 +2222,7 @@
             const winner = state.players.find(player => player.id === snapshot.result.playerId);
             $('#result-icon').textContent = '🏠';
             $('#result-kicker').textContent = 'Sprzedane';
-            $('#result-title').textContent = `${winner.name} bierze klitkę`;
+            $('#result-title').textContent = `${winner.name} zabezpiecza aktywo`;
             $('#result-copy').textContent = `za ${money(snapshot.result.price)}${reveal}`;
             if (!winner.isHuman) sound.sold(true);
             $('#result-overlay').hidden = false;
@@ -2286,6 +2317,7 @@
         $('#auction-panel').hidden = true;
         $('#buy-button').hidden = true;
         $('#buy-help').textContent = '';
+        $('#skip-listing-button').hidden = true;
         renderListing();
         renderPlayerRail();
         renderReady();
@@ -2409,11 +2441,12 @@
         // bezwartościowa, więc bot idzie na całość.
         return bots.map((player, index) => {
           const profile = BOT_PROFILES[index % BOT_PROFILES.length];
-          const aggro = tier.aggroMin + Math.random() * (tier.aggroMax - tier.aggroMin);
+          const aggroBase = tier.aggroMin + Math.random() * (tier.aggroMax - tier.aggroMin);
+          const aggro = Math.max(.03, aggroBase + profile.aggroMod);
           const target = isFinalListing
             ? player.cash
             : Math.round(Math.min(player.cash, START_PRICE * aggro));
-          const notBeforeMs = tier.delayMin + Math.random() * (tier.delayMax - tier.delayMin);
+          const notBeforeMs = Math.max(200, (tier.delayMin + Math.random() * (tier.delayMax - tier.delayMin)) * profile.delayMod);
           const reactionMs = profile.reactionMin + Math.random() * (profile.reactionMax - profile.reactionMin);
 
           return {
@@ -2436,6 +2469,7 @@
         $('#buy-button').hidden = false;
         $('#buy-button').disabled = false;
         $('#buy-help').textContent = 'Jedno dotknięcie kupuje po cenie z tej milisekundy.';
+        $('#skip-listing-button').hidden = network.active;
         sound.beginAuction();
         renderTicker(START_PRICE);
         $('#auction-progress').style.transform = 'scaleX(1)';
@@ -2459,19 +2493,9 @@
         if (!affordable) $('#buy-help').textContent = 'Cena musi spaść poniżej Twojego salda.';
         else if ($('#buy-help').textContent.startsWith('Cena musi')) $('#buy-help').textContent = 'Jedno dotknięcie kupuje po cenie z tej milisekundy.';
 
-        const willingBots = state.botTargets
-          .filter(bot => {
-            const player = state.players.find(item => item.id === bot.playerId);
-            if (!player || elapsed < bot.notBeforeMs || bot.target <= 0 || price > bot.target || price > player.cash) return false;
-            if (bot.triggeredAt === null) bot.triggeredAt = elapsed;
-            return elapsed >= bot.triggeredAt + bot.reactionMs;
-          })
-          .sort((a, b) =>
-            (a.triggeredAt + a.reactionMs) - (b.triggeredAt + b.reactionMs) || b.target - a.target
-          );
-
-        if (willingBots.length) {
-          settleSale(willingBots[0].playerId, price);
+        const winner = pickWillingBot(state.botTargets, elapsed, price);
+        if (winner) {
+          settleSale(winner.playerId, price);
           return;
         }
 
@@ -2481,6 +2505,30 @@
           return;
         }
         state.auctionFrame = requestAnimationFrame(auctionLoop);
+      }
+
+      // "Pomiń": gracz wie, że i tak nie weźmie udziału w tej licytacji (np.
+      // za mało gotówki), więc od razu domykamy rundę tak, jakby po prostu
+      // nie kliknął kupna — bez czekania na realny upływ AUCTION_MS. Boty
+      // wciąż licytują między sobą (albo trafia do "prawdziwych ludzi").
+      function skipCurrentListing() {
+        if (network.active || state.phase !== 'auction' || state.settled) return;
+        cancelAnimationFrame(state.auctionFrame);
+        const listing = currentListing();
+        const threshold = familyThresholdFor(listing);
+        for (let elapsed = 0; elapsed <= AUCTION_MS; elapsed += 16) {
+          const price = Math.max(0, Math.floor(START_PRICE * (1 - elapsed / AUCTION_MS)));
+          const winner = pickWillingBot(state.botTargets, elapsed, price);
+          if (winner) {
+            settleSale(winner.playerId, price);
+            return;
+          }
+          if (price <= threshold) {
+            settleFamilyBuy(threshold);
+            return;
+          }
+        }
+        settleFamilyBuy(threshold);
       }
 
       function buyNow(event) {
@@ -2634,7 +2682,7 @@
 
         $('#result-icon').textContent = '🏠';
         $('#result-kicker').textContent = 'Sprzedane';
-        $('#result-title').textContent = `${player.name} bierze klitkę`;
+        $('#result-title').textContent = `${player.name} zabezpiecza aktywo`;
         $('#result-copy').textContent = `za ${money(paid)}${soldReveal}${divideReveal}`;
         if (!player.isHuman) sound.sold(true);
         showResultAndAdvance(
@@ -2732,11 +2780,9 @@
             </div>`;
         }).join('');
         const familyCount = state.familyBuys.length;
-        const totalResolved = network.active ? state.totalListings : state.listings.length;
-        const takenByPlayers = totalResolved - familyCount;
         $('#final-market-note').textContent = familyCount > 0
-          ? `Z rynku wymknęło się ${familyCount} ${familyCount === 1 ? 'mieszkanie' : 'mieszkań'} dla ludzi, którzy chcieli w nich normalnie zamieszkać. Gracze zabrali sobie ${takenByPlayers}.`
-          : `Żadne mieszkanie się nie wymknęło — gracze zabrali sobie wszystkie ${takenByPlayers}.`;
+          ? `${familyCount} ${familyCount === 1 ? 'mieszkanie wymknęło' : 'mieszkań wymknęło'} się z rynku, ktoś tam normalnie zamieszka.`
+          : `Mieszkańcy nie mieli szans, wszystko w rękach fliperów.`;
         $('#final-market-note').hidden = false;
 
         const isNetworkGuest = network.active && network.playerId !== network.hostId;
@@ -2864,6 +2910,10 @@
         else setReady('p0');
       });
       $('#buy-button').addEventListener('pointerdown', buyNow, { passive: false });
+      $('#skip-listing-button').addEventListener('click', () => {
+        sound.button(false);
+        skipCurrentListing();
+      });
       $('#skip-end-button').addEventListener('click', () => {
         sound.button(false);
         skipToEnd();
@@ -2959,8 +3009,10 @@
         dividedRentPerUnit,
         DIVIDE_COST,
         skipToEnd,
+        skipCurrentListing,
         updateSkipButton,
-        difficultyTiers: DIFFICULTY_TIERS
+        difficultyTiers: DIFFICULTY_TIERS,
+        botProfiles: BOT_PROFILES
       };
     })();
   </script>
