@@ -289,7 +289,7 @@
     .tier-card.is-locked { opacity: .5; filter: grayscale(.5); box-shadow: none; }
     .tier-card.is-locked .tier-card-status { color: var(--muted); }
     .final-unlock { margin: -8px 0 18px; text-align: center; color: var(--green-dark); font-size: 13px; font-weight: 1000; }
-    .final-market-note { margin: 14px 0 0; padding: 13px 15px; border-radius: 13px; background: #fff1ef; border: 2px solid var(--red); color: var(--red-dark); font-size: 13.5px; font-weight: 900; text-align: center; line-height: 1.5; }
+    .final-market-note { margin: 14px 0 16px; padding: 13px 15px; border-radius: 13px; background: #fff1ef; border: 2px solid var(--red); color: var(--red-dark); font-size: 13.5px; font-weight: 900; text-align: center; line-height: 1.5; }
     .custom-options { display: grid; gap: 14px; margin: 22px 0; }
     .custom-option { padding: 14px; background: white; border: 1px solid var(--line); border-radius: 12px; }
     .custom-option select { width: 100%; height: 48px; padding: 0 12px; border: 2px solid #9eacb4; border-radius: 9px; background: white; color: var(--ink); font: inherit; font-weight: 850; }
@@ -853,9 +853,29 @@
     .divide-photo.is-cut .divide-photo-right { transform: translateX(16px) rotate(4deg); }
     .divide-photo.is-cut::after { opacity: 1; }
     .divide-options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
-    .divide-option { padding: 10px; background: var(--cream); border: 1px solid var(--line); border-radius: 11px; text-align: center; }
+    .divide-option {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      background: var(--cream);
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      text-align: center;
+      font: inherit;
+      color: inherit;
+      cursor: pointer;
+      appearance: none;
+      -webkit-appearance: none;
+      -webkit-tap-highlight-color: transparent;
+      transition: border-color .15s ease, transform .12s ease, box-shadow .15s ease;
+    }
+    .divide-option:hover:not(:disabled) { border-color: var(--ink); transform: translateY(-1px); }
+    .divide-option:active:not(:disabled) { transform: translateY(0); }
+    .divide-option:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; }
+    .divide-option:disabled { opacity: .5; cursor: not-allowed; }
     .divide-option-label { color: var(--muted); font-size: 9px; font-weight: 1000; letter-spacing: .06em; text-transform: uppercase; }
     .divide-option-value { margin-top: 4px; font-size: 14px; font-weight: 1000; line-height: 1.25; }
+    .divide-option-cost { margin-top: 3px; font-size: 10px; font-weight: 800; color: var(--muted); }
     .final-screen { background: linear-gradient(180deg, #edf7f1, #f4f6f7 62%); }
     .final-crown { margin: 6vh 0 8px; text-align: center; font-size: 74px; line-height: 1; transform: rotate(-6deg); }
     .final-title { margin: 0; text-align: center; font-size: 48px; line-height: .88; letter-spacing: -.055em; }
@@ -1112,6 +1132,7 @@
           <strong id="debit-amount">−456 250 zł</strong>
           <div class="purchase-debit-row"><span class="before" id="debit-before">4 000 000 zł</span><span class="arrow">→</span><span class="after" id="debit-after">3 543 750 zł</span></div>
         </div>
+        <button class="primary" id="result-continue-button" style="margin-top:16px" hidden>Dalej</button>
       </div>
     </div>
     <div class="debit-flyer" id="debit-flyer" aria-hidden="true">−456 250 zł</div>
@@ -1136,19 +1157,16 @@
           <div class="divide-photo-half divide-photo-left" id="divide-photo-left"></div>
           <div class="divide-photo-half divide-photo-right" id="divide-photo-right"></div>
         </div>
-        <div class="divide-options">
-          <div class="divide-option">
+        <div class="divide-options" id="divide-actions">
+          <button type="button" class="divide-option" id="divide-keep-button">
             <div class="divide-option-label">Zostaw jak jest</div>
             <div class="divide-option-value" id="divide-keep-value">0 zł/mies.</div>
-          </div>
-          <div class="divide-option">
+          </button>
+          <button type="button" class="divide-option" id="divide-split-button">
             <div class="divide-option-label">Podziel na 2</div>
             <div class="divide-option-value" id="divide-split-value">0 zł/mies.</div>
-          </div>
-        </div>
-        <div class="button-stack" id="divide-actions">
-          <button class="secondary" id="divide-keep-button">Zostaw jak jest</button>
-          <button class="primary" id="divide-split-button">Podziel za 500 000 zł</button>
+            <div class="divide-option-cost" id="divide-split-cost">koszt: 500 000 zł</div>
+          </button>
         </div>
         <p class="halfway-note" id="divide-waiting-note" hidden>Czeka na decyzję kupującego…</p>
       </div>
@@ -1388,7 +1406,8 @@
         customSettings: null,
         startCash: START_CASH,
         divideResolve: null,
-        familyBuys: []
+        familyBuys: [],
+        resultContinue: null
       };
 
       const network = {
@@ -1404,10 +1423,20 @@
         lastResultKey: '',
         purchasePending: false,
         countdownFrame: 0,
-        finalFallbackTimer: 0
+        finalFallbackTimer: 0,
+        pendingFamilyDismiss: false
       };
 
       const money = value => Math.max(0, Math.round(value)).toLocaleString('pl-PL') + ' zł';
+
+      // Polska odmiana liczebnikowa: 1 → jedna forma, 2-4 (poza 12-14) →
+      // druga, reszta (5+, 12-14) → trzecia. Np. plural(2,'klitka','klitki','klitek') → 'klitki'.
+      const plural = (count, one, few, many) => {
+        if (count === 1) return one;
+        const mod10 = count % 10;
+        const mod100 = count % 100;
+        return mod10 >= 2 && mod10 <= 4 && !(mod100 >= 12 && mod100 <= 14) ? few : many;
+      };
 
       function createSoundController() {
         let context = null;
@@ -2138,7 +2167,8 @@
         cancelAnimationFrame(state.auctionFrame);
         cancelAnimationFrame(network.countdownFrame);
         $('#countdown-overlay').hidden = true;
-        $('#result-overlay').hidden = true;
+        if (!network.pendingFamilyDismiss) $('#result-overlay').hidden = true;
+        $('#divide-overlay').hidden = true;
         $('#ready-panel').hidden = false;
         $('#auction-panel').hidden = true;
         $('#buy-button').hidden = true;
@@ -2150,6 +2180,7 @@
         prepareNetworkGame(snapshot);
         state.phase = 'countdown';
         $('#ready-button').disabled = true;
+        $('#divide-overlay').hidden = true;
         $('#countdown-overlay').hidden = false;
         cancelAnimationFrame(network.countdownFrame);
         let previousValue = '';
@@ -2200,6 +2231,7 @@
         network.purchasePending = false;
         cancelAnimationFrame(network.countdownFrame);
         $('#countdown-overlay').hidden = true;
+        $('#divide-overlay').hidden = true;
         $('#ready-panel').hidden = true;
         $('#auction-panel').hidden = false;
         $('#buy-button').hidden = false;
@@ -2215,7 +2247,7 @@
       function renderNetworkDivide(snapshot, listing) {
         const isBuyer = snapshot.result.playerId === network.playerId;
         const decided = snapshot.result.divideDecision != null;
-        $('#result-overlay').hidden = true;
+        if (!network.pendingFamilyDismiss) $('#result-overlay').hidden = true;
         $('#divide-kicker').textContent = 'Duże mieszkanie';
         const keepRent = listing.rent;
         const splitRent = dividedRentPerUnit(listing.rent);
@@ -2238,9 +2270,9 @@
           $('#divide-actions').hidden = false;
           $('#divide-waiting-note').hidden = true;
           $('#divide-split-button').disabled = !canAfford;
-          $('#divide-split-button').textContent = canAfford
-            ? `Podziel za ${money(DIVIDE_COST)}`
-            : `Podziel za ${money(DIVIDE_COST)} (brak środków)`;
+          $('#divide-split-cost').textContent = canAfford
+            ? `koszt: ${money(DIVIDE_COST)}`
+            : `koszt: ${money(DIVIDE_COST)} · brak środków`;
         } else {
           $('#divide-title').textContent = 'Podzielić na klitki?';
           $('#divide-actions').hidden = true;
@@ -2276,6 +2308,7 @@
             $('#result-title').textContent = `${winner.name} zabezpiecza aktywo`;
             $('#result-copy').textContent = `za ${money(snapshot.result.price)}${reveal}`;
             if (!winner.isHuman) sound.sold(true);
+            $('#result-continue-button').hidden = true;
             $('#result-overlay').hidden = false;
             if (winner.isHuman && Number.isFinite(previousHumanCash) && previousHumanCash > winner.cash) {
               animateDebit(previousHumanCash, winner.cash, snapshot.result.price);
@@ -2291,6 +2324,12 @@
             $('#result-copy').textContent = `za ${money(snapshot.result.price)}${reveal} · nikt z graczy nie zaproponował więcej`;
             hideDebit();
             sound.family();
+            // Ten komunikat jest ważniejszy niż zwykłe "sprzedane" — nie
+            // powinien tylko błysnąć razem z resztą wyników rundy. Zostaje
+            // widoczny do kliknięcia; runda w tle i tak toczy się dalej po
+            // stronie serwera niezależnie od tego okienka.
+            network.pendingFamilyDismiss = true;
+            $('#result-continue-button').hidden = false;
             $('#result-overlay').hidden = false;
           } else {
             $('#result-icon').textContent = '🕳️';
@@ -2299,6 +2338,7 @@
             $('#result-copy').textContent = `Nikt nie odważył się jej kupić.${reveal}`;
             hideDebit();
             sound.unsold();
+            $('#result-continue-button').hidden = true;
             $('#result-overlay').hidden = false;
           }
         }
@@ -2316,6 +2356,7 @@
         if (snapshot.round + 1 >= snapshot.totalListings) {
           network.finalFallbackTimer = setTimeout(() => {
             if (!network.active || state.phase !== 'result') return;
+            network.pendingFamilyDismiss = false;
             $('#result-overlay').hidden = true;
             showFinal();
           }, 1_800);
@@ -2350,6 +2391,7 @@
           clearTimeout(network.finalFallbackTimer);
           network.finalFallbackTimer = 0;
           state.players = networkPlayers(snapshot);
+          network.pendingFamilyDismiss = false;
           $('#countdown-overlay').hidden = true;
           $('#result-overlay').hidden = true;
           $('#divide-overlay').hidden = true;
@@ -2683,9 +2725,9 @@
         renderDividePhoto(listing);
         const canAfford = player.cash >= DIVIDE_COST;
         $('#divide-split-button').disabled = !canAfford;
-        $('#divide-split-button').textContent = canAfford
-          ? `Podziel za ${money(DIVIDE_COST)}`
-          : `Podziel za ${money(DIVIDE_COST)} (brak środków)`;
+        $('#divide-split-cost').textContent = canAfford
+          ? `koszt: ${money(DIVIDE_COST)}`
+          : `koszt: ${money(DIVIDE_COST)} · brak środków`;
         $('#divide-actions').hidden = false;
         $('#divide-waiting-note').hidden = true;
         $('#divide-photo').classList.remove('is-cut');
@@ -2789,15 +2831,16 @@
         $('#result-copy').textContent = `za ${money(threshold)}${reveal} · nikt z graczy nie zaproponował więcej`;
         hideDebit();
         sound.family();
-        showResultAndAdvance(1150);
+        showResultAndAdvance('click');
       }
 
       function showResultAndAdvance(delay, debit = null, pendingDivideFor = null) {
         $('#result-overlay').hidden = false;
         if (debit) animateDebit(debit.before, debit.after, debit.paid);
         else hideDebit();
-        setTimeout(() => {
+        const proceed = () => {
           $('#result-overlay').hidden = true;
+          $('#result-continue-button').hidden = true;
           const advance = () => {
             state.listingIndex += 1;
             if (state.listingIndex >= state.listings.length) showFinal();
@@ -2805,7 +2848,18 @@
           };
           if (pendingDivideFor) showDivideDecision(pendingDivideFor, advance);
           else advance();
-        }, delay);
+        };
+        // "rodzina kupuje" (delay === 'click'): komunikat, że mieszkanie
+        // wymknęło się na rzecz kogoś, kto tam zamieszka, jest ważniejszy
+        // niż zwykłe "sprzedane" — nie powinien tylko błysnąć, więc czeka
+        // na kliknięcie zamiast znikać po stałym czasie.
+        if (delay === 'click') {
+          $('#result-continue-button').hidden = false;
+          state.resultContinue = proceed;
+        } else {
+          $('#result-continue-button').hidden = true;
+          setTimeout(proceed, delay);
+        }
       }
 
       function rankPlayers() {
@@ -2826,13 +2880,15 @@
           return `
             <div class="standing">
               <div class="standing-rank">${index + 1}</div>
-              <div><div class="standing-name">${player.name}</div><div class="standing-meta">${player.properties.length} ${player.properties.length === 1 ? 'klitka' : 'klitek'} · zostało ${money(player.cash)}</div></div>
+              <div><div class="standing-name">${player.name}</div><div class="standing-meta">${player.properties.length} ${plural(player.properties.length, 'klitka', 'klitki', 'klitek')} · zostało ${money(player.cash)}</div></div>
               <div class="standing-income">${money(income)}<small>co miesiąc</small></div>
             </div>`;
         }).join('');
         const familyCount = state.familyBuys.length;
+        const familyNoun = plural(familyCount, 'mieszkanie', 'mieszkania', 'mieszkań');
+        const familyVerb = plural(familyCount, 'wymknęło', 'wymknęły', 'wymknęło');
         $('#final-market-note').textContent = familyCount > 0
-          ? `${familyCount} ${familyCount === 1 ? 'mieszkanie wymknęło' : 'mieszkań wymknęło'} się z rynku, ktoś tam normalnie zamieszka.`
+          ? `${familyCount} ${familyNoun} ${familyVerb} się z rynku, ktoś tam normalnie zamieszka.`
           : `Mieszkańcy nie mieli szans, wszystko w rękach fliperów.`;
         $('#final-market-note').hidden = false;
 
@@ -2871,10 +2927,13 @@
         cancelAnimationFrame(state.auctionFrame);
         state.botReadyTimers.forEach(clearTimeout);
         state.botReadyTimers = [];
+        network.pendingFamilyDismiss = false;
         $('#countdown-overlay').hidden = true;
         $('#result-overlay').hidden = true;
+        $('#result-continue-button').hidden = true;
         $('#divide-overlay').hidden = true;
         state.divideResolve = null;
+        state.resultContinue = null;
       }
 
       $('#demo-button').addEventListener('click', () => {
@@ -3010,6 +3069,19 @@
           setTimeout(() => { if (state.divideResolve) state.divideResolve('split'); }, 550);
         }
       });
+      $('#result-continue-button').addEventListener('click', () => {
+        $('#result-continue-button').hidden = true;
+        if (network.active) {
+          network.pendingFamilyDismiss = false;
+          $('#result-overlay').hidden = true;
+          return;
+        }
+        if (state.resultContinue) {
+          const proceed = state.resultContinue;
+          state.resultContinue = null;
+          proceed();
+        }
+      });
 
       if (typeof document.addEventListener === 'function') {
         document.addEventListener('pointerdown', () => sound.unlock(), { once: true, passive: true });
@@ -3071,7 +3143,10 @@
         skipCurrentListing,
         updateSkipButton,
         difficultyTiers: DIFFICULTY_TIERS,
-        botProfiles: BOT_PROFILES
+        botProfiles: BOT_PROFILES,
+        showNetworkReady,
+        plural,
+        network
       };
     })();
   </script>
