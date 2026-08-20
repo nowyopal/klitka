@@ -1763,9 +1763,28 @@
       function createSoundController() {
         let context = null;
         let unlocked = false;
-        let menuTimer = 0;
         let scene = 'intro';
         let lastAuctionPulse = -Infinity;
+
+        // Dyskretny podkład wygenerowany dla KLITKI. Plik jest częścią paczki,
+        // więc gra nie zależy od zewnętrznego odtwarzacza ani dostępności Suno.
+        // Przeglądarki mobilne pozwalają uruchomić audio dopiero po pierwszym
+        // dotknięciu ekranu; obsługuje to unlock() wywoływany niżej.
+        const backgroundMusic = typeof document !== 'undefined'
+          ? document.createElement('audio')
+          : null;
+        if (backgroundMusic) {
+          backgroundMusic.id = 'klitka-background-music';
+          backgroundMusic.src = 'assets/klitka-loop.mp3';
+          backgroundMusic.hidden = true;
+          backgroundMusic.loop = true;
+          backgroundMusic.preload = 'auto';
+          backgroundMusic.volume = .09;
+          backgroundMusic.playsInline = true;
+          if (backgroundMusic.nodeType && document.body?.appendChild) {
+            document.body.appendChild(backgroundMusic);
+          }
+        }
 
         const audioConstructor = () => globalThis.AudioContext || globalThis.webkitAudioContext;
         const canPlay = () => context && context.state !== 'closed';
@@ -1806,81 +1825,20 @@
           source.start(start);
         }
 
-        // "Poczekalnia dewelopera": cztery akordy (Fmaj7-Dm7-Gm7-C7), ciepłe
-        // pady, delikatny pluck melodii — ale fraza celowo nigdy się nie
-        // rozwiązuje (ostatni takt C7 zawiesza się na tercji, nie wraca do
-        // Fmaj7), jak muzyka z infolinii, która nigdy nie przełącza na
-        // konsultanta. Cała fraza trwa 4 takty i zapętla się płynnie.
-        const MENU_BEAT = 60 / 100;
-        const MENU_BARS = [
-          { pad: [174.61, 220.00, 261.63, 329.63], bass: [87.31, 130.81, 87.31, 110.00], melody: [261.63, null, 329.63, null] },
-          { pad: [146.83, 174.61, 220.00, 261.63], bass: [73.42, 110.00, 73.42, 98.00], melody: [220.00, null, 261.63, null] },
-          { pad: [196.00, 233.08, 293.66, 349.23], bass: [98.00, 146.83, 98.00, 130.81], melody: [293.66, null, 349.23, null] },
-          { pad: [130.81, 164.81, 196.00, 233.08], bass: [65.41, 98.00, 65.41, 82.41], melody: [233.08, null, 329.63, null] }
-        ];
-
-        let nextPhraseStart = 0;
-
-        function menuLoop() {
-          if (!canPlay() || scene !== 'intro') return;
-          const barDuration = MENU_BEAT * 4;
-          const phraseDuration = MENU_BARS.length * barDuration;
-          // Zegar audio, nie zegar setTimeout: setTimeout budzi się z
-          // niedokładnością rzędu kilku-kilkunastu ms, co na złączeniu 4. i
-          // 1. taktu słychać jako mikroprzerwę albo zdwojenie ataku. Kolejna
-          // fraza zawsze zaczyna się dokładnie tam, gdzie powinna wypaść
-          // poprzednia (czysta arytmetyka), niezależnie od tego, kiedy
-          // faktycznie wybudzi się callback — więc pętla nie dryfuje.
-          if (nextPhraseStart < context.currentTime) nextPhraseStart = context.currentTime + .05;
-          const phraseOffset = nextPhraseStart - context.currentTime;
-          MENU_BARS.forEach((bar, barIndex) => {
-            const barStart = phraseOffset + barIndex * barDuration;
-            bar.pad.forEach((freq, voiceIndex) => tone(freq, barDuration * .94, {
-              delay: barStart,
-              type: voiceIndex === 0 ? 'triangle' : 'sine',
-              volume: .012
-            }));
-            bar.bass.forEach((freq, beatIndex) => tone(freq, MENU_BEAT * .85, {
-              delay: barStart + beatIndex * MENU_BEAT,
-              type: 'sine',
-              volume: .03
-            }));
-            bar.melody.forEach((freq, beatIndex) => {
-              if (!freq) return;
-              tone(freq, MENU_BEAT * .7, {
-                delay: barStart + beatIndex * MENU_BEAT + MENU_BEAT * .05,
-                type: 'triangle',
-                volume: .022
-              });
-            });
-            for (let beat = 0; beat < 4; beat += 1) {
-              noise(.05, .008, barStart + beat * MENU_BEAT);
-            }
-          });
-          nextPhraseStart += phraseDuration;
-          const wakeDelayMs = Math.max(0, (nextPhraseStart - context.currentTime) * 1_000 - 60);
-          menuTimer = setTimeout(menuLoop, wakeDelayMs);
-        }
-
-        function stopMenu() {
-          clearTimeout(menuTimer);
-          menuTimer = 0;
-        }
-
-        function startMenu() {
-          if (!canPlay() || scene !== 'intro' || menuTimer) return;
-          menuLoop();
-        }
-
-        function sync() {
-          if (scene === 'intro') startMenu();
-          else stopMenu();
+        async function startBackgroundMusic() {
+          if (!backgroundMusic || !backgroundMusic.paused) return;
+          try {
+            await backgroundMusic.play();
+          } catch {}
         }
 
         async function unlock() {
+          // play() musi zostać wywołane bezpośrednio w geście użytkownika.
+          // Dopiero potem można czekać na wznowienie AudioContext dla efektów.
+          const musicPromise = startBackgroundMusic();
           if (unlocked && context) {
             if (context.state === 'suspended') await context.resume().catch(() => {});
-            sync();
+            await musicPromise;
             return;
           }
           const Constructor = audioConstructor();
@@ -1889,13 +1847,23 @@
             context = new Constructor();
             unlocked = true;
             if (context.state === 'suspended') await context.resume();
-            sync();
+            await musicPromise;
           } catch {}
         }
 
         return {
           unlock,
-          setScene(nextScene) { scene = nextScene; sync(); },
+          setScene(nextScene) { scene = nextScene; },
+          musicState() {
+            return backgroundMusic ? {
+              paused: backgroundMusic.paused,
+              currentTime: backgroundMusic.currentTime,
+              duration: backgroundMusic.duration,
+              loop: backgroundMusic.loop,
+              volume: backgroundMusic.volume,
+              readyState: backgroundMusic.readyState
+            } : null;
+          },
           button(strong = false) {
             noise(strong ? .075 : .045, strong ? .055 : .025);
             tone(strong ? 118 : 310, strong ? .11 : .045, { type: 'square', volume: strong ? .045 : .018, to: strong ? 76 : 260 });
@@ -1909,7 +1877,7 @@
               tone(330 + (3 - step) * 45, .1, { type: 'square', volume: .035, to: 285 + (3 - step) * 45 });
             }
           },
-          beginAuction() { lastAuctionPulse = -Infinity; stopMenu(); },
+          beginAuction() { lastAuctionPulse = -Infinity; },
           auction(progress) {
             if (!canPlay()) return;
             const now = typeof performance !== 'undefined' ? performance.now() : Date.now();
@@ -3468,6 +3436,7 @@
         botProfiles: BOT_PROFILES,
         showNetworkReady,
         plural,
+        musicState: () => sound.musicState(),
         network
       };
     })();
