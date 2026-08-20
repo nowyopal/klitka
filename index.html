@@ -1135,9 +1135,29 @@
 
     @media (min-width: 650px) {
       body { padding: 18px 0; }
-      .app, .screen { min-height: 844px; }
-      .app { border: 3px solid var(--ink); border-radius: 34px; }
-      .countdown-overlay, .result-overlay { inset: 18px calc((100vw - 384px)/2); min-height: 808px; border-radius: 31px; }
+      .app {
+        width: clamp(390px, 58vw, 520px);
+        min-height: max(844px, calc(100dvh - 36px));
+        border: 3px solid var(--ink);
+        border-radius: 34px;
+      }
+      .screen {
+        min-height: max(844px, calc(100dvh - 36px));
+        padding-left: clamp(18px, 3vw, 28px);
+        padding-right: clamp(18px, 3vw, 28px);
+      }
+      .game-viewport { min-height: max(808px, calc(100dvh - 36px)); }
+      .photo-grid { height: clamp(290px, 38vh, 380px); }
+      .countdown-overlay,
+      .result-overlay,
+      .halfway-overlay {
+        inset: 18px auto;
+        left: 50%;
+        width: clamp(390px, 58vw, 520px);
+        min-height: calc(100dvh - 36px);
+        border-radius: 31px;
+        transform: translateX(-50%);
+      }
     }
 
     @media (prefers-reduced-motion: reduce) {
