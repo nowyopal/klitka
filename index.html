@@ -1133,31 +1133,99 @@
       .buy-button { min-height: 60px; margin-top: 8px; }
     }
 
-    @media (min-width: 650px) {
-      body { padding: 18px 0; }
+    @media (min-width: 900px) {
+      body { padding: 0; background: var(--cream); }
       .app {
-        width: clamp(390px, 58vw, 520px);
-        min-height: max(844px, calc(100dvh - 36px));
-        border: 3px solid var(--ink);
-        border-radius: 34px;
+        width: 100%;
+        max-width: none;
+        min-height: 100dvh;
+        border: 0;
+        border-radius: 0;
+        box-shadow: none;
       }
       .screen {
-        min-height: max(844px, calc(100dvh - 36px));
-        padding-left: clamp(18px, 3vw, 28px);
-        padding-right: clamp(18px, 3vw, 28px);
+        min-height: 100dvh;
+        padding: clamp(28px, 4vh, 48px) clamp(32px, 6vw, 96px);
       }
-      .game-viewport { min-height: max(808px, calc(100dvh - 36px)); }
-      .photo-grid { height: clamp(290px, 38vh, 380px); }
+
+      #intro-screen {
+        display: grid;
+        grid-template-columns: minmax(330px, 540px) minmax(350px, 480px);
+        grid-template-rows: auto auto auto auto;
+        align-content: center;
+        justify-content: center;
+        column-gap: clamp(40px, 6vw, 92px);
+      }
+      #intro-screen > .hero { grid-column: 1; grid-row: 1; align-self: end; padding: 0; }
+      #intro-screen > .lead {
+        grid-column: 1;
+        grid-row: 2;
+        max-width: 500px;
+        margin: 8px 0 10px;
+        text-align: left;
+        font-size: 22px;
+      }
+      #intro-screen > .rules-link { grid-column: 1; grid-row: 3; justify-self: start; margin-left: 0; }
+      #intro-screen > .panel { grid-column: 2; grid-row: 1 / span 3; align-self: center; width: 100%; }
+      #intro-screen > .tiny-note { grid-column: 1 / -1; grid-row: 4; margin-top: 30px; }
+
+      #tiers-screen { width: min(100%, 1240px); margin: 0 auto; }
+      .tier-list {
+        grid-auto-flow: row;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        grid-auto-columns: auto;
+        gap: 18px;
+        margin: 0;
+        padding: 18px 0 28px;
+        overflow: visible;
+        scroll-snap-type: none;
+      }
+      .tier-card { min-height: 286px; }
+
+      #custom-screen,
+      #lobby-screen { width: min(100%, 820px); margin: 0 auto; }
+      .custom-options { grid-template-columns: 1fr 1fr; }
+      .custom-option:last-child { grid-column: 1 / -1; }
+
+      .game-screen { padding-left: clamp(32px, 5vw, 78px); padding-right: clamp(32px, 5vw, 78px); }
+      .game-viewport {
+        width: min(100%, 1220px);
+        min-height: calc(100dvh - clamp(56px, 8vh, 96px));
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: minmax(500px, 1.35fr) minmax(350px, .85fr);
+        grid-template-rows: auto auto auto auto auto auto auto minmax(76px, 1fr);
+        align-content: start;
+        column-gap: clamp(24px, 3vw, 42px);
+      }
+      .game-viewport > .topbar { grid-column: 1 / -1; grid-row: 1; }
+      .game-viewport > .listing-card { grid-column: 1; grid-row: 2 / span 7; align-self: start; }
+      .game-viewport > .ready-panel,
+      .game-viewport > .auction-wrap { grid-column: 2; grid-row: 2; margin-top: 0; }
+      .game-viewport > .buy-button { grid-column: 2; grid-row: 3; margin-top: 12px; }
+      .game-viewport > .buy-help { grid-column: 2; grid-row: 4; }
+      .game-viewport > .skip-listing-button { grid-column: 2; grid-row: 5; }
+      .game-viewport > .skip-end-button { grid-column: 2; grid-row: 6; }
+      .game-viewport > .balances-heading { grid-column: 2; grid-row: 7; }
+      .game-viewport > .player-rail { grid-column: 2; grid-row: 8; }
+      .photo-grid { height: clamp(390px, 55vh, 610px); }
+      #game-back { margin-top: 28px !important; }
+
+      .final-screen { align-items: center; }
+      .final-screen > * { width: min(100%, 760px); }
+
       .countdown-overlay,
       .result-overlay,
       .halfway-overlay {
-        inset: 18px auto;
-        left: 50%;
-        width: clamp(390px, 58vw, 520px);
-        min-height: calc(100dvh - 36px);
-        border-radius: 31px;
-        transform: translateX(-50%);
+        inset: 0;
+        left: 0;
+        width: 100%;
+        min-height: 100dvh;
+        border-radius: 0;
+        transform: none;
       }
+      .result-card,
+      .halfway-card { width: min(100%, 520px); }
     }
 
     @media (prefers-reduced-motion: reduce) {
