@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-  <meta name="theme-color" content="#183b4d">
+  <meta name="theme-color" content="#f3f5f4">
   <meta name="robots" content="noindex,nofollow,noarchive">
   <title>KLITKA — gra o patodeweloperce</title>
   <style>
@@ -897,6 +897,229 @@
     .standing-meta { margin-top: 2px; color: var(--muted); font-size: 9px; font-weight: 850; }
     .standing-income { text-align: right; font-size: 16px; font-weight: 1000; }
     .standing-income small { display: block; color: var(--muted); font-size: 8px; text-transform: uppercase; }
+
+    /* Matowy, zabawkowy system powierzchni. Bez szkła i bez ruchomych refleksów. */
+    :root {
+      --cream: #f3f5f4;
+      --paper: #f7f7f2;
+      --yellow: #f4c92f;
+      --red: #df594c;
+      --red-dark: #b43d34;
+      --blue: #4e78b7;
+      --green: #49a66f;
+      --green-dark: #226b46;
+      --muted: #65716e;
+      --line: #d0d4cd;
+      --surface: #eeefe9;
+      --surface-edge: #c8cbc3;
+      --shadow: 0 5px 0 var(--surface-edge), 0 10px 20px rgba(38,47,42,.12);
+      --radius: 20px;
+    }
+
+    body { background: #e3e7e4; }
+    .app { background: var(--cream); box-shadow: 0 0 42px rgba(38,47,42,.16); }
+    .screen { background: var(--cream); }
+    .game-screen { background: #edf0ed; }
+
+    .panel,
+    .custom-option,
+    .listing-card,
+    .ready-panel,
+    .result-card,
+    .halfway-card {
+      background: var(--surface);
+      border: 1px solid rgba(74,82,78,.1);
+      border-radius: var(--radius);
+      box-shadow:
+        0 5px 0 var(--surface-edge),
+        0 10px 20px rgba(38,47,42,.12),
+        inset 0 1px 0 rgba(255,255,255,.52);
+    }
+
+    .identity-block {
+      background: var(--surface);
+      border-bottom-color: rgba(74,82,78,.13);
+      border-radius: var(--radius) var(--radius) 0 0;
+    }
+    #intro-screen .identity-block > .label,
+    #intro-screen .join-box > .label { text-align: center; }
+
+    .join-box {
+      background: #e5e7e1;
+      border: 1px solid rgba(55,64,59,.08);
+      border-radius: 15px;
+      box-shadow: inset 0 2px 0 rgba(0,0,0,.07);
+    }
+    .entry-divider::before,
+    .entry-divider::after { background: rgba(71,79,75,.18); }
+
+    .text-input,
+    .custom-option select {
+      background: #f7f7f2;
+      border: 2px solid rgba(55,64,59,.13);
+      border-radius: 15px;
+      box-shadow: inset 0 3px 0 rgba(0,0,0,.1);
+    }
+    .text-input:focus,
+    .custom-option select:focus {
+      border-color: var(--yellow);
+      box-shadow: inset 0 3px 0 rgba(0,0,0,.1), 0 0 0 3px rgba(244,201,47,.28);
+    }
+
+    .rules-link {
+      color: var(--ink);
+      text-decoration-color: var(--yellow);
+      text-decoration-thickness: 3px;
+    }
+
+    .primary, .secondary, .danger, .ghost {
+      --button-bg: var(--yellow);
+      --button-fg: #202620;
+      min-height: 58px;
+      color: var(--button-fg);
+      background: var(--button-bg);
+      border: 0;
+      border-radius: 18px;
+      font-weight: 900;
+      box-shadow:
+        inset 0 2px 0 rgba(255,255,255,.16),
+        0 6px 0 color-mix(in srgb, var(--button-bg) 72%, black),
+        0 10px 14px rgba(29,37,33,.15);
+      transform: translateY(0) scale(1);
+      transition:
+        transform .22s cubic-bezier(.175,.885,.32,1.15),
+        box-shadow .22s cubic-bezier(.175,.885,.32,1.15),
+        opacity .15s ease,
+        background-color .15s ease;
+    }
+    .secondary { --button-bg: var(--blue); --button-fg: #fff; }
+    .danger { --button-bg: var(--red); --button-fg: #fff; }
+    .ghost { --button-bg: #dfe3dd; --button-fg: var(--ink); }
+    .primary:active:not(:disabled),
+    .secondary:active:not(:disabled),
+    .danger:active:not(:disabled),
+    .ghost:active:not(:disabled) {
+      transform: translateY(5px) scale(.985);
+      box-shadow:
+        inset 0 3px 2px rgba(0,0,0,.1),
+        0 1px 0 color-mix(in srgb, var(--button-bg) 72%, black),
+        0 3px 6px rgba(29,37,33,.12);
+      transition-duration: .07s;
+    }
+    .primary:disabled,
+    .secondary:disabled,
+    .danger:disabled,
+    .ghost:disabled {
+      box-shadow: 0 3px 0 color-mix(in srgb, var(--button-bg) 72%, black);
+      transform: none;
+    }
+    .skip-end-button,
+    .skip-listing-button,
+    #tiers-back,
+    #custom-back,
+    #leave-lobby,
+    #game-back,
+    #add-bot-button {
+      min-height: 40px;
+      border-radius: 13px;
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.18),
+        0 3px 0 color-mix(in srgb, var(--button-bg) 72%, black),
+        0 6px 9px rgba(29,37,33,.1);
+    }
+    #join-button {
+      min-height: 50px;
+      height: 50px;
+      border-radius: 13px;
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.18),
+        0 4px 0 color-mix(in srgb, var(--button-bg) 72%, black),
+        0 7px 10px rgba(29,37,33,.1);
+    }
+
+    .tier-card {
+      background: var(--paper);
+      border: 1px solid rgba(74,82,78,.12);
+      border-radius: 19px;
+      box-shadow:
+        0 5px 0 color-mix(in srgb, var(--blue) 28%, #bfc4bd),
+        0 9px 15px rgba(38,47,42,.12),
+        inset 0 1px 0 rgba(255,255,255,.55);
+      transition: transform .22s cubic-bezier(.175,.885,.32,1.15), box-shadow .22s cubic-bezier(.175,.885,.32,1.15);
+    }
+    .tier-card:active:not(:disabled) {
+      transform: translateY(4px) scale(.99);
+      box-shadow: 0 1px 0 color-mix(in srgb, var(--blue) 28%, #bfc4bd), 0 3px 6px rgba(38,47,42,.1);
+    }
+    .tier-card.is-cleared { background: #dcefe2; border-color: #aacdb6; }
+
+    .code-card {
+      background: #29475b;
+      border-radius: 18px;
+      box-shadow: 0 6px 0 #172c39, 0 10px 17px rgba(29,37,33,.16), inset 0 2px 0 rgba(255,255,255,.1);
+    }
+    .lobby-player,
+    .player-card,
+    .standing {
+      background: var(--paper);
+      border: 1px solid rgba(74,82,78,.11);
+      border-radius: 14px;
+      box-shadow: 0 3px 0 #d4d7d0, 0 6px 10px rgba(38,47,42,.08);
+    }
+    .player-card.me { background: #e4ecf8; border-color: #a9bfdf; }
+    .standing:first-child { background: #dcefe2; border-color: #aacdb6; }
+
+    .player-count-control button,
+    .divide-option {
+      --button-bg: #dfe3dd;
+      color: var(--ink);
+      background: var(--button-bg);
+      border: 0;
+      border-radius: 14px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.2), 0 4px 0 color-mix(in srgb, var(--button-bg) 72%, black), 0 7px 10px rgba(29,37,33,.11);
+      font-weight: 900;
+      transition: transform .2s cubic-bezier(.175,.885,.32,1.15), box-shadow .2s cubic-bezier(.175,.885,.32,1.15);
+    }
+    .player-count-control button:active:not(:disabled),
+    .divide-option:active:not(:disabled) {
+      transform: translateY(3px) scale(.985);
+      box-shadow: 0 1px 0 color-mix(in srgb, var(--button-bg) 72%, black), 0 3px 5px rgba(29,37,33,.1);
+    }
+
+    .listing-card { overflow: hidden; }
+    .photo-grid { background: #d8ddd9; }
+    .location-strip,
+    .divisible-badge {
+      border-radius: 10px;
+      box-shadow: 0 3px 0 rgba(29,37,33,.24), 0 6px 9px rgba(29,37,33,.13);
+    }
+    .fact.rent { background: #dfeee4; }
+    .ready-chip { background: #f7f7f2; border-color: #cfd4cd; box-shadow: 0 2px 0 #d1d4ce; }
+    .ready-chip.ready { background: #bce4c8; }
+    .ready-button.is-ready { --button-bg: #8fcba0; }
+
+    .auction-wrap {
+      background: #25343d;
+      border-radius: 19px;
+      box-shadow: 0 6px 0 #152027, 0 10px 16px rgba(17,31,39,.18), inset 0 2px 0 rgba(255,255,255,.08);
+    }
+    .buy-button { --button-bg: var(--red); --button-fg: #fff; }
+    .buy-button::after { display: none; animation: none; }
+
+    .countdown-overlay,
+    .result-overlay,
+    .halfway-overlay {
+      background: rgba(29,34,31,.8);
+      backdrop-filter: none;
+    }
+    .purchase-debit,
+    .final-market-note {
+      background: #f8dfdb;
+      border-color: var(--red);
+      box-shadow: inset 0 2px 0 rgba(0,0,0,.06);
+    }
+    .debit-flyer { box-shadow: 0 5px 0 color-mix(in srgb, var(--red) 72%, black), 0 9px 13px rgba(23,23,18,.28); }
+    .final-screen { background: #edf1ed; }
 
 
     @media (max-height: 760px) {
