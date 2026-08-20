@@ -943,6 +943,8 @@
     }
     #intro-screen .identity-block > .label,
     #intro-screen .join-box > .label { text-align: center; }
+    #name-input,
+    #join-code { text-align: center; }
 
     .join-box {
       background: #e5e7e1;
@@ -1038,6 +1040,8 @@
     }
 
     .tier-card {
+      align-items: center;
+      text-align: center;
       background: var(--paper);
       border: 1px solid rgba(74,82,78,.12);
       border-radius: 19px;
@@ -1047,11 +1051,20 @@
         inset 0 1px 0 rgba(255,255,255,.55);
       transition: transform .22s cubic-bezier(.175,.885,.32,1.15), box-shadow .22s cubic-bezier(.175,.885,.32,1.15);
     }
+    .tier-card-city-row { width: 100%; justify-content: center; }
+    .tier-card-landmark,
+    .tier-card-desc,
+    .tier-card-record,
+    .tier-card-status { width: 100%; text-align: center; }
     .tier-card:active:not(:disabled) {
       transform: translateY(4px) scale(.99);
       box-shadow: 0 1px 0 color-mix(in srgb, var(--blue) 28%, #bfc4bd), 0 3px 6px rgba(38,47,42,.1);
     }
     .tier-card.is-cleared { background: #dcefe2; border-color: #aacdb6; }
+    #tiers-screen > .lobby-title,
+    #tiers-screen > .lobby-title + p,
+    #lobby-screen > .lobby-title,
+    #lobby-subtitle { text-align: center; }
 
     .code-card {
       background: #29475b;
